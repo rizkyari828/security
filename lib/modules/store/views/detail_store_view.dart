@@ -286,10 +286,10 @@ class StoreDetailView extends GetView<StoreDetailController> {
                     : Container(
                         height: 70,
                         width: 70,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.blueAccent,
-                        ),
+                         decoration: BoxDecoration(
+                           borderRadius: BorderRadius.circular(10),
+                           color: ColorConstants.secondaryAppColor,
+                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Image.network(
@@ -385,10 +385,10 @@ class StoreDetailView extends GetView<StoreDetailController> {
                     : Container(
                         height: 70,
                         width: 70,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.blueAccent,
-                        ),
+                         decoration: BoxDecoration(
+                           borderRadius: BorderRadius.circular(10),
+                           color: ColorConstants.secondaryAppColor,
+                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Image.network(

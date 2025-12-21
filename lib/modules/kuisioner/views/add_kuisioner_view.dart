@@ -282,25 +282,26 @@ class SingleChoice extends GetView<KusionerController> {
               // Hanya tampilkan pilihan jika answer masih kosong
               if (answer == '')
                 Obx(() {
-                  return Column(
-                    children: options
-                        .where((option) => option.trim().isNotEmpty)
-                        .map((option) {
-                      return RadioListTile<String>(
-                        title: CommonWidget.bodyText(text: option),
-                        value: option,
-                        groupValue: controller.answers[idSoal.toString()],
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.setAnswer(
-                              idSoal.toString(),
-                              idKategori.toString(),
-                              value,
-                            );
-                          }
-                        },
+                  return RadioGroup<String>(
+                    groupValue: controller.answers[idSoal.toString()],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      controller.setAnswer(
+                        idSoal.toString(),
+                        idKategori.toString(),
+                        value,
                       );
-                    }).toList(),
+                    },
+                    child: Column(
+                      children: options
+                          .where((option) => option.trim().isNotEmpty)
+                          .map((option) {
+                        return RadioListTile<String>(
+                          title: CommonWidget.bodyText(text: option),
+                          value: option,
+                        );
+                      }).toList(),
+                    ),
                   );
                 }),
               // Jika sudah ada jawaban, bisa tampilkan info jawaban atau kosongkan saja

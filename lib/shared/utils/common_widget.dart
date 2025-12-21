@@ -431,10 +431,10 @@ class CommonWidget {
               : percentage < 0.5
                   ? Colors.orange
                   : percentage < 0.75
-                      ? Colors.amber
-                      : percentage < 1.0
-                          ? Colors.blue
-                          : Colors.green,
+                       ? Colors.amber
+                       : percentage < 1.0
+                           ? ColorConstants.secondaryAppColor
+                           : Colors.green,
         ),
         SizedBox(height: 20.0),
         Divider(

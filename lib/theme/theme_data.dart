@@ -45,7 +45,7 @@ class ThemeConfig {
         cursorColor: accentColor,
       ),
       appBarTheme: AppBarTheme(
-        color: cardBackground,
+        backgroundColor: cardBackground,
         iconTheme: IconThemeData(
           color: secondaryText,
         ),

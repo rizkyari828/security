@@ -71,18 +71,29 @@ void main() async {
     );
   }
   GetStorage.init();
-  await initializeDateFormatting('id_ID', "").then((_) => runApp(App()));
+  await initializeDateFormatting('id_ID', "").then((_) => runApp(const App()));
   configLoading();
   
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   // final List<FirebaseMessage> messageList = [];
+
+  const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  @override
+  void initState() {
+    super.initState();
+    initFCM();
+  }
 
   @override
   Widget build(BuildContext context) {
-    initFCM();
-
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       enableLog: true,
@@ -117,7 +128,9 @@ void configLoading() {
     ..animationStyle = EasyLoadingAnimationStyle.scale;
 }
 
-void initFCM() async {
+Future<void> initFCM() async {
+  if (Firebase.apps.isEmpty) return;
+
   // if (StringUtils.isEmpty(_userData.token)) return; // stop
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 

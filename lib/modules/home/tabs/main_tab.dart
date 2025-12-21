@@ -917,7 +917,7 @@ class MainTab extends GetView<HomeController> {
                                 width: 70,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: Colors.blueAccent,
+                                  color: ColorConstants.secondaryAppColor,
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
@@ -1053,10 +1053,10 @@ class MainTab extends GetView<HomeController> {
                       : Container(
                           height: 35,
                           width: 35,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.blueAccent,
-                          ),
+                           decoration: BoxDecoration(
+                             borderRadius: BorderRadius.circular(10),
+                             color: ColorConstants.secondaryAppColor,
+                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: Image.network(

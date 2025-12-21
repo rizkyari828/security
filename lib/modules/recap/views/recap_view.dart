@@ -58,7 +58,7 @@ class RecapView extends GetView<RecapController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Obx(() => Container(
-                        color: Colors.blue.shade50,
+                        color: ColorConstants.blueBackground,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Row(
@@ -126,7 +126,8 @@ class RecapView extends GetView<RecapController> {
                         ),
                       )),
                   Container(
-                    color: Colors.blue.shade200,
+                    color:
+                        CommonWidget.setOpacity(ColorConstants.secondaryAppColor, 0.25),
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Container(

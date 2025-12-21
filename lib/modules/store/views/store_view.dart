@@ -104,7 +104,7 @@ class StoreView extends GetView<StoreListController> {
       iconColor = Colors.deepPurple;
     } else {
       iconData = Icons.assignment_turned_in;
-      iconColor = Colors.blue;
+      iconColor = ColorConstants.secondaryAppColor;
     }
     return Padding(
       padding: const EdgeInsets.only(left: 20.0, bottom: 10, top: 10),
@@ -203,10 +203,10 @@ class StoreView extends GetView<StoreListController> {
                             : Container(
                                 height: 70,
                                 width: 70,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.blueAccent,
-                                ),
+                                 decoration: BoxDecoration(
+                                   borderRadius: BorderRadius.circular(10),
+                                   color: ColorConstants.secondaryAppColor,
+                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.network(

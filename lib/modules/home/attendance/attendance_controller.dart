@@ -503,9 +503,9 @@ class AttendanceController extends FaceRecognitionController {
         circleId: CircleId('A1'),
         center: _myOffice,
         radius: 150,
-        fillColor: CommonWidget.setOpacity(Colors.blueAccent, 0.9),
+        fillColor: CommonWidget.setOpacity(ColorConstants.secondaryAppColor, 0.9),
         strokeWidth: 3,
-        strokeColor: CommonWidget.setOpacity(Colors.blueAccent, 0.9),
+        strokeColor: CommonWidget.setOpacity(ColorConstants.secondaryAppColor, 0.9),
       ));
 
       if (res?.data?.first.flag == "1") {

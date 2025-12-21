@@ -53,7 +53,7 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _cardMenu("Hari Ini", () {}, Colors.blue),
+                          _cardMenu("Hari Ini", () {}, ColorConstants.secondaryAppColor),
                           _cardMenu("Minggu Ini", () {}, Colors.grey),
                           _cardMenu("Bulan Ini", () {}, Colors.grey),
                         ],
