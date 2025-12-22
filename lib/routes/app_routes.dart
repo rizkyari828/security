@@ -44,4 +44,7 @@ abstract class Routes {
   static const AGENT = '/agent';
   static const DETAIL_AGENT = '/detail-agent';
   static const ADD_AGENT = '/add-agent';
+  static const SHIFT_SWAP = '/shift-swap';
+  static const CLAIM = '/claim';
+  static const PAYSLIP = '/payslip';
 }

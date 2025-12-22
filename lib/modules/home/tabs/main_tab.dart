@@ -1,4 +1,4 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -9,7 +9,6 @@ import 'package:sales/shared/utils/common_widget.dart';
 import 'package:sales/shared/utils/network_checker.dart';
 import 'package:sales/shared/utils/size_config.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class MainTab extends GetView<HomeController> {
   @override
@@ -17,52 +16,46 @@ class MainTab extends GetView<HomeController> {
     double scaleWidth = MediaQuery.of(context).size.width / 360;
     controller.context = context;
     controller.showMoodDialogOncePerDay(context);
-    return Obx(() => Scaffold(
+    return Obx(
+      () => Scaffold(
         floatingActionButton: controller.isConnectedToInternetWidget.value
             ? Padding(
                 padding: EdgeInsets.only(left: scaleWidth * 30),
                 child: controller.internetConnection(),
               )
             : SizedBox(),
-        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
+        backgroundColor: ColorConstants.lightGray,
         body: controller.tipeUser.value == '1'
             ? _buildGridView(scaleWidth, context, controller)
-            : _getItems(controller, context)));
+            : _getItems(controller, context),
+      ),
+    );
   }
 
   Widget _buildGridView(scaleWidth, context, HomeController controller) {
     final sw = SizeConfig().screenWidth;
-    List<Widget> rows = [];
     final menus = controller.visibleMenus;
-    const cardsPerRow = 3;
-    final spacing = CommonWidget.rowWidth(width: sw * .03);
+    const cardsPerRow = 4;
+    final contentWidth = sw * 0.92; // karena container margin kiri/kanan = 4%
+    final spacing = contentWidth * 0.03;
+    final tileWidth =
+        (contentWidth - (spacing * (cardsPerRow - 1))) / cardsPerRow;
 
-    for (int i = 0; i < menus.length; i += cardsPerRow) {
-      final rowMenus = menus.skip(i).take(cardsPerRow).toList();
-
-      // Sisipkan spacer di antara card menu
-      List<Widget> rowChildren = [];
-      for (int j = 0; j < rowMenus.length; j++) {
-        rowChildren.add(_cardMenu(
-          rowMenus[j]['icon'],
-          rowMenus[j]['title'],
-          rowMenus[j]['onPressed'],
-          rowMenus[j]['color'],
-        ));
-        // Tambahkan spacer kecuali setelah card terakhir
-        if (j != rowMenus.length - 1) {
-          rowChildren.add(spacing);
-        }
-      }
-
-      rows.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: rowChildren,
-        ),
-      );
-      rows.add(CommonWidget.rowHeight());
-    }
+    final quickActionsGrid = Wrap(
+      spacing: spacing,
+      runSpacing: spacing,
+      children: menus
+          .map(
+            (menu) => _cardMenu(
+              menu['icon'],
+              menu['title'],
+              menu['onPressed'],
+              menu['color'],
+              width: tileWidth,
+            ),
+          )
+          .toList(),
+    );
 
     final sh = SizeConfig().screenHeight;
     return SingleChildScrollView(
@@ -70,8 +63,11 @@ class MainTab extends GetView<HomeController> {
         children: [
           controller.tipeUser.value == "1"
               ? Container(
-                  margin:
-                      EdgeInsets.only(left: sw * .04, right: sw * .04, top: 0),
+                  margin: EdgeInsets.only(
+                    left: sw * .04,
+                    right: sw * .04,
+                    top: 0,
+                  ),
                   child: Column(
                     children: [
                       CommonWidget.rowHeight(),
@@ -83,9 +79,24 @@ class MainTab extends GetView<HomeController> {
                       // dailyProgress(),
                       // attendanceTask(),
                       // CommonWidget.rowHeight(),
-                      Container(
-                          height: sh * .26, child: _getSlideImage(controller)),
-                      ...rows,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                        child: _attendanceInfoCard(context),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 6.0,
+                            bottom: 10.0,
+                          ),
+                          child: CommonWidget.minHeadText(
+                            text: 'Aksi Cepat',
+                            color: ColorConstants.black,
+                          ),
+                        ),
+                      ),
+                      quickActionsGrid,
                       // Row(
                       //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       //   children: [
@@ -146,21 +157,17 @@ class MainTab extends GetView<HomeController> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Padding(
-                          padding:
-                              const EdgeInsets.only(bottom: 15.0, left: 10),
+                          padding: const EdgeInsets.only(
+                            bottom: 15.0,
+                            left: 10,
+                          ),
                           child: CommonWidget.minHeadText(
-                              text: 'Ringkasan', color: ColorConstants.black),
+                            text: 'Ringkasan',
+                            color: ColorConstants.black,
+                          ),
                         ),
                       ),
-                      controller.menuBenefit.value == false
-                          ? _eventMenu(context, multipleColumn: false)
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _benefitMenu(context),
-                                _eventMenu(context),
-                              ],
-                            ),
+                      _securitySummaryRow(),
                       CommonWidget.rowHeight(height: sh * 0.01),
                       // _statusTaskBar(),
                       CommonWidget.rowHeight(),
@@ -168,8 +175,11 @@ class MainTab extends GetView<HomeController> {
                   ),
                 )
               : Container(
-                  margin:
-                      EdgeInsets.only(left: sw * .04, right: sw * .04, top: 0),
+                  margin: EdgeInsets.only(
+                    left: sw * .04,
+                    right: sw * .04,
+                    top: 0,
+                  ),
                   child: Column(
                     children: [
                       CommonWidget.rowHeight(),
@@ -181,33 +191,7 @@ class MainTab extends GetView<HomeController> {
                       dailyProgress(),
                       attendanceTask(),
                       CommonWidget.rowHeight(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _cardMenu(Icons.store, "Kunjungan",
-                              controller.goToStorePages, Colors.indigo),
-                          CommonWidget.rowWidth(width: sw * .03),
-                          _cardMenu(Icons.search_rounded, "Leads",
-                              controller.goToLeadsPages, Colors.indigo),
-                        ],
-                      ),
-                      CommonWidget.rowHeight(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _cardMenu(Icons.work_rounded, "Lembur",
-                              controller.goToOvertimePages, Colors.indigo),
-                          CommonWidget.rowWidth(width: sw * .03),
-                          _cardMenu(Icons.airplane_ticket_rounded, "Cuti",
-                              controller.goToCutiPages, Colors.indigo),
-                          if (controller.groupId == '1') ...[
-                            CommonWidget.rowWidth(width: sw * .03),
-                            _cardMenu(Icons.assignment, "Kuisioner",
-                                controller.goToKuisionerPages, Colors.indigo),
-                          ]
-                        ],
-                      ),
-                      CommonWidget.rowHeight(),
+                      quickActionsGrid,
                     ],
                   ),
                 ),
@@ -220,9 +204,7 @@ class MainTab extends GetView<HomeController> {
     final sh = SizeConfig().screenHeight;
     final sw = SizeConfig().screenWidth;
     return Container(
-      margin: EdgeInsets.only(
-        top: sh / 20,
-      ),
+      margin: EdgeInsets.only(top: sh / 20),
       child: Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 10),
         child: Row(
@@ -231,9 +213,7 @@ class MainTab extends GetView<HomeController> {
               flex: 5,
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 10,
-                  ),
+                  SizedBox(width: 10),
                   CircleAvatar(
                     radius: 22,
                     backgroundColor: ColorConstants.mainColor,
@@ -243,18 +223,17 @@ class MainTab extends GetView<HomeController> {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Center(
-                              child: Icon(
-                            Icons.person,
-                            size: 32,
-                            color: ColorConstants.white,
-                          ));
+                            child: Icon(
+                              Icons.person,
+                              size: 32,
+                              color: ColorConstants.white,
+                            ),
+                          );
                         },
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 10,
-                  ),
+                  SizedBox(width: 10),
                   Container(
                     width: sw / 3,
                     child: Column(
@@ -274,8 +253,9 @@ class MainTab extends GetView<HomeController> {
                               .ellipsis, // tambahkan "..." jika teks terlalu panjang
                         ),
                         CommonWidget.subtitleText(
-                            text: controller.idPegawai.value,
-                            color: ColorConstants.black),
+                          text: controller.idPegawai.value,
+                          color: ColorConstants.black,
+                        ),
                       ],
                     ),
                   ),
@@ -285,23 +265,27 @@ class MainTab extends GetView<HomeController> {
             Row(
               children: [
                 InkWell(
-                    onTap: controller.goToNotificationPages,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: ColorConstants.mainColor,
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(
-                            width: 2.0, color: ColorConstants.borderColor),
+                  onTap: controller.goToNotificationPages,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: ColorConstants.mainColor,
+                      borderRadius: BorderRadius.circular(10.0),
+                      border: Border.all(
+                        width: 2.0,
+                        color: ColorConstants.borderColor,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Icon(Icons.notifications,
-                            color: ColorConstants.white, size: 27),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.notifications,
+                        color: ColorConstants.white,
+                        size: 27,
                       ),
-                    )),
-                SizedBox(
-                  width: 3,
+                    ),
+                  ),
                 ),
+                SizedBox(width: 3),
                 // controller.tipe.value == "2"
                 //     ? InkWell(
                 //         onTap: controller.dialogConfirmation,
@@ -324,9 +308,7 @@ class MainTab extends GetView<HomeController> {
                 // SizedBox(
                 //   width: 3,
                 // ),
-                NetworkChecker.networkMeter(
-                  controller.qualityNetwork,
-                )
+                NetworkChecker.networkMeter(controller.qualityNetwork),
               ],
             ),
           ],
@@ -335,221 +317,269 @@ class MainTab extends GetView<HomeController> {
     );
   }
 
-  Widget _benefitMenu(context) {
+  Widget _securitySummaryRow() {
     final sw = SizeConfig().screenWidth;
-    return InkWell(
-      onTap: () => controller.goToBenefitPages(),
-      child: Container(
-          width: sw / 2.3,
-          decoration: BoxDecoration(
-            color: ColorConstants.white,
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(width: 2.0, color: ColorConstants.borderColor),
-          ),
-          child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(children: [
-                CommonWidget.bodyText(
-                    text: 'Benefit'.toUpperCase(), color: ColorConstants.black),
-                CommonWidget.rowHeight(),
-                Icon(
-                  Icons.attach_money_rounded,
-                  size: 50,
-                  color: Colors.orange,
-                ),
-                CommonWidget.rowHeight(),
-                CommonWidget.subtitleText(
-                    text: (controller.benefitDashboard.value?.nominal
-                            .toString() ??
-                        "0")),
-                CommonWidget.rowHeight(height: 8.0),
-                CommonWidget.subtitleText(
-                  text:
-                      '${DateFormat("MMMM, yyyy", "en_EN").format(DateTime.now())}',
-                ),
-                CommonWidget.rowHeight(),
-              ]))),
-    );
-  }
-
-  Widget _eventMenu(context, {bool multipleColumn = true}) {
-    final sw = SizeConfig().screenWidth;
-    return InkWell(
-      onTap: () => controller.goToEventPages(),
-      child: Container(
-          width: !multipleColumn ? sw : sw / 2.3,
-          decoration: BoxDecoration(
-            color: ColorConstants.white,
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(width: 2.0, color: ColorConstants.borderColor),
-          ),
-          child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: multipleColumn == true
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                          CommonWidget.bodyText(
-                              text: 'Event'.toUpperCase(),
-                              color: ColorConstants.black),
-                          CommonWidget.rowHeight(),
-                          Icon(
-                            Icons.calendar_month_rounded,
-                            size: 50,
-                            color: Colors.cyan,
-                          ),
-                          CommonWidget.rowHeight(),
-                          CommonWidget.subtitleText(
-                              text: controller.benefitDashboard.value?.event ==
-                                      ""
-                                  ? 'Tidak ada event'
-                                  : controller.benefitDashboard.value?.event ??
-                                      'Tidak ada event'),
-                          CommonWidget.rowHeight(height: 8.0),
-                          CommonWidget.subtitleText(
-                              text: controller.dateNow.value),
-                          CommonWidget.rowHeight(),
-                        ])
-                  : Column(
-                      children: [
-                        CommonWidget.bodyText(
-                            text: 'Event'.toUpperCase(),
-                            color: ColorConstants.black),
-                        // CommonWidget.rowHeight(height: 5),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Column(
-                                children: [
-                                  Icon(
-                                    Icons.calendar_month_rounded,
-                                    size: 50,
-                                    color: Colors.cyan,
-                                  ),
-                                ],
-                              ),
-                              CommonWidget.rowWidth(),
-                              Column(
-                                children: [
-                                  CommonWidget.rowHeight(),
-                                  CommonWidget.subtitleText(
-                                      text: controller.benefitDashboard.value
-                                                  ?.event ==
-                                              ""
-                                          ? 'Tidak ada event'
-                                          : controller.benefitDashboard.value
-                                                  ?.event ??
-                                              'Tidak ada event'),
-                                  CommonWidget.rowHeight(height: 8.0),
-                                  CommonWidget.subtitleText(
-                                      text: controller.dateNow.value),
-                                  CommonWidget.rowHeight(),
-                                ],
-                              ),
-                            ]),
-                      ],
-                    ))),
-    );
-  }
-
-  Widget _statusTaskBar() {
-    return InkWell(
-      onTap: () => controller.goToLemburPages(controller.monthInt, "now", '3',
-          needBack: false),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(width: 2.0, color: ColorConstants.borderColor),
-        ),
-        height: SizeConfig().screenHeight / 9,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CommonWidget.rowHeight(height: 8.0),
-            Padding(
-              padding: const EdgeInsets.only(left: 25.0),
-              child: CommonWidget.bodyText(
-                  text: 'Data Booking'.toUpperCase(),
-                  color: ColorConstants.black),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 5.0),
-              child: ListTile(
-                leading: Container(
-                  decoration: new BoxDecoration(
-                    color: ColorConstants.mainColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.library_books_rounded,
-                      color: Colors.white,
-                      size: SizeConfig().screenWidth * .06,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: _summaryCard(
+            title: 'Patroli',
+            icon: Icons.shield_rounded,
+            color: ColorConstants.mainColor,
+            child: Obx(() {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${controller.dailyProgressCount.value}',
+                    style: TextStyle(
+                      color: ColorConstants.black,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 22,
+                      letterSpacing: 0.2,
+                      fontFamily: 'Poppins',
                     ),
                   ),
+                  CommonWidget.captionText(
+                    text: 'Hari ini',
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '${controller.montlyProgressCount.value}',
+                    style: TextStyle(
+                      color: ColorConstants.black,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 18,
+                      letterSpacing: 0.2,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  CommonWidget.captionText(
+                    text: 'Bulan ini',
+                    color: Colors.grey,
+                  ),
+                ],
+              );
+            }),
+            onTap: controller.goToPatroliPages,
+          ),
+        ),
+        CommonWidget.rowWidth(width: sw * .03),
+        Expanded(
+          child: _summaryCard(
+            title: 'Pending Upload',
+            icon: Icons.cloud_upload_rounded,
+            color: (controller.pendingAttendanceCount > 0)
+                ? Colors.orange
+                : Colors.green,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${controller.pendingAttendanceCount}',
+                  style: TextStyle(
+                    color: ColorConstants.black,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
+                    letterSpacing: 0.2,
+                    fontFamily: 'Poppins',
+                  ),
                 ),
-                title: Row(
-                  children: [
-                    CommonWidget.headText(
-                        text:
-                            "${controller.benefitDashboard.value?.jumlahBoking ?? 0} ",
-                        color: ColorConstants.mainColor),
-                    CommonWidget.subtitleText(
-                        text: "Dari bulan kemarin",
-                        color: ColorConstants.black),
-                  ],
+                CommonWidget.captionText(
+                  text: 'data belum terkirim',
+                  color: Colors.grey,
                 ),
-              ),
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: CommonWidget.setOpacity(
+                      ColorConstants.mainColor,
+                      0.10,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      width: 1,
+                      color: CommonWidget.setOpacity(
+                        ColorConstants.mainColor,
+                        0.22,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'KIRIM',
+                        style: TextStyle(
+                          color: ColorConstants.mainColor,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11,
+                          letterSpacing: 0.4,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 16,
+                        color: ColorConstants.mainColor,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+            onTap: () async {
+              if (controller.pendingAttendanceCount == 0) return;
+              await controller.submitPendingAttendance();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _summaryCard({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required Widget child,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(width: 1.0, color: ColorConstants.borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: CommonWidget.setOpacity(Colors.black, 0.06),
+              blurRadius: 14.0,
+              spreadRadius: 1.0,
+              offset: const Offset(0.0, 8.0),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w800,
+                    fontSize: 11,
+                    letterSpacing: 0.6,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: CommonWidget.setOpacity(color, 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, size: 18, color: color),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            child,
           ],
         ),
       ),
     );
   }
 
-  Widget _cardMenu(icon, String title, onPressed, Color colorCircle) {
-    return Expanded(
+  Widget _cardMenu(
+    icon,
+    String title,
+    onPressed,
+    Color colorCircle, {
+    double? width,
+  }) {
+    final isCompact = (width ?? 0) > 0 && (width ?? 0) < 102;
+    final iconBgSize = isCompact ? 44.0 : 52.0;
+    final iconSize = isCompact ? 24.0 : 28.0;
+    final fontSize = isCompact ? 10.0 : 12.0;
+    final padding = isCompact ? 8.0 : 10.0;
+    const gap = 8.0;
+    final minHeight = (padding * 2) + iconBgSize + gap + (fontSize * 2.8);
+    final baseHeight = (width ?? 0) > 0
+        ? (width! * (isCompact ? 1.15 : 1.22))
+        : SizeConfig().screenHeight * .14;
+    final height = math.max(baseHeight, minHeight);
+
+    return SizedBox(
+      width: width ?? (SizeConfig().screenWidth * .20),
+      height: height,
       child: Container(
         decoration: BoxDecoration(
-          color: CommonWidget.setOpacity(ColorConstants.cardColor, 0.9),
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(width: 2.0, color: ColorConstants.borderColor),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.0),
+          border: Border.all(width: 1.0, color: ColorConstants.borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: CommonWidget.setOpacity(Colors.black, 0.06),
+              blurRadius: 14.0,
+              spreadRadius: 1.0,
+              offset: const Offset(0.0, 8.0),
+            ),
+          ],
         ),
-        width: SizeConfig().screenWidth * .20,
-        height: SizeConfig().screenHeight * .13,
         child: InkWell(
+          borderRadius: BorderRadius.circular(14.0),
           onTap: () {
             onPressed();
           },
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(padding),
             child: Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    decoration: new BoxDecoration(
-                      color: colorCircle,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(
-                        icon,
-                        color: Colors.white,
-                        size: SizeConfig().screenWidth * .06,
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: iconBgSize,
+                        height: iconBgSize,
+                        decoration: BoxDecoration(
+                          color: CommonWidget.setOpacity(colorCircle, 0.12),
+                          shape: BoxShape.circle,
+                        ),
                       ),
+                      Icon(icon, color: colorCircle, size: iconSize),
+                    ],
+                  ),
+                  SizedBox(height: gap),
+                  Text(
+                    title.toUpperCase(),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colorCircle,
+                      fontWeight: FontWeight.w800,
+                      fontSize: fontSize,
+                      letterSpacing: isCompact ? 0.2 : 0.4,
+                      fontFamily: 'Poppins',
                     ),
                   ),
-                  SizedBox(height: SizeConfig().screenHeight * .01),
-                  CommonWidget.subtitleText(
-                      text: title.toUpperCase(),
-                      color: colorCircle,
-                      fontWeight: FontWeight.w500),
                 ],
               ),
             ),
@@ -563,85 +593,359 @@ class MainTab extends GetView<HomeController> {
     return controller.users.value == null ? [] : controller.users.value!.data;
   }
 
-  Widget _getSlideImage(HomeController controller) {
+  Widget _attendanceInfoCard(BuildContext context) {
     final sw = SizeConfig().screenWidth;
-    return CarouselSlider(
-      options: CarouselOptions(
-        enableInfiniteScroll: true,
-        autoPlay: true,
-        autoPlayInterval: Duration(seconds: 3),
-        autoPlayAnimationDuration: Duration(milliseconds: 800),
-        autoPlayCurve: Curves.fastOutSlowIn,
-        height: 400.0,
-        viewportFraction: 1,
-      ),
-      items: controller.listEvent.map((i) {
-        return Builder(
-          builder: (BuildContext context) {
-            return InkWell(
-              onTap: () {
-                controller.goToDetailEventPages(
-                  id: i.id.toString(),
-                );
-              },
-              child: Container(
-                width: sw,
-                // margin: const EdgeInsets.only(left: 15.0, right: 15.0),
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+    return Obx(() {
+      final isLoading = controller.attendanceInfoLoading.value;
+      final lateMinutes = controller.attendanceLateMinutes;
+      final hasSchedule = controller.attendanceSchedule.value != null;
+      final checkInDone = controller.attendanceCheckInLabel != '--:--';
+      final checkOutDone = controller.attendanceCheckOutLabel != '--:--';
+      final statusColor = !hasSchedule
+          ? Colors.grey
+          : (lateMinutes ?? 0) > 0
+          ? Colors.red
+          : (checkInDone && checkOutDone)
+          ? Colors.green
+          : ColorConstants.mainColor;
+      final String ctaText = !hasSchedule
+          ? 'Lihat Kehadiran'
+          : !checkInDone
+          ? 'Absen Masuk'
+          : !checkOutDone
+          ? 'Absen Pulang'
+          : 'Lihat Kehadiran';
+      final IconData ctaIcon = !hasSchedule
+          ? Icons.calendar_today_rounded
+          : !checkInDone
+          ? Icons.login_rounded
+          : !checkOutDone
+          ? Icons.logout_rounded
+          : Icons.arrow_forward_rounded;
+
+      final shiftLabelRaw = controller.attendanceShiftLabel;
+      final hasShiftTime = shiftLabelRaw != '--:-- - --:--';
+      final shiftLabel = !hasSchedule
+          ? 'Belum ada jadwal'
+          : hasShiftTime
+          ? shiftLabelRaw
+          : 'Shift belum tersedia';
+
+      final checkInColor = hasSchedule ? Colors.green : Colors.grey;
+      final checkOutColor = hasSchedule
+          ? ColorConstants.mainColor
+          : Colors.grey;
+      final lateColor = !hasSchedule
+          ? Colors.grey
+          : (lateMinutes ?? 0) > 0
+          ? Colors.red
+          : Colors.green;
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16.0),
+          onTap: controller.goToAbsensiPages,
+          child: Container(
+            width: sw,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.0),
+              color: Colors.white,
+              border: Border.all(width: 1.0, color: ColorConstants.borderColor),
+              boxShadow: [
+                BoxShadow(
+                  color: CommonWidget.setOpacity(Colors.black, 0.08),
+                  blurRadius: 18.0,
+                  spreadRadius: 2.0,
+                  offset: const Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
                       child: Container(
-                        width: sw,
-                        height: sw * .5,
-                        child: ClipRRect(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 2.0,
-                                  color: ColorConstants.borderColor),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                        width: 6,
+                        color: ColorConstants.mainColor,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                  child: isLoading
+                      ? SizedBox(
+                          height: 110,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: ColorConstants.mainColor,
+                                ),
                               ),
-                              color: Colors.black,
-                              image: new DecorationImage(
-                                fit: BoxFit.cover,
-                                // colorFilter: ColorFilter.mode(
-                                //     CommonWidget.setOpacity(Colors.black, 0.4),
-                                //     BlendMode.dstATop),
-                                image: new NetworkImage(
-                                  i.foto ?? '',
+                              const SizedBox(width: 10),
+                              CommonWidget.subtitleText(
+                                text: 'Memuat data kehadiran...',
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CommonWidget.captionText(
+                                        text: 'Kehadiran',
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        controller.attendanceDateLabel,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: ColorConstants.black,
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 14,
+                                          letterSpacing: 0.2,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                _pill(
+                                  text: shiftLabel,
+                                  color: hasSchedule
+                                      ? ColorConstants.mainColor
+                                      : Colors.grey,
+                                  icon: hasSchedule
+                                      ? Icons.schedule_rounded
+                                      : Icons.event_busy_rounded,
+                                ),
+                              ],
+                            ),
+                            if (hasSchedule) ...[
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline_rounded,
+                                    size: 16,
+                                    color: statusColor,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      controller.attendanceStatusLabel,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: statusColor,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                        letterSpacing: 0.2,
+                                        fontFamily: 'Poppins',
+                                      ),
+                                    ),
+                                  ),
+                                  if ((lateMinutes ?? 0) > 0) ...[
+                                    const SizedBox(width: 8),
+                                    _pill(
+                                      text: controller.attendanceLateLabel,
+                                      color: Colors.red,
+                                      icon: Icons.warning_rounded,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ],
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14.0),
+                                border: Border.all(
+                                  width: 1.0,
+                                  color: ColorConstants.borderColor,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _attendanceMetric(
+                                      icon: Icons.check_circle_rounded,
+                                      color: checkInColor,
+                                      label: 'Check In',
+                                      value: controller.attendanceCheckInLabel,
+                                      isDone: checkInDone,
+                                    ),
+                                  ),
+                                  _metricDivider(),
+                                  Expanded(
+                                    child: _attendanceMetric(
+                                      icon: Icons.access_time_filled_rounded,
+                                      color: checkOutColor,
+                                      label: 'Check Out',
+                                      value: controller.attendanceCheckOutLabel,
+                                      isDone: checkOutDone,
+                                    ),
+                                  ),
+                                  _metricDivider(),
+                                  Expanded(
+                                    child: _attendanceMetric(
+                                      icon: Icons.warning_rounded,
+                                      color: lateColor,
+                                      label: 'Terlambat',
+                                      value: controller.attendanceLateLabel,
+                                      isDone: lateMinutes != null,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 44,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ColorConstants.mainColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                onPressed: controller.goToAbsensiPages,
+                                icon: Icon(ctaIcon, size: 18),
+                                label: Text(
+                                  ctaText.toUpperCase(),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
+                                    letterSpacing: 0.4,
+                                    fontFamily: 'Poppins',
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(bottom: 40.0, left: 20),
-                    //   child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     mainAxisSize: MainAxisSize.max,
-                    //     mainAxisAlignment: MainAxisAlignment.end,
-                    //     children: [
-                    //       CommonWidget.bodyText(
-                    //           text: i.namaEvent ?? '', color: Colors.white),
-                    //       CommonWidget.bodyText(
-                    //           text: DateFormat("MMMM dd, yyyy", "en_EN")
-                    //               .format(i.tanggalAcara ?? DateTime.now())
-                    //               .toString(),
-                    //           color: Colors.white),
-                    //     ],
-                    //   ),
-                    // ),
-                  ],
                 ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _pill({
+    required String text,
+    required Color color,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: CommonWidget.setOpacity(color, 0.10),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(
+          width: 1.0,
+          color: CommonWidget.setOpacity(color, 0.22),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+                letterSpacing: 0.2,
+                fontFamily: 'Poppins',
               ),
-            );
-          },
-        );
-      }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _metricDivider() {
+    return Container(
+      width: 1,
+      height: 56,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      color: ColorConstants.borderColor,
+    );
+  }
+
+  Widget _attendanceMetric({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required String value,
+    required bool isDone,
+  }) {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: CommonWidget.setOpacity(color, 0.12),
+                shape: BoxShape.circle,
+              ),
+            ),
+            Icon(icon, color: color, size: 22),
+          ],
+        ),
+        const SizedBox(height: 6),
+        CommonWidget.captionText(text: label, color: Colors.grey),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            color: isDone ? color : Colors.grey,
+            fontWeight: FontWeight.w800,
+            fontSize: 16,
+            letterSpacing: 0.2,
+            fontFamily: 'Poppins',
+          ),
+        ),
+      ],
     );
   }
 
@@ -693,9 +997,13 @@ class MainTab extends GetView<HomeController> {
                         child: Row(
                           children: [
                             CommonWidget.subtitleText(
-                                text: 'Jadwal ', color: ColorConstants.black),
+                              text: 'Jadwal ',
+                              color: ColorConstants.black,
+                            ),
                             CommonWidget.minHeadText(
-                                text: 'Kunjungan', color: ColorConstants.black),
+                              text: 'Patroli',
+                              color: ColorConstants.black,
+                            ),
                           ],
                         ),
                       ),
@@ -706,21 +1014,23 @@ class MainTab extends GetView<HomeController> {
                 ? InkWell(
                     onTap: () {
                       controller.goToDetailPages(
-                          id: controller.listStore[i].tokoId.toString(),
-                          type: controller.listStore[i].typList.toString(),
-                          storeName: controller.listStore[i].namaToko ?? '',
-                          statusKunjungan:
-                              controller.listStore[i].statusKunjungan ?? '');
+                        id: controller.listStore[i].tokoId.toString(),
+                        type: controller.listStore[i].typList.toString(),
+                        storeName: controller.listStore[i].namaToko ?? '',
+                        statusKunjungan:
+                            controller.listStore[i].statusKunjungan ?? '',
+                      );
                     },
                     child: customStockExpandedCard(
-                        name: controller.listStore[i].namaToko ?? '',
-                        photo: controller.listStore[i].pathToko ?? '',
-                        type: controller.listStore[i].typList == '1'
-                            ? 'Kunjungan Terjadwal'
-                            : 'Kunjungan Tidak Terjadwal',
-                        address: controller.listStore[i].alamatToko ?? '',
-                        statusKunjungan:
-                            controller.listStore[i].statusKunjungan ?? ''),
+                      name: controller.listStore[i].namaToko ?? '',
+                      photo: controller.listStore[i].pathToko ?? '',
+                      type: controller.listStore[i].typList == '1'
+                          ? 'Kunjungan Terjadwal'
+                          : 'Kunjungan Tidak Terjadwal',
+                      address: controller.listStore[i].alamatToko ?? '',
+                      statusKunjungan:
+                          controller.listStore[i].statusKunjungan ?? '',
+                    ),
                   )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -735,7 +1045,9 @@ class MainTab extends GetView<HomeController> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10.0),
                           border: Border.all(
-                              width: 2.0, color: ColorConstants.borderColor),
+                            width: 2.0,
+                            color: ColorConstants.borderColor,
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -746,40 +1058,16 @@ class MainTab extends GetView<HomeController> {
                             ),
                             CommonWidget.rowHeight(height: 5),
                             CommonWidget.subtitleText(
-                                text: 'Belum ada jadwal kunjungan',
-                                color: ColorConstants.black,
-                                fontWeight: FontWeight.normal),
+                              text: 'Belum ada jadwal kunjungan',
+                              color: ColorConstants.black,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _cardMenuFilter(String title, onPressed, Color colorCircle) {
-    return Container(
-      decoration: BoxDecoration(
-        color: CommonWidget.setOpacity(colorCircle, 0.9),
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(width: 2.0, color: ColorConstants.borderColor),
-      ),
-      width: SizeConfig().screenWidth * .24,
-      child: InkWell(
-        onTap: () {
-          onPressed();
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-            child: CommonWidget.subtitleText(
-                text: title.toUpperCase(),
-                color: Colors.white,
-                fontWeight: FontWeight.w500),
-          ),
         ),
       ),
     );
@@ -802,12 +1090,10 @@ class MainTab extends GetView<HomeController> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             headerTextSummary('Total Kunjungan', '0', Colors.grey),
-            Divider(
-              color: ColorConstants.backgroundTextField,
-            ),
+            Divider(color: ColorConstants.backgroundTextField),
             textSummary('Berhasil', '0', Colors.green),
             textSummary('Gagal', '0', Colors.orange),
-            textSummary('Tidak Dikunjungi', '0', Colors.red)
+            textSummary('Tidak Dikunjungi', '0', Colors.red),
           ],
         ),
       ),
@@ -820,18 +1106,13 @@ class MainTab extends GetView<HomeController> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.data_usage,
-              color: color,
-              size: 20,
-            ),
-            SizedBox(
-              width: 10,
-            ),
+            Icon(Icons.data_usage, color: color, size: 20),
+            SizedBox(width: 10),
             CommonWidget.subtitleText(
-                text: title,
-                fontWeight: FontWeight.bold,
-                color: ColorConstants.mainColor),
+              text: title,
+              fontWeight: FontWeight.bold,
+              color: ColorConstants.mainColor,
+            ),
           ],
         ),
         CommonWidget.minHeadText(text: value, color: ColorConstants.mainColor),
@@ -845,16 +1126,12 @@ class MainTab extends GetView<HomeController> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.circle,
-              color: color,
-              size: 10,
-            ),
-            SizedBox(
-              width: 10,
-            ),
+            Icon(Icons.circle, color: color, size: 10),
+            SizedBox(width: 10),
             CommonWidget.subtitleText(
-                text: title, color: ColorConstants.mainColor),
+              text: title,
+              color: ColorConstants.mainColor,
+            ),
           ],
         ),
         CommonWidget.minHeadText(text: value, color: ColorConstants.mainColor),
@@ -899,8 +1176,9 @@ class MainTab extends GetView<HomeController> {
                         photo == ''
                             ? Container(
                                 decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
                                   color: Colors.red,
                                 ),
                                 child: Padding(
@@ -926,42 +1204,41 @@ class MainTab extends GetView<HomeController> {
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Center(
-                                        child: Icon(Icons.store_rounded,
-                                            color: Colors.white, size: 65),
+                                        child: Icon(
+                                          Icons.store_rounded,
+                                          color: Colors.white,
+                                          size: 65,
+                                        ),
                                       );
                                     },
                                   ),
                                 ),
                               ),
-                        SizedBox(
-                          width: 20,
-                        ),
+                        SizedBox(width: 20),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CommonWidget.subtitleText(
-                                text: name, fontWeight: FontWeight.bold),
-                            SizedBox(
-                              height: 5,
+                              text: name,
+                              fontWeight: FontWeight.bold,
                             ),
+                            SizedBox(height: 5),
                             Container(
                               width: SizeConfig().screenWidth * .50,
                               child: CommonWidget.subtitleText(
-                                  text: 'Alamat : ' + address,
-                                  // fontWeight: FontWeight.bold,
-                                  color: ColorConstants.mainColor),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            CommonWidget.subtitleText(
-                                text: type,
+                                text: 'Alamat : ' + address,
                                 // fontWeight: FontWeight.bold,
-                                color: ColorConstants.mainColor),
-                            SizedBox(
-                              height: 5,
+                                color: ColorConstants.mainColor,
+                              ),
                             ),
+                            SizedBox(height: 5),
+                            CommonWidget.subtitleText(
+                              text: type,
+                              // fontWeight: FontWeight.bold,
+                              color: ColorConstants.mainColor,
+                            ),
+                            SizedBox(height: 5),
                           ],
                         ),
                       ],
@@ -1053,10 +1330,10 @@ class MainTab extends GetView<HomeController> {
                       : Container(
                           height: 35,
                           width: 35,
-                           decoration: BoxDecoration(
-                             borderRadius: BorderRadius.circular(10),
-                             color: ColorConstants.secondaryAppColor,
-                           ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: ColorConstants.secondaryAppColor,
+                          ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: Image.network(
@@ -1064,16 +1341,17 @@ class MainTab extends GetView<HomeController> {
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Center(
-                                  child: Icon(Icons.store_rounded,
-                                      color: Colors.white, size: 25),
+                                  child: Icon(
+                                    Icons.store_rounded,
+                                    color: Colors.white,
+                                    size: 25,
+                                  ),
                                 );
                               },
                             ),
                           ),
                         ),
-                  SizedBox(
-                    width: 20,
-                  ),
+                  SizedBox(width: 20),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1083,9 +1361,10 @@ class MainTab extends GetView<HomeController> {
                       Container(
                         width: SizeConfig().screenWidth * .50,
                         child: CommonWidget.subtitleText(
-                            text: 'Alamat : ' + address,
-                            // fontWeight: FontWeight.bold,
-                            color: ColorConstants.mainColor),
+                          text: 'Alamat : ' + address,
+                          // fontWeight: FontWeight.bold,
+                          color: ColorConstants.mainColor,
+                        ),
                       ),
                     ],
                   ),
@@ -1102,11 +1381,16 @@ class MainTab extends GetView<HomeController> {
                     color: Colors.grey,
                     child: Padding(
                       padding: const EdgeInsets.only(
-                          bottom: 3.0, top: 3, right: 5, left: 5),
+                        bottom: 3.0,
+                        top: 3,
+                        right: 5,
+                        left: 5,
+                      ),
                       child: CommonWidget.captionMultilineText(
-                          text: 'Belum dikunjungi',
-                          color: Colors.white,
-                          textAlign: TextAlign.center),
+                        text: 'Belum dikunjungi',
+                        color: Colors.white,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ],
@@ -1157,18 +1441,20 @@ class MainTab extends GetView<HomeController> {
                       ),
                       SizedBox(width: 10),
                       CommonWidget.subtitlePlusText(
-                          text: 'Progress Harian',
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
+                        text: 'Progress Harian',
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ],
                   ),
                   CommonWidget.rowHeight(),
                   Row(
                     children: [
                       CommonWidget.bigText(
-                          text:
-                              ' ${controller.detailDashboard.value.dailyActualProgress ?? 0} / ${controller.detailDashboard.value.dailyPlanProgress ?? 0}',
-                          color: Colors.black),
+                        text:
+                            ' ${controller.detailDashboard.value.dailyActualProgress ?? 0} / ${controller.detailDashboard.value.dailyPlanProgress ?? 0}',
+                        color: Colors.black,
+                      ),
                       SizedBox(width: 10),
                       CommonWidget.subtitleText(
                         text: 'Kunjungan',
@@ -1179,16 +1465,17 @@ class MainTab extends GetView<HomeController> {
                 ],
               ),
               CircularPercentIndicator(
-                  progressColor: ColorConstants.mainColor,
-                  radius: 50.0,
-                  lineWidth: 13.0,
-                  animation: true,
-                  percent: 0.7,
-                  center: CommonWidget.subtitleText(
-                    text:
-                        '${controller.detailDashboard.value.monthlyPercentageAttendance ?? 0}%',
-                    color: Colors.black,
-                  ))
+                progressColor: ColorConstants.mainColor,
+                radius: 50.0,
+                lineWidth: 13.0,
+                animation: true,
+                percent: 0.7,
+                center: CommonWidget.subtitleText(
+                  text:
+                      '${controller.detailDashboard.value.monthlyPercentageAttendance ?? 0}%',
+                  color: Colors.black,
+                ),
+              ),
             ],
           ),
         ),
@@ -1234,18 +1521,20 @@ class MainTab extends GetView<HomeController> {
                       ),
                       SizedBox(width: 10),
                       CommonWidget.subtitlePlusText(
-                          text: 'Absensi Bulanan',
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
+                        text: 'Absensi Bulanan',
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ],
                   ),
                   CommonWidget.rowHeight(),
                   Row(
                     children: [
                       CommonWidget.bigText(
-                          text:
-                              ' ${controller.detailDashboard.value.monthlyActualAttendance ?? 0} / ${controller.detailDashboard.value.monthlyPlanAttendance ?? 0}',
-                          color: Colors.black),
+                        text:
+                            ' ${controller.detailDashboard.value.monthlyActualAttendance ?? 0} / ${controller.detailDashboard.value.monthlyPlanAttendance ?? 0}',
+                        color: Colors.black,
+                      ),
                       SizedBox(width: 10),
                       CommonWidget.subtitleText(
                         text: 'Absensi',
@@ -1256,16 +1545,17 @@ class MainTab extends GetView<HomeController> {
                 ],
               ),
               CircularPercentIndicator(
-                  progressColor: Colors.green,
-                  radius: 50.0,
-                  lineWidth: 13.0,
-                  animation: true,
-                  percent: 0.7,
-                  center: CommonWidget.subtitleText(
-                    text:
-                        '${controller.detailDashboard.value.monthlyPercentageAttendance ?? 0}%',
-                    color: Colors.black,
-                  ))
+                progressColor: Colors.green,
+                radius: 50.0,
+                lineWidth: 13.0,
+                animation: true,
+                percent: 0.7,
+                center: CommonWidget.subtitleText(
+                  text:
+                      '${controller.detailDashboard.value.monthlyPercentageAttendance ?? 0}%',
+                  color: Colors.black,
+                ),
+              ),
             ],
           ),
         ),
@@ -1275,69 +1565,72 @@ class MainTab extends GetView<HomeController> {
 
   Widget pendingTask() {
     final hasInternet = controller.isConnectedToInternet.value;
-    final bgColor =
-        hasInternet ? Colors.green[100] : ColorConstants.yellowBackground;
+    final bgColor = hasInternet
+        ? Colors.green[100]
+        : ColorConstants.yellowBackground;
     final iconColor = hasInternet ? Colors.green : Colors.orange;
-    final iconData =
-        hasInternet ? Icons.cloud_done_rounded : Icons.warning_rounded;
+    final iconData = hasInternet
+        ? Icons.cloud_done_rounded
+        : Icons.warning_rounded;
     final infoText = hasInternet
         ? 'Koneksi internet tersedia, klik untuk kirim data pending.'
         : 'Segera periksa koneksi internet mu dan klik disini untuk mengirim kembali';
     return Padding(
       padding: const EdgeInsets.only(bottom: 10, top: 10),
       child: InkWell(
-          onTap: () async {
-            await controller.submitPendingAttendance();
-          },
-          child: Container(
-            height: 75,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: iconColor,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Icon(
-                        iconData,
-                        color: ColorConstants.white,
-                        size: SizeConfig().screenWidth * .05,
-                      ),
+        onTap: () async {
+          await controller.submitPendingAttendance();
+        },
+        child: Container(
+          height: 75,
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: iconColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Icon(
+                      iconData,
+                      color: ColorConstants.white,
+                      size: SizeConfig().screenWidth * .05,
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CommonWidget.minSubtitleText(
-                          text:
-                              '${controller.pendingAttendanceCount} Data Pending',
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
-                      Container(
-                        width: SizeConfig().screenWidth * .70,
-                        child: CommonWidget.captionMultilineText(
-                          text: infoText,
-                          color: Colors.black,
-                        ),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CommonWidget.minSubtitleText(
+                      text: '${controller.pendingAttendanceCount} Data Pending',
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    Container(
+                      width: SizeConfig().screenWidth * .70,
+                      child: CommonWidget.captionMultilineText(
+                        text: infoText,
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

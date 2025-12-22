@@ -19,8 +19,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:sales/api/api.dart';
-import 'package:sales/models/response/reliver/list_reliver_response.dart';
 import 'package:sales/models/response/store/list_store.dart';
+import 'package:sales/models/response/user/user_schedule.dart';
 import 'package:sales/models/response/user/users_response.dart';
 import 'package:sales/modules/home/base_controller.dart';
 import 'package:sales/modules/home/home.dart';
@@ -48,7 +48,8 @@ class HomeController extends BaseController {
   var benefitDashboard = Rxn<DataBenefitDashboard>();
   List<Marker> markers = <Marker>[];
   Set<Circle> circles = <Circle>{};
-  var listEvent = <EventList>[].obs;
+  final RxBool attendanceInfoLoading = false.obs;
+  final Rxn<Schedule> attendanceSchedule = Rxn<Schedule>();
 
   late MainTab mainTab;
   late DiscoverTab discoverTab;
@@ -115,6 +116,30 @@ class HomeController extends BaseController {
     );
   }
 
+  void goToAbsensiPages() {
+    Get.toNamed(Routes.DISCOVER_TAB);
+  }
+
+  void goToIzinPages() {
+    Get.toNamed(Routes.LEAVE);
+  }
+
+  void goToShiftSwapPages() {
+    Get.toNamed(Routes.SHIFT_SWAP);
+  }
+
+  void goToClaimPages() {
+    Get.toNamed(Routes.CLAIM);
+  }
+
+  void goToPatroliPages() {
+    Get.toNamed(Routes.STORE);
+  }
+
+  void goToPayslipPages() {
+    Get.toNamed(Routes.PAYSLIP);
+  }
+
   void onLoading() async {
     page.value = page.value + 1;
 
@@ -129,10 +154,10 @@ class HomeController extends BaseController {
     super.onReady();
     // if (isConnectedToInternetWidget.value == false) {
     determinePosition();
-    getDataEvent(1);
     getDataBenefit();
     getStore(page.value);
     getDataDashboard();
+    getAttendanceInfo();
   }
 
   @override
@@ -823,9 +848,16 @@ class HomeController extends BaseController {
     Get.toNamed(Routes.DETAIL_EVENT, arguments: id);
   }
 
-  void getDataEvent(page) async {
-    final res = await apiRepository.listEvent(page: page);
-    listEvent.addAll(res?.data ?? []);
+  Future<void> getAttendanceInfo() async {
+    attendanceInfoLoading.value = true;
+    try {
+      final res = await apiRepository.getUserSchedule();
+      attendanceSchedule.value = res?.data?.schedule;
+    } catch (_) {
+      attendanceSchedule.value = null;
+    } finally {
+      attendanceInfoLoading.value = false;
+    }
   }
 
   void getDataBenefit() async {
@@ -839,15 +871,12 @@ class HomeController extends BaseController {
       final res = await apiRepository.listStore(
           page: page, data: UserIdRequest(id: userId.value));
 
-      if (res != null && res.data?.length != 0) {
+      final data = res?.data;
+      if (data != null && data.isNotEmpty) {
         // Ubah objek DataStore ke JSON sebelum simpan
-        final jsonList = res.data?.map((e) => e.toJson()).toList();
+        final jsonList = data.map((e) => e.toJson()).toList();
         box.write('cached_items_page_$page', jsonList);
-        if (jsonList?.length != 0) {
-          listStore.addAll(res.data!);
-        } else {
-          _loadFromCache(page);
-        }
+        listStore.addAll(data);
       } else {
         _loadFromCache(page);
       }
@@ -859,12 +888,21 @@ class HomeController extends BaseController {
 
   void _loadFromCache(int page) {
     final cachedData = box.read('cached_items_page_$page');
+    if (cachedData is! List || cachedData.isEmpty) {
+      listStore.add(DataStore(tokoId: 0));
+      return;
+    }
 
-    if (cachedData.length != 0) {
-      listStore.addAll(List<DataStore>.from(
-        (cachedData as List).map((e) => DataStore.fromJson(e)),
-      ));
-    } else {
+    try {
+      listStore.addAll(
+        cachedData.map((e) {
+          if (e is Map) {
+            return DataStore.fromJson(Map<String, dynamic>.from(e));
+          }
+          throw StateError('Invalid cached item type: ${e.runtimeType}');
+        }),
+      );
+    } catch (_) {
       listStore.add(DataStore(tokoId: 0));
     }
   }
@@ -875,7 +913,87 @@ class HomeController extends BaseController {
     page.value = 1;
     getStore(page.value);
     loadUsers();
+    getAttendanceInfo();
     refreshController.refreshCompleted();
+  }
+
+  String get attendanceDateLabel {
+    final schedule = attendanceSchedule.value;
+    final rawDate =
+        schedule?.dataUserAttandance?.dateAttendence ?? schedule?.dateCheckIn;
+    final parsed = _tryParseDate(rawDate) ?? DateTime.now();
+    return DateFormat("EEEE, d MMMM yyyy", "id_ID").format(parsed);
+  }
+
+  String get attendanceShiftLabel {
+    final shift = attendanceSchedule.value?.scheduleShift;
+    final start = _formatHHmm(shift?.startTime);
+    final end = _formatHHmm(shift?.endTime);
+    if (start == '--:--' || end == '--:--') return '--:-- - --:--';
+    return '$start - $end';
+  }
+
+  String get attendanceCheckInLabel {
+    final checkIn = attendanceSchedule.value?.dataUserAttandance?.checkIn;
+    return _formatHHmm(checkIn);
+  }
+
+  String get attendanceCheckOutLabel {
+    final checkOut = attendanceSchedule.value?.dataUserAttandance?.checkOut;
+    return _formatHHmm(checkOut);
+  }
+
+  int? get attendanceLateMinutes {
+    final checkIn = _parseTimeOfDay(
+        attendanceSchedule.value?.dataUserAttandance?.checkIn);
+    final start =
+        _parseTimeOfDay(attendanceSchedule.value?.scheduleShift?.startTime);
+    if (checkIn == null || start == null) return null;
+    final checkInMinutes = checkIn.hour * 60 + checkIn.minute;
+    final startMinutes = start.hour * 60 + start.minute;
+    final diff = checkInMinutes - startMinutes;
+    return diff > 0 ? diff : 0;
+  }
+
+  String get attendanceLateLabel {
+    final minutes = attendanceLateMinutes;
+    if (minutes == null) return '-';
+    return '$minutes Menit';
+  }
+
+  String get attendanceStatusLabel {
+    final status =
+        attendanceSchedule.value?.dataUserAttandance?.attendenceStatus?.name;
+    if (status != null && status.isNotEmpty) return status;
+    if (attendanceCheckInLabel != '--:--') return 'Hadir';
+    return attendanceSchedule.value == null ? 'Belum ada jadwal' : 'Belum absen';
+  }
+
+  DateTime? _tryParseDate(String? value) {
+    if (value == null) return null;
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return null;
+    return DateTime.tryParse(trimmed);
+  }
+
+  TimeOfDay? _parseTimeOfDay(String? value) {
+    if (value == null) return null;
+    final match =
+        RegExp(r'(\d{1,2}):(\d{2})(?::\d{2})?').firstMatch(value);
+    if (match == null) return null;
+    final hour = int.tryParse(match.group(1) ?? '');
+    final minute = int.tryParse(match.group(2) ?? '');
+    if (hour == null || minute == null) return null;
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  String _formatHHmm(String? value) {
+    final time = _parseTimeOfDay(value);
+    if (time == null) return '--:--';
+    final h = time.hour.toString().padLeft(2, '0');
+    final m = time.minute.toString().padLeft(2, '0');
+    return '$h:$m';
   }
 
   void goToDetailPages(
@@ -1019,77 +1137,76 @@ class HomeController extends BaseController {
   void getDataDashboard() async {
     final monthly = await apiRepository.getDashboardKunjungan(
         DashboardRequest(id: userId.value, type: 'bulan'));
-    if (monthly != null) {
-      dailyProgressCount.value = monthly.data!.first.count ?? 0;
+    if (monthly?.data != null && monthly!.data!.isNotEmpty) {
+      montlyProgressCount.value = monthly.data!.first.count ?? 0;
     }
 
-    final daily = await apiRepository.getDashboardKunjungan(
-        DashboardRequest(id: userId.value, type: 'hari'));
-    if (daily != null) {
-      montlyProgressCount.value = monthly?.data!.first.count ?? 0;
+    final daily = await apiRepository
+        .getDashboardKunjungan(DashboardRequest(id: userId.value, type: 'hari'));
+    if (daily?.data != null && daily!.data!.isNotEmpty) {
+      dailyProgressCount.value = daily.data!.first.count ?? 0;
     }
   }
 
   List<Map<String, dynamic>> get visibleMenus {
-    final List<Map<String, dynamic>> allMenus = [
+    return [
       {
-        'show': menuKunjungan.value,
-        'icon': Icons.store,
-        'title': 'Kunjungan',
-        'onPressed': goToStorePages,
-        'color': Colors.indigo,
+        'show': true,
+        'icon': Icons.calendar_month_rounded,
+        'title': 'Absensi',
+        'onPressed': goToAbsensiPages,
+        'color': ColorConstants.secondaryColor,
       },
       {
-        'show': menuLeads.value,
-        'icon': Icons.search_rounded,
-        'title': 'Leads',
-        'onPressed': goToLeadsPages,
-        'color': Colors.indigo,
-      },
-      {
-        'show': menuProspek.value,
-        'icon': Icons.handshake_rounded,
-        'title': 'Prospek',
-        'onPressed': goToProspekV2,
-        'color': Colors.indigo,
-      },
-      // {
-      //   'show': menuAgent.value,
-      //   'icon': Icons.person_2_rounded,
-      //   'title': 'My Agent',
-      //   'onPressed': goToAgentPages,
-      //   'color': Colors.indigo,
-      // },
-      {
-        'show': menuBenefit.value,
-        'icon': Icons.attach_money_rounded,
-        'title': 'Benefit',
-        'onPressed': goToBenefitPages,
-        'color': Colors.indigo,
-      },
-      {
-        'show': menuLembur.value,
-        'icon': Icons.work_rounded,
-        'title': 'Lembur',
-        'onPressed': goToOvertimePages,
-        'color': Colors.indigo,
-      },
-      {
-        'show': menuCuti.value,
+        'show': true,
         'icon': Icons.airplane_ticket_rounded,
         'title': 'Cuti',
         'onPressed': goToCutiPages,
-        'color': Colors.indigo,
+        'color': ColorConstants.secondaryColor,
       },
       {
-        'show': menuKuisioner.value,
-        'icon': Icons.assignment,
-        'title': 'Kuisioner',
-        'onPressed': goToKuisionerPages,
-        'color': Colors.indigo,
+        'show': true,
+        'icon': Icons.work_rounded,
+        'title': 'Lembur',
+        'onPressed': goToOvertimePages,
+        'color': ColorConstants.secondaryColor,
+      },
+      {
+        'show': true,
+        'icon': Icons.swap_horiz_rounded,
+        'title': 'Tukar Shift',
+        'onPressed': goToShiftSwapPages,
+        'color': ColorConstants.secondaryColor,
+      },
+      {
+        'show': true,
+        'icon': Icons.assignment_turned_in_rounded,
+        'title': 'Izin',
+        'onPressed': goToIzinPages,
+        'color': ColorConstants.secondaryColor,
+      },
+      {
+        'show': true,
+        'icon': Icons.medical_services_rounded,
+        'title': 'Claim',
+        'onPressed': goToClaimPages,
+        'color': ColorConstants.secondaryColor,
+      },
+      {
+        'show': true,
+        'icon': Icons.security_rounded,
+        'title': 'Patroli',
+        'onPressed': goToPatroliPages,
+        'color': ColorConstants.secondaryColor,
+      },
+      {
+        'show': true,
+        'icon': Icons.receipt_long_rounded,
+        'title': 'Payslip',
+        'onPressed': goToPayslipPages,
+        'color': ColorConstants.secondaryColor,
       },
     ];
-    return allMenus.where((menu) => menu['show'] == true).toList();
   }
 
   @override

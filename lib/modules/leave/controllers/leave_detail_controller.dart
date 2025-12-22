@@ -66,7 +66,7 @@ class LeaveDetailController extends BaseController {
   void approval({
     action = "reject",
   }) async {
-    final res = await apiRepository.updateApprovalIzin(
+    await apiRepository.updateApprovalIzin(
         detail.value.id.toString(),
         UpdateApprovalIzinRequest(
           action: action,

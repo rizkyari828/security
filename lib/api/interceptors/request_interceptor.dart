@@ -13,6 +13,8 @@ import 'package:sales/shared/utils/common_widget.dart';
 import 'package:sales/shared/utils/size_config.dart';
 import 'package:sales/shared/widgets/button.dart';
 
+import 'loading_tracker.dart';
+
 FutureOr<Request?> requestInterceptor(Request request) async {
   // Tambahkan header dasar
   request.headers['X-Requested-With'] = 'XMLHttpRequest';
@@ -62,7 +64,7 @@ FutureOr<Request?> requestInterceptor(Request request) async {
       final connection = await InternetAddress.lookup('google.com');
       if (connection.isNotEmpty && connection[0].rawAddress.isNotEmpty) {
         // Internet OK
-        EasyLoading.show(status: 'loading..');
+        if (LoadingTracker.shouldShow(request)) LoadingTracker.begin(request);
         return request;
       } else {
         Future.delayed(Duration.zero, () {

@@ -318,7 +318,7 @@ class TextAreaField extends StatelessWidget {
 }
 
 class CustomDropDownSearch extends StatelessWidget {
-  var listItem;
+  final List<dynamic> listItem;
   final String labelText;
   final onChanged;
   final bool enabled;

@@ -352,8 +352,9 @@ class LeadsController extends BaseController {
     masterData.clear();
     final resListStatusPekerjaan =
         await apiRepository.getMasterData2('Status Kerja Leads');
-    if (resListStatusPekerjaan!.data != null) {
-      masterData.value = resListStatusPekerjaan!.data!;
+    final statusPekerjaanData = resListStatusPekerjaan?.data;
+    if (statusPekerjaanData != null) {
+      masterData.value = statusPekerjaanData;
       for (var element in masterData) {
         listStatusPekerjaan.add(element);
       }

@@ -241,7 +241,6 @@ class StoreDetailView extends GetView<StoreDetailController> {
   }
 
   Widget _buildViewScheduleSubmit(BuildContext context) {
-    final sw = SizeConfig().screenWidth;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(25.0),
@@ -340,7 +339,6 @@ class StoreDetailView extends GetView<StoreDetailController> {
   }
 
   Widget _buildViewNon(BuildContext context) {
-    final sw = SizeConfig().screenWidth;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(25.0),

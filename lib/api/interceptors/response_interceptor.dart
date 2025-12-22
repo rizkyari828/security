@@ -8,14 +8,15 @@ import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-FutureOr<dynamic> responseInterceptor(
-    Request request, Response response) async {
+import 'loading_tracker.dart';
+
+FutureOr<Response> responseInterceptor(Request request, Response response) async {
   print(request.url);
   print(response.body);
 
   if (response.statusCode == -1) {
     EasyLoading.showError('Tidak ada koneksi internet');
-    EasyLoading.dismiss();
+    LoadingTracker.end(request);
     return response;
   }
 
@@ -24,8 +25,8 @@ FutureOr<dynamic> responseInterceptor(
       final message = ErrorResponse.fromJson(response.body);
       if (message.error == true) {
         EasyLoading.showError(message.message ?? '');
-        EasyLoading.dismiss();
-        return;
+        LoadingTracker.end(request);
+        return response;
       }
     } catch (e) {
       // Catch jika parsing gagal
@@ -36,7 +37,7 @@ FutureOr<dynamic> responseInterceptor(
     handleErrorStatus(response);
   }
 
-  EasyLoading.dismiss();
+  LoadingTracker.end(request);
   return response;
 }
 
@@ -72,6 +73,4 @@ void handleErrorStatus(Response response) {
     EasyLoading.showError('Terjadi kesalahan saat memproses data');
     print("Parsing error di handleErrorStatus: $e");
   }
-
-  EasyLoading.dismiss();
 }

@@ -55,7 +55,6 @@ import 'package:sales/models/response/benefit/type_cuti.dart';
 import 'package:sales/models/response/cuti_sales/list_cuti_sales.dart';
 import 'package:sales/models/response/cuti_sales/show_cuti_sales.dart';
 import 'package:sales/models/response/dashboard/dashboard_kunjungan_response.dart';
-import 'package:sales/models/response/dashboard/dashboard_response.dart';
 import 'package:sales/models/response/izin/list_izin.dart';
 import 'package:sales/models/response/izin/show_izin.dart';
 import 'package:sales/models/response/izin/type_izin.dart';
@@ -100,7 +99,17 @@ class ApiRepository {
           .login('/api/login', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
-        return LoginRespons.fromJson(res.body);
+        final body = res.body;
+        if (body is Map<String, dynamic>) {
+          return LoginRespons.fromJson(body);
+        }
+        if (body is Map) {
+          return LoginRespons.fromJson(Map<String, dynamic>.from(body));
+        }
+        if (body is String) {
+          return LoginResponsFromJson(body);
+        }
+        throw FormatException('Unexpected response body: ${body.runtimeType}');
       } else {
         EasyLoading.showError('Connection Timeout. Please try again later');
         EasyLoading.dismiss();

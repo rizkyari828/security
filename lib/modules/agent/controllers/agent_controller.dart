@@ -307,9 +307,6 @@ class AgentController extends BaseController {
     masterData.clear();
     final resListStatusLead = await apiRepository.getMasterData2('Status Lead');
     masterData.value = resListStatusLead!.data!;
-    for (var element in masterData) {
-      // listStatusLead.add(element);
-    }
   }
 
   final signatureController = SignatureController(

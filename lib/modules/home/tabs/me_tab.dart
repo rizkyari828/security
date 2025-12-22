@@ -156,7 +156,6 @@ class MeTab extends GetView<HomeController> {
   }
 
   Widget _buildListData() {
-    final sw = SizeConfig().screenWidth;
     return Padding(
       padding: const EdgeInsets.only(left: 25.0, right: 25.0, bottom: 20.0),
       child: Obx(() => Column(

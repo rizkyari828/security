@@ -42,6 +42,7 @@ class AuthController extends GetxController {
         LoginRequest(
           username: loginEmailController.text,
           password: loginPasswordController.text,
+          kunci: ApiConstants.loginKunci,
         ),
       );
 
@@ -52,22 +53,26 @@ class AuthController extends GetxController {
       final prefs = Get.find<SharedPreferences>();
       prefs.clear();
       if (res?.error == false) {
-        if (res?.data?.first.token != '' || res?.data?.first.token != null) {
-          prefs.setString(StorageConstants.token, res?.data?.first.token ?? '');
-          prefs.setString(StorageConstants.name, res?.data?.first.nama ?? '');
-          prefs.setString(StorageConstants.userId,
-              res?.data?.first.userId.toString() ?? "");
+        final hasUser = res?.data?.isNotEmpty == true;
+        final firstUser = hasUser ? res!.data!.first : null;
+        final hasToken = (firstUser?.token?.isNotEmpty ?? false);
+
+        if (hasToken) {
+          prefs.setString(StorageConstants.token, firstUser?.token ?? '');
+          prefs.setString(StorageConstants.name, firstUser?.nama ?? '');
+          prefs.setString(
+              StorageConstants.userId, firstUser?.userId.toString() ?? "");
           prefs.setString(StorageConstants.idPegawai,
-              res?.data?.first.idPegawai.toString() ?? "");
+              firstUser?.idPegawai.toString() ?? "");
           prefs.setString(StorageConstants.username,
-              res?.data?.first.username.toString() ?? "");
+              firstUser?.username.toString() ?? "");
           prefs.setString(
-              StorageConstants.profilePhoto, res?.data?.first.foto ?? "");
-          prefs.setString(StorageConstants.groupId,
-              res?.data?.first.stsUser.toString() ?? "");
+              StorageConstants.profilePhoto, firstUser?.foto ?? "");
           prefs.setString(
-              StorageConstants.tipe, res?.data?.first.tipe.toString() ?? "");
-          final menus = res?.data?.first.menus;
+              StorageConstants.groupId, firstUser?.stsUser.toString() ?? "");
+          prefs.setString(
+              StorageConstants.tipe, firstUser?.tipe.toString() ?? "");
+          final menus = firstUser?.menus;
 
           if (menus != null) {
             prefs.setBool('menu_kunjungan', menus.kunjungan ?? false);

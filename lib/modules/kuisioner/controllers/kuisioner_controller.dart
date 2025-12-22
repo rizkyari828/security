@@ -26,10 +26,6 @@ class KusionerController extends BaseController {
 
   var imageFileList = <XFile>[].obs;
 
-  set _imageFile(XFile? value) {
-    imageFileList.addAll((value == null ? null : <XFile>[value])!);
-  }
-
   final ImagePicker _picker = ImagePicker();
 
   final startDateController = TextEditingController();

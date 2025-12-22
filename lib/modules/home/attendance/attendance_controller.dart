@@ -478,13 +478,6 @@ class AttendanceController extends FaceRecognitionController {
     //     infoWindow: InfoWindow(title: userSchedule.data?.branch?.name)));
   }
 
-  String _printDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
-  }
-
   void validateAttandance() async {
     try {
       final res = await apiRepository.validateAttendance(

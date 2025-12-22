@@ -40,6 +40,12 @@ import 'package:sales/modules/store/views/add_store_view.dart';
 import 'package:sales/modules/store/views/detail_store_view.dart';
 import 'package:sales/modules/store/views/result_kunjungan.dart';
 import 'package:sales/modules/store/views/store_view.dart';
+import 'package:sales/modules/claim/bindings/claim_binding.dart';
+import 'package:sales/modules/claim/views/claim_view.dart';
+import 'package:sales/modules/payslip/bindings/payslip_binding.dart';
+import 'package:sales/modules/payslip/views/payslip_view.dart';
+import 'package:sales/modules/shift_swap/bindings/shift_swap_binding.dart';
+import 'package:sales/modules/shift_swap/views/shift_swap_view.dart';
 
 import '../modules/notification/bindings/notification_binding.dart';
 import '../modules/notification/views/notification_view.dart';
@@ -264,6 +270,21 @@ class AppPages {
       name: Routes.DETAIL_AGENT,
       page: () => AgentDetailView(),
       binding: AgentBinding(),
+    ),
+    GetPage(
+      name: Routes.SHIFT_SWAP,
+      page: () => const ShiftSwapView(),
+      binding: ShiftSwapBinding(),
+    ),
+    GetPage(
+      name: Routes.CLAIM,
+      page: () => const ClaimView(),
+      binding: ClaimBinding(),
+    ),
+    GetPage(
+      name: Routes.PAYSLIP,
+      page: () => const PayslipView(),
+      binding: PayslipBinding(),
     ),
   ];
 }

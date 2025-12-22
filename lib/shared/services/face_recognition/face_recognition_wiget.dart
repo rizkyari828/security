@@ -76,10 +76,10 @@ class FaceRecognitionWiget {
               showCameraLensControl: false,
               messageBuilder: (context, face) {
                 if (face == null) {
-                  return _message('Tempatkan wajah Anda di kamera');
+                  return _message('Absensi (Face Detected)\nTempatkan wajah Anda di kamera');
                 }
                 if (!face.wellPositioned) {
-                  return _message('Tempatkan wajah Anda di kotak');
+                  return _message('Absensi (Face Detected)\nTempatkan wajah Anda di kotak');
                 }
                 return const SizedBox.shrink();
               }));
