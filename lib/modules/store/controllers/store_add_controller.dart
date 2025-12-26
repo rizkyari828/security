@@ -63,7 +63,8 @@ class StoreAddController extends BaseController {
   RxString? retrieveDataError;
 
   set _imageFile(XFile? value) {
-    imageFileList.addAll((value == null ? null : <XFile>[value])!);
+    if (value == null) return;
+    imageFileList.add(value);
   }
 
   void changeStatus(String value) {
@@ -233,11 +234,16 @@ class StoreAddController extends BaseController {
     final position = await _geolocatorPlatform.getCurrentPosition();
     myLocation = LatLng(position.latitude, position.longitude);
 
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-
-    locationDetail.value =
-        "${placemarks[2].street}, ${placemarks[2].subLocality}, ${placemarks[2].locality}, ${placemarks[2].administrativeArea}";
+    try {
+      final placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      final place = placemarks.isNotEmpty ? placemarks.first : null;
+      locationDetail.value = place == null
+          ? ''
+          : "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}";
+    } catch (_) {
+      locationDetail.value = '';
+    }
 
     final prefs = Get.find<SharedPreferences>();
     if (prefs.getString('token') != null) {
@@ -261,7 +267,9 @@ class StoreAddController extends BaseController {
             imageQuality: quality,
           );
 
-          imageFileList.addAll(pickedFileList!);
+          if (pickedFileList != null) {
+            imageFileList.addAll(pickedFileList);
+          }
         } catch (e) {
           pickImageError = e;
         }

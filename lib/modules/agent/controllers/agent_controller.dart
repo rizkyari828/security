@@ -25,7 +25,8 @@ class AgentController extends BaseController {
   var imageFileList = <XFile>[].obs;
 
   set _imageFile(XFile? value) {
-    imageFileList.addAll((value == null ? null : <XFile>[value])!);
+    if (value == null) return;
+    imageFileList.add(value);
   }
 
   dynamic pickImageError;
@@ -97,7 +98,9 @@ class AgentController extends BaseController {
             imageQuality: quality,
           );
 
-          imageFileList.addAll(pickedFileList!);
+          if (pickedFileList != null) {
+            imageFileList.addAll(pickedFileList);
+          }
         } catch (e) {
           pickImageError = e;
         }
@@ -260,11 +263,16 @@ class AgentController extends BaseController {
     final position = await _geolocatorPlatform.getCurrentPosition();
     myLocation = LatLng(position.latitude, position.longitude);
 
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-
-    locationDetail.value =
-        "${placemarks[2].street}, ${placemarks[2].subLocality}, ${placemarks[2].locality}, ${placemarks[2].administrativeArea}";
+    try {
+      final placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      final place = placemarks.isNotEmpty ? placemarks.first : null;
+      locationDetail.value = place == null
+          ? ''
+          : "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}";
+    } catch (_) {
+      locationDetail.value = '';
+    }
 
     final prefs = Get.find<SharedPreferences>();
     if (prefs.getString('token') != null) {
@@ -290,7 +298,12 @@ class AgentController extends BaseController {
   void getMasterData() async {
     masterData.clear();
     final resListLeadSource = await apiRepository.getMasterData2('Sumber Lead');
-    masterData.value = resListLeadSource!.data!;
+    final leadSourceData = resListLeadSource?.data;
+    if (leadSourceData == null || leadSourceData.isEmpty) {
+      EasyLoading.showError('Gagal memuat master data');
+      return;
+    }
+    masterData.value = leadSourceData;
 
     for (var element in masterData) {
       listTypeAgent.add(element);
@@ -299,14 +312,24 @@ class AgentController extends BaseController {
     masterData.clear();
     final resListLeadCategory =
         await apiRepository.getMasterData2('Kategori Lead');
-    masterData.value = resListLeadCategory!.data!;
+    final leadCategoryData = resListLeadCategory?.data;
+    if (leadCategoryData == null || leadCategoryData.isEmpty) {
+      EasyLoading.showError('Gagal memuat master data');
+      return;
+    }
+    masterData.value = leadCategoryData;
     for (var element in masterData) {
       listStatusActive.add(element);
     }
 
     masterData.clear();
     final resListStatusLead = await apiRepository.getMasterData2('Status Lead');
-    masterData.value = resListStatusLead!.data!;
+    final statusLeadData = resListStatusLead?.data;
+    if (statusLeadData == null || statusLeadData.isEmpty) {
+      EasyLoading.showError('Gagal memuat master data');
+      return;
+    }
+    masterData.value = statusLeadData;
   }
 
   final signatureController = SignatureController(

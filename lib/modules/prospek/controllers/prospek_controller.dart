@@ -117,10 +117,13 @@ class ProspekController extends GetxController {
 
   void getMasterStatusProspek() async {
     final res = await apiRepository.getMasterStatus();
-    masterStatus.value = res!.data!;
+    final data = res?.data;
+    if (data == null || data.isEmpty) return;
+
+    masterStatus.value = data;
     // for (var element in masterStatus) {
     listStatusOrder.add(MasterStatus(id: 0, namaCat: "All"));
-    listStatusOrder.addAll(res.data!);
+    listStatusOrder.addAll(data);
 
     // }
   }

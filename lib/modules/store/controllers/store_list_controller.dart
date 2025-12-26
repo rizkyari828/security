@@ -150,14 +150,16 @@ class StoreListController extends BaseController {
   void getDataDashboard() async {
     final monthly = await apiRepository.getDashboardKunjungan(
         DashboardRequest(id: userId.value, type: 'bulan'));
-    if (monthly != null) {
-      montlyProgressCount.value = monthly.data!.first.count ?? 0;
+    final monthlyData = monthly?.data;
+    if (monthlyData != null && monthlyData.isNotEmpty) {
+      montlyProgressCount.value = monthlyData.first.count ?? 0;
     }
 
     final daily = await apiRepository.getDashboardKunjungan(
         DashboardRequest(id: userId.value, type: 'hari'));
-    if (daily != null) {
-      dailyProgressCount.value = daily.data!.first.count ?? 0;
+    final dailyData = daily?.data;
+    if (dailyData != null && dailyData.isNotEmpty) {
+      dailyProgressCount.value = dailyData.first.count ?? 0;
     }
   }
 }

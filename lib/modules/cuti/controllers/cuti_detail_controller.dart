@@ -5,6 +5,7 @@ import 'package:sales/models/request/cuti_sales/update_approval_request.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sales/models/response/cuti_sales/show_cuti_sales.dart';
+import 'package:sales/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CutiDetailController extends GetxController {
@@ -61,8 +62,12 @@ class CutiDetailController extends GetxController {
   void getDetailCuti() async {
     final res = await apiRepository
         .showCutiSales(ShowCutiSalesRequest(id: argm.toString()));
-    print(res!.data!);
-    detail.value = res.data!.first;
+    final data = res?.data;
+    if (data == null || data.isEmpty) {
+      CommonWidget.errorSnackBar('Gagal memuat detail cuti');
+      return;
+    }
+    detail.value = data.first;
     statusApproval.value = detail.value.statusCuti.toString().toLowerCase();
     String idRoleDetail =
         stringRoletoId(detail.value.levelApproval.toString().toLowerCase());

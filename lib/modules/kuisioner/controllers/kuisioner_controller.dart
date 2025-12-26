@@ -119,7 +119,9 @@ class KusionerController extends BaseController {
             imageQuality: quality,
           );
 
-          imageFileList.addAll(pickedFileList!);
+          if (pickedFileList != null) {
+            imageFileList.addAll(pickedFileList);
+          }
         } catch (e) {
           pickImageError = e;
         }

@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "security (Debug)",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "security (Debug • Manual Capture)",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--dart-define=FACE_MANUAL_CAPTURE=true"]
+    },
+    {
+      "name": "security (Profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    }
+  ]
+}

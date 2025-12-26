@@ -368,13 +368,15 @@ class CommonWidget {
 
   static void errorSnackBar(String error) async {
     Get.snackbar(
-      "Informasi",
+      "Error",
       error,
-      icon: Icon(Icons.warning_rounded, color: Colors.white),
+      icon: Icon(Icons.error_outline_rounded, color: Colors.white),
       snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.red,
+      snackStyle: SnackStyle.FLOATING,
+      backgroundColor: const Color(0xFFB42318),
       borderRadius: 20,
-      margin: EdgeInsets.all(15),
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       colorText: Colors.white,
       duration: Duration(seconds: 4),
       isDismissible: true,
@@ -431,10 +433,10 @@ class CommonWidget {
               : percentage < 0.5
                   ? Colors.orange
                   : percentage < 0.75
-                       ? Colors.amber
-                       : percentage < 1.0
-                           ? ColorConstants.secondaryAppColor
-                           : Colors.green,
+                      ? Colors.amber
+                      : percentage < 1.0
+                          ? ColorConstants.secondaryAppColor
+                          : Colors.green,
         ),
         SizedBox(height: 20.0),
         Divider(

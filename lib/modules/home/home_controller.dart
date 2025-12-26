@@ -81,7 +81,8 @@ class HomeController extends BaseController {
   var imageFileList = <XFile>[].obs;
 
   set _imageFile(XFile? value) {
-    imageFileList.addAll((value == null ? null : <XFile>[value])!);
+    if (value == null) return;
+    imageFileList.add(value);
   }
 
   dynamic pickImageError;
@@ -117,7 +118,7 @@ class HomeController extends BaseController {
   }
 
   void goToAbsensiPages() {
-    Get.toNamed(Routes.DISCOVER_TAB);
+    Get.toNamed(Routes.RECAP);
   }
 
   void goToIzinPages() {
@@ -301,7 +302,9 @@ class HomeController extends BaseController {
             imageQuality: quality,
           );
 
-          imageFileList.addAll(pickedFileList!);
+          if (pickedFileList != null) {
+            imageFileList.addAll(pickedFileList);
+          }
         } catch (e) {
           pickImageError = e;
         }
@@ -478,7 +481,12 @@ class HomeController extends BaseController {
   void submitToken(token) async {
     final res = await apiRepository
         .updateFcmProfile(UpdateFcmProfileRequest(fcmToken: token));
-    if (res!.error == false) {
+    if (res == null) {
+      print('Token update failed');
+      return;
+    }
+
+    if (res.error == false) {
       print('Token updated');
     } else {
       print('Token update failed');
@@ -487,7 +495,9 @@ class HomeController extends BaseController {
 
   void getReviewRate() async {
     final res = await apiRepository.getRate();
-    if (res!.error == false) {
+    if (res == null) return;
+
+    if (res.error == false) {
       showRate.value = res.data ?? ShowReviewRateData();
       showRateDialog.value = true;
       callDialog();
@@ -500,7 +510,12 @@ class HomeController extends BaseController {
   void submitReview({int rate = 0, String note = ''}) async {
     final res =
         await apiRepository.submitRate(SubmitRate(rate: rate, note: note));
-    if (res!.error == false) {
+    if (res == null) {
+      EasyLoading.showError('Gagal disimpan');
+      return;
+    }
+
+    if (res.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
       // Get.back();
     } else {
@@ -523,7 +538,13 @@ class HomeController extends BaseController {
 
     final res = await apiRepository.updatePhotoProfile(
         UpdatePhotoProfileRequest(base64Photo: _afterBase64.first));
-    if (res!.error == false) {
+    if (res == null) {
+      EasyLoading.showError('Gagal disimpan');
+      EasyLoading.dismiss();
+      return;
+    }
+
+    if (res.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
       final prefs = Get.find<SharedPreferences>();
       prefs.setString(
@@ -819,7 +840,13 @@ class HomeController extends BaseController {
       qty,
     );
 
-    if (res!.error == false) {
+    if (res == null) {
+      EasyLoading.showError('Gagal disimpan');
+      EasyLoading.dismiss();
+      return;
+    }
+
+    if (res.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
       EasyLoading.dismiss();
       Get.back();
@@ -863,7 +890,9 @@ class HomeController extends BaseController {
   void getDataBenefit() async {
     final res = await apiRepository
         .listBenefitDashboard(IdRequest(id: userId.value, token: token.value));
-    benefitDashboard.value = res?.data!.first;
+    final data = res?.data;
+    benefitDashboard.value =
+        (data != null && data.isNotEmpty) ? data.first : null;
   }
 
   void getStore(page) async {
@@ -944,8 +973,8 @@ class HomeController extends BaseController {
   }
 
   int? get attendanceLateMinutes {
-    final checkIn = _parseTimeOfDay(
-        attendanceSchedule.value?.dataUserAttandance?.checkIn);
+    final checkIn =
+        _parseTimeOfDay(attendanceSchedule.value?.dataUserAttandance?.checkIn);
     final start =
         _parseTimeOfDay(attendanceSchedule.value?.scheduleShift?.startTime);
     if (checkIn == null || start == null) return null;
@@ -966,7 +995,9 @@ class HomeController extends BaseController {
         attendanceSchedule.value?.dataUserAttandance?.attendenceStatus?.name;
     if (status != null && status.isNotEmpty) return status;
     if (attendanceCheckInLabel != '--:--') return 'Hadir';
-    return attendanceSchedule.value == null ? 'Belum ada jadwal' : 'Belum absen';
+    return attendanceSchedule.value == null
+        ? 'Belum ada jadwal'
+        : 'Belum absen';
   }
 
   DateTime? _tryParseDate(String? value) {
@@ -978,8 +1009,7 @@ class HomeController extends BaseController {
 
   TimeOfDay? _parseTimeOfDay(String? value) {
     if (value == null) return null;
-    final match =
-        RegExp(r'(\d{1,2}):(\d{2})(?::\d{2})?').firstMatch(value);
+    final match = RegExp(r'(\d{1,2}):(\d{2})(?::\d{2})?').firstMatch(value);
     if (match == null) return null;
     final hour = int.tryParse(match.group(1) ?? '');
     final minute = int.tryParse(match.group(2) ?? '');
@@ -1141,8 +1171,8 @@ class HomeController extends BaseController {
       montlyProgressCount.value = monthly.data!.first.count ?? 0;
     }
 
-    final daily = await apiRepository
-        .getDashboardKunjungan(DashboardRequest(id: userId.value, type: 'hari'));
+    final daily = await apiRepository.getDashboardKunjungan(
+        DashboardRequest(id: userId.value, type: 'hari'));
     if (daily?.data != null && daily!.data!.isNotEmpty) {
       dailyProgressCount.value = daily.data!.first.count ?? 0;
     }

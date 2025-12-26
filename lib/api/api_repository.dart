@@ -90,13 +90,16 @@ class ApiRepository {
   ApiRepository({required this.apiProvider});
 
   final ApiProvider apiProvider;
-  final int timeout = 10;
+  final int timeout = 30;
 
   Future<LoginRespons?> login(
-      String username, String password, LoginRequest data) async {
+    String username,
+    String password,
+    LoginRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .login('/api/login', data)
+          .login('/api/v2/login', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         final body = res.body;
@@ -125,7 +128,7 @@ class ApiRepository {
 
   Future<LogoutResponse?> logout(LogoutRequest data) async {
     final res = await apiProvider
-        .logout('/api/v1/auth/logout', data)
+        .logout('/api/v2/v1/auth/logout', data)
         .timeout(Duration(seconds: timeout));
     if (res.statusCode == 200) {
       return LogoutResponse.fromJson(res.body);
@@ -134,7 +137,7 @@ class ApiRepository {
   }
 
   Future<UsersResponse?> getUsers() async {
-    final res = await apiProvider.getUsers('/api/users?page=1&per_page=12');
+    final res = await apiProvider.getUsers('/api/v2/users?page=1&per_page=12');
     if (res.statusCode == 200) {
       return UsersResponse.fromJson(res.body);
     }
@@ -142,7 +145,7 @@ class ApiRepository {
   }
 
   Future<UserScheduleResponse?> getUserSchedule() async {
-    final res = await apiProvider.getUserSchedule('/api/v1/user/schedule');
+    final res = await apiProvider.getUserSchedule('/api/v2/v1/user/schedule');
     if (res.statusCode == 200) {
       return UserScheduleResponse.fromJson(res.body);
     }
@@ -152,10 +155,33 @@ class ApiRepository {
   Future<RecapHistoryResponse?> getRecapHistory(IdRequest data) async {
     try {
       final res = await apiProvider
-          .getRecapHistory('/api/listAbsen', data)
+          .getRecapHistory('/api/v2/listAbsen', data)
           .timeout(Duration(seconds: timeout));
-      if (res.statusCode == 200) {
-        return RecapHistoryResponse.fromJson(res.body);
+
+      if (res.statusCode == -1) {
+        return RecapHistoryResponse(
+          error: true,
+          message: 'Tidak ada koneksi internet',
+          data: const <DataHistory>[],
+        );
+      }
+
+      final body = res.body;
+      if (body == null) {
+        return RecapHistoryResponse(
+          error: true,
+          message: 'Server tidak merespon',
+          data: const <DataHistory>[],
+        );
+      }
+      if (body is Map<String, dynamic>) {
+        return RecapHistoryResponse.fromJson(body);
+      }
+      if (body is Map) {
+        return RecapHistoryResponse.fromJson(Map<String, dynamic>.from(body));
+      }
+      if (body is String) {
+        return recapHistoryResponseFromJson(body);
       }
     } on TimeoutException catch (_) {
       EasyLoading.showError('Connection Timeout. Please try again later');
@@ -167,8 +193,9 @@ class ApiRepository {
   }
 
   Future<AttendanceValidateResponse?> validateAttendance(
-      AttendanceValidateRequest request) async {
-    final link = '/api/beforeAbsen';
+    AttendanceValidateRequest request,
+  ) async {
+    final link = '/api/v2/beforeAbsen';
     try {
       final res = await apiProvider
           .validateAttendance(link, request)
@@ -186,10 +213,11 @@ class ApiRepository {
   }
 
   Future<AttendanceSubmitResponse?> submitAttendance(
-      AttendanceSubmitRequest data) async {
+    AttendanceSubmitRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .submitAttendance('/api/absen', data)
+          .submitAttendance('/api/v2/absen', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return AttendanceSubmitResponse.fromJson(res.body);
@@ -204,10 +232,11 @@ class ApiRepository {
   }
 
   Future<AttendanceSubmitResponse?> submitAttendanceOut(
-      AttendanceSubmitRequest data) async {
+    AttendanceSubmitRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .submitAttendance('/api/absenOut', data)
+          .submitAttendance('/api/v2/absenOut', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return AttendanceSubmitResponse.fromJson(res.body);
@@ -222,16 +251,20 @@ class ApiRepository {
   }
 
   //START PROSPEK
-  Future<ProspekResponse?> listProspek(GetListRequest data,
-      {int page = 1, int limit = 10}) async {
+  Future<ProspekResponse?> listProspek(
+    GetListRequest data, {
+    int page = 1,
+    int limit = 10,
+  }) async {
     try {
       final res = await apiProvider
           .getProspek(
-              '/api/getdata?page=' +
-                  page.toString() +
-                  '&limit=' +
-                  limit.toString(),
-              data)
+            '/api/v2/getdata?page=' +
+                page.toString() +
+                '&limit=' +
+                limit.toString(),
+            data,
+          )
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ProspekResponse.fromJson(res.body);
@@ -248,7 +281,7 @@ class ApiRepository {
   Future<MasterDataProspekResponse?> getMasterData() async {
     try {
       final res = await apiProvider
-          .getMasterData('/api/getMasterData')
+          .getMasterData('/api/v2/getMasterData')
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return MasterDataProspekResponse.fromJson(res.body);
@@ -265,7 +298,7 @@ class ApiRepository {
   Future<MasterStatusProspekResponse?> getMasterStatus() async {
     try {
       final res = await apiProvider
-          .getMasterData('/api/getCatTrans')
+          .getMasterData('/api/v2/getCatTrans')
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return MasterStatusProspekResponse.fromJson(res.body);
@@ -280,10 +313,12 @@ class ApiRepository {
   }
 
   Future<ShowProspekResponse?> showProspek(
-      String id, GetListRequest data) async {
+    String id,
+    GetListRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .getShowProspek('/api/getdataDetail?noTrans=' + id, data)
+          .getShowProspek('/api/v2/getdataDetail?noTrans=' + id, data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowProspekResponse.fromJson(res.body);
@@ -300,7 +335,7 @@ class ApiRepository {
   Future<MasterIdProspekResponse?> getMasterIdProspek() async {
     try {
       final res = await apiProvider
-          .getMasterData('/api/getCatSc')
+          .getMasterData('/api/v2/getCatSc')
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return MasterIdProspekResponse.fromJson(res.body);
@@ -317,7 +352,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitOvertime(SubmitOvertimeRequest data) async {
     try {
       final res = await apiProvider
-          .submitOvertime('/api/saveProspek', data)
+          .submitOvertime('/api/v2/saveProspek', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200) {
         return ErrorResponse.fromJson(res.body);
@@ -332,10 +367,11 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> submitOvertimeClient(
-      SubmitOvertimeClientRequest data) async {
+    SubmitOvertimeClientRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .submitOvertimeClient('/api/v1/overtime', data)
+          .submitOvertimeClient('/api/v2/v1/overtime', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200) {
         return ErrorResponse.fromJson(res.body);
@@ -350,10 +386,12 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateApprovalOvertime(
-      String id, UpdateApprovalOvertimeRequest data) async {
+    String id,
+    UpdateApprovalOvertimeRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .updateApprovalOvertime('/api/updateProspek', data)
+          .updateApprovalOvertime('/api/v2/updateProspek', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -368,11 +406,13 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> setDoneOvertime(
-      String id, SetDoneOvertimeRequest data) async {
+    String id,
+    SetDoneOvertimeRequest data,
+  ) async {
     print(data);
     try {
       final res = await apiProvider
-          .setDoneOvertime('/api/v1/overtime/set-done/' + id, data)
+          .setDoneOvertime('/api/v2/v1/overtime/set-done/' + id, data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200 || res.statusCode == 401) {
@@ -389,16 +429,20 @@ class ApiRepository {
   //END PROSPEK
 
   //START BENEFIT
-  Future<BenefitResponse?> listBenefit(BenefitRequest data,
-      {int page = 1, int limit = 10}) async {
+  Future<BenefitResponse?> listBenefit(
+    BenefitRequest data, {
+    int page = 1,
+    int limit = 10,
+  }) async {
     try {
       final res = await apiProvider
           .getBenefit(
-              '/api/listBenefit?page=' +
-                  page.toString() +
-                  '&limit=' +
-                  limit.toString(),
-              data)
+            '/api/v2/listBenefit?page=' +
+                page.toString() +
+                '&limit=' +
+                limit.toString(),
+            data,
+          )
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return BenefitResponse.fromJson(res.body);
@@ -415,7 +459,7 @@ class ApiRepository {
   Future<TypeCutiResponse?> typeCuti({int page = 1, int limit = 10}) async {
     try {
       final res = await apiProvider
-          .getTypeCuti('/api/v1/cuti/type')
+          .getTypeCuti('/api/v2/v1/cuti/type')
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return TypeCutiResponse.fromJson(res.body);
@@ -433,7 +477,7 @@ class ApiRepository {
     print(id);
     try {
       final res = await apiProvider
-          .getShowCuti('/api/v1/cuti/' + id)
+          .getShowCuti('/api/v2/v1/cuti/' + id)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowCutiResponse.fromJson(res.body);
@@ -450,7 +494,7 @@ class ApiRepository {
   Future<BenefitDashboardResponse?> listBenefitDashboard(IdRequest data) async {
     try {
       final res = await apiProvider
-          .getBenefitDashboard('/api/benefit', data)
+          .getBenefitDashboard('/api/v2/benefit', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return BenefitDashboardResponse.fromJson(res.body);
@@ -467,7 +511,7 @@ class ApiRepository {
   Future<ShowCutiResponse?> submitCuti(SubmitCutiRequest data) async {
     try {
       final res = await apiProvider
-          .submitCuti('/api/v1/cuti', data)
+          .submitCuti('/api/v2/v1/cuti', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowCutiResponse.fromJson(res.body);
@@ -482,10 +526,12 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateApprovalCuti(
-      String id, UpdateApprovalCutiRequest data) async {
+    String id,
+    UpdateApprovalCutiRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .updateApprovalCuti('/api/v1/cuti/update-status/' + id, data)
+          .updateApprovalCuti('/api/v2/v1/cuti/update-status/' + id, data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -500,11 +546,13 @@ class ApiRepository {
   }
 
   Future<ShowCutiResponse?> updateCuti(
-      String id, SubmitCutiRequest data) async {
+    String id,
+    SubmitCutiRequest data,
+  ) async {
     print(data);
     try {
       final res = await apiProvider
-          .updateCuti('/api/v1/cuti/' + id, data)
+          .updateCuti('/api/v2/v1/cuti/' + id, data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200 || res.statusCode == 401) {
@@ -521,11 +569,14 @@ class ApiRepository {
   //END BENEFIT
 
   //START IZIN
-  Future<IzinResponse?> listIzin(
-      {int page = 1, int limit = 10, required IdRequest data}) async {
+  Future<IzinResponse?> listIzin({
+    int page = 1,
+    int limit = 10,
+    required IdRequest data,
+  }) async {
     try {
       final res = await apiProvider
-          .getIzin('/api/listIjin?page=' + page.toString(), data)
+          .getIzin('/api/v2/listIjin?page=' + page.toString(), data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return IzinResponse.fromJson(res.body);
@@ -542,7 +593,7 @@ class ApiRepository {
   Future<TypeIzinResponse?> typeIzin() async {
     try {
       final res = await apiProvider
-          .getTypeIzin('/api/masterIjin')
+          .getTypeIzin('/api/v2/masterIjin')
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return TypeIzinResponse.fromJson(res.body);
@@ -559,7 +610,7 @@ class ApiRepository {
   Future<ShowIzinResponse?> showIzin(ShowLeaveRequest data) async {
     try {
       final res = await apiProvider
-          .getShowIzin('/api/detailIjin', data)
+          .getShowIzin('/api/v2/detailIjin', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowIzinResponse.fromJson(res.body);
@@ -576,7 +627,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitIzin(SubmitIzinRequest data) async {
     try {
       final res = await apiProvider
-          .submitIzin('/api/ijin', data)
+          .submitIzin('/api/v2/ijin', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -591,10 +642,12 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateApprovalIzin(
-      String id, UpdateApprovalIzinRequest data) async {
+    String id,
+    UpdateApprovalIzinRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .updateApprovalIzin('/api/v1/izin/update-status/' + id, data)
+          .updateApprovalIzin('/api/v2/v1/izin/update-status/' + id, data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -612,7 +665,7 @@ class ApiRepository {
     print(data);
     try {
       final res = await apiProvider
-          .updateIzin('/api/v1/izin/set-done/' + id, data)
+          .updateIzin('/api/v2/v1/izin/set-done/' + id, data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200 || res.statusCode == 401) {
@@ -631,7 +684,7 @@ class ApiRepository {
   Future<EventResponse?> listEvent({int page = 1, int limit = 10}) async {
     try {
       final res = await apiProvider
-          .getReliver('/api/listEvent')
+          .getReliver('/api/v2/listEvent')
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return EventResponse.fromJson(res.body);
@@ -648,7 +701,7 @@ class ApiRepository {
   Future<ShowReliverResponse?> showReliver(ShowEventRequest data) async {
     try {
       final res = await apiProvider
-          .getShowReliver('/api/detailEvent', data)
+          .getShowReliver('/api/v2/detailEvent', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowReliverResponse.fromJson(res.body);
@@ -666,7 +719,7 @@ class ApiRepository {
     try {
       print(data);
       final res = await apiProvider
-          .submitReliver('/api/v1/reliver', data)
+          .submitReliver('/api/v2/v1/reliver', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -681,10 +734,12 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateApprovalReliver(
-      String id, ApproveReliverRequest data) async {
+    String id,
+    ApproveReliverRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .updateApprovalReliver('/api/v1/reliver/approve/' + id, data)
+          .updateApprovalReliver('/api/v2/v1/reliver/approve/' + id, data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -702,7 +757,7 @@ class ApiRepository {
   Future<ErrorResponse?> deleteTaskList(String idTask, String idType) async {
     try {
       final res = await apiProvider
-          .deleteTaskList('/api/v1/task/' + idTask + '/' + idType)
+          .deleteTaskList('/api/v2/v1/task/' + idTask + '/' + idType)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -716,11 +771,13 @@ class ApiRepository {
     return null;
   }
 
-  Future<BranchListResponse?> branchList(
-      {int page = 1, int limit = 100}) async {
+  Future<BranchListResponse?> branchList({
+    int page = 1,
+    int limit = 100,
+  }) async {
     try {
       final res = await apiProvider
-          .getBranchList('/api/v1/branch?limit=' + limit.toString())
+          .getBranchList('/api/v2/v1/branch?limit=' + limit.toString())
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200) {
         return BranchListResponse.fromJson(res.body);
@@ -739,7 +796,8 @@ class ApiRepository {
     try {
       final res = await apiProvider
           .getBranchList(
-              '/api/v1/branch/tad-users?branch_id=' + branchId.toString())
+            '/api/v2/v1/branch/tad-users?branch_id=' + branchId.toString(),
+          )
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200) {
@@ -757,7 +815,7 @@ class ApiRepository {
   Future<ErrorResponse?> updateFcmProfile(UpdateFcmProfileRequest data) async {
     try {
       final res = await apiProvider
-          .updateFcmProfile('/api/v1/auth/update', data)
+          .updateFcmProfile('/api/v2/v1/auth/update', data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200 || res.statusCode == 401) {
@@ -773,10 +831,11 @@ class ApiRepository {
   }
 
   Future<UpdateProfileResponse?> updatePhotoProfile(
-      UpdatePhotoProfileRequest data) async {
+    UpdatePhotoProfileRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .updatePhotoProfile('/api/v1/auth/update', data)
+          .updatePhotoProfile('/api/v2/v1/auth/update', data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200 || res.statusCode == 401) {
@@ -794,7 +853,7 @@ class ApiRepository {
   Future<ShowReviewRateResponse?> getRate() async {
     try {
       final res = await apiProvider
-          .getRate('/api/v1/rate')
+          .getRate('/api/v2/v1/rate')
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200) {
@@ -812,7 +871,7 @@ class ApiRepository {
   Future<ShowReviewRateResponse?> submitRate(SubmitRate data) async {
     try {
       final res = await apiProvider
-          .submitRate('/api/v1/rate', data)
+          .submitRate('/api/v2/v1/rate', data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200) {
@@ -830,7 +889,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitInput(SubmitInputRequest data) async {
     try {
       final res = await apiProvider
-          .submitInput('/api/saveCall', data)
+          .submitInput('/api/v2/saveCall', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -847,7 +906,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitKuisioner(SubmitKuisionerRequest data) async {
     try {
       final res = await apiProvider
-          .submitKuisioner('/api/simpanQuisionerKedua', data)
+          .submitKuisioner('/api/v2/simpanQuisionerKedua', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -862,10 +921,11 @@ class ApiRepository {
   }
 
   Future<InputDataKuisionerRespons?> submitDataKuisioner(
-      KuisionerInputDataRequest data) async {
+    KuisionerInputDataRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .submitInputDataKuisioner('/api/simpanQuisionerAwal', data)
+          .submitInputDataKuisioner('/api/v2/simpanQuisionerAwal', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return InputDataKuisionerRespons.fromJson(res.body);
@@ -880,8 +940,9 @@ class ApiRepository {
   }
 
   Future<AttendanceValidateResponse?> validateAttendanceStore(
-      AttendanceValidateRequest request) async {
-    final link = '/api/beforeAbsenKampas';
+    AttendanceValidateRequest request,
+  ) async {
+    final link = '/api/v2/beforeAbsenKampas';
     try {
       final res = await apiProvider
           .validateAttendance(link, request)
@@ -899,10 +960,11 @@ class ApiRepository {
   }
 
   Future<AttendanceSubmitResponse?> submitAttendanceStore(
-      AttendanceSubmitRequestWrapper data) async {
+    AttendanceSubmitRequestWrapper data,
+  ) async {
     try {
       final res = await apiProvider
-          .submitKunjungan('/api/chekInkampas', data)
+          .submitKunjungan('/api/v2/chekInkampas', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return AttendanceSubmitResponse.fromJson(res.body);
@@ -917,10 +979,11 @@ class ApiRepository {
   }
 
   Future<AttendanceSubmitResponse?> submitNonScheduleVisited(
-      NonScheduleSubmitRequest data) async {
+    NonScheduleSubmitRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .submitNonKunjungan('/api/simpanKunjunganNon', data)
+          .submitNonKunjungan('/api/v2/simpanKunjunganNon', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return AttendanceSubmitResponse.fromJson(res.body);
@@ -935,10 +998,11 @@ class ApiRepository {
   }
 
   Future<AttendanceSubmitResponse?> submitAttendanceOutStore(
-      AttendanceSubmitRequest data) async {
+    AttendanceSubmitRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .submitAttendance('/api/chekOutkampas', data)
+          .submitAttendance('/api/v2/chekOutkampas', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return AttendanceSubmitResponse.fromJson(res.body);
@@ -952,11 +1016,14 @@ class ApiRepository {
     return null;
   }
 
-  Future<KanvasResponse?> listStore(
-      {int page = 1, int limit = 10, required UserIdRequest data}) async {
+  Future<KanvasResponse?> listStore({
+    int page = 1,
+    int limit = 10,
+    required UserIdRequest data,
+  }) async {
     try {
       final res = await apiProvider
-          .getStore('/api/ListKampas?user_id=' + data.id)
+          .getStore('/api/v2/ListKampas?user_id=' + data.id)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return KanvasResponse.fromJson(res.body);
@@ -973,7 +1040,7 @@ class ApiRepository {
   Future<ErrorResponse?> decreaseQtyItems(QtyUpdateRequest data) async {
     try {
       final res = await apiProvider
-          .submitQtyInput('/api/qtyKurang', data)
+          .submitQtyInput('/api/v2/qtyKurang', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -987,11 +1054,14 @@ class ApiRepository {
     return null;
   }
 
-  Future<ListItemsResponse?> listItems(
-      {int page = 1, int limit = 10, required UserIdRequest data}) async {
+  Future<ListItemsResponse?> listItems({
+    int page = 1,
+    int limit = 10,
+    required UserIdRequest data,
+  }) async {
     try {
       final res = await apiProvider
-          .getStore('/api/ListBarangKanvas?user_id=' + data.id)
+          .getStore('/api/v2/ListBarangKanvas?user_id=' + data.id)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ListItemsResponse.fromJson(res.body);
@@ -1005,11 +1075,12 @@ class ApiRepository {
     return null;
   }
 
-  Future<ListKuisionerRespons?> listKuisioner(
-      {required ListKuisionerRequest data}) async {
+  Future<ListKuisionerRespons?> listKuisioner({
+    required ListKuisionerRequest data,
+  }) async {
     try {
       final res = await apiProvider
-          .getKuisioner('/api/listQuisioner', data)
+          .getKuisioner('/api/v2/listQuisioner', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ListKuisionerRespons.fromJson(res.body);
@@ -1027,7 +1098,7 @@ class ApiRepository {
   Future<LemburResponse?> listLembur({required UserIdRequest data}) async {
     try {
       final res = await apiProvider
-          .getLembur('/api/list_lembur', data)
+          .getLembur('/api/v2/list_lembur', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return LemburResponse.fromJson(res.body);
@@ -1044,7 +1115,7 @@ class ApiRepository {
   Future<ShowLemburResponse?> showLembur(ShowLemburRequest data) async {
     try {
       final res = await apiProvider
-          .getShowLembur('/api/detail_lembur', data)
+          .getShowLembur('/api/v2/detail_lembur', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowLemburResponse.fromJson(res.body);
@@ -1061,7 +1132,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitLembur(SubmitLemburRequest data) async {
     try {
       final res = await apiProvider
-          .submitLembur('/api/simpan_lembur', data)
+          .submitLembur('/api/v2/simpan_lembur', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1076,10 +1147,11 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateApprovalLembur(
-      UpdateApprovalLemburRequest data) async {
+    UpdateApprovalLemburRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .updateApprovalLembur('/api/approve_lembur', data)
+          .updateApprovalLembur('/api/v2/approve_lembur', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1094,11 +1166,13 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateLembur(
-      String id, SubmitLemburRequest data) async {
+    String id,
+    SubmitLemburRequest data,
+  ) async {
     print(data);
     try {
       final res = await apiProvider
-          .updateLembur('/api/v1/izin/set-done/' + id, data)
+          .updateLembur('/api/v2/v1/izin/set-done/' + id, data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200 || res.statusCode == 401) {
@@ -1116,7 +1190,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitLead(SubmitLeadRequest data) async {
     try {
       final res = await apiProvider
-          .submitLead('/api/simpan_leads', data)
+          .submitLead('/api/v2/simpan_leads', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1133,7 +1207,7 @@ class ApiRepository {
   Future<LeadResponse?> listLeads({required UserIdRequest data}) async {
     try {
       final res = await apiProvider
-          .getLeads('/api/get_leads', data)
+          .getLeads('/api/v2/get_leads', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return LeadResponse.fromJson(res.body);
@@ -1147,14 +1221,16 @@ class ApiRepository {
     return null;
   }
 
-  Future<MasterData2Response?> getMasterData2(String filter,
-      {String userId = '0'}) async {
+  Future<MasterData2Response?> getMasterData2(
+    String filter, {
+    String userId = '0',
+  }) async {
     try {
       String url = '';
       if (userId != '0') {
-        url = '/api/getMaster?flag=' + filter + '&user_id=' + userId;
+        url = '/api/v2/getMaster?flag=' + filter + '&user_id=' + userId;
       } else {
-        url = '/api/getMaster?flag=' + filter;
+        url = '/api/v2/getMaster?flag=' + filter;
       }
       final res = await apiProvider
           .getMasterData(url)
@@ -1172,10 +1248,11 @@ class ApiRepository {
   }
 
   Future<DetailStoreResponse?> showDetailKunjungan(
-      ShowDetailKunjunganRequest data) async {
+    ShowDetailKunjunganRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .getShowKunjungan('/api/DetailListKampas', data)
+          .getShowKunjungan('/api/v2/DetailListKampas', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return DetailStoreResponse.fromJson(res.body);
@@ -1193,7 +1270,7 @@ class ApiRepository {
   Future<CutiSalesResponse?> listCuti({required UserIdRequest data}) async {
     try {
       final res = await apiProvider
-          .getLembur('/api/list_cuti', data)
+          .getLembur('/api/v2/list_cuti', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return CutiSalesResponse.fromJson(res.body);
@@ -1208,10 +1285,11 @@ class ApiRepository {
   }
 
   Future<ShowCutiSalesResponse?> showCutiSales(
-      ShowCutiSalesRequest data) async {
+    ShowCutiSalesRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .getShowCutiSales('/api/detail_cuti', data)
+          .getShowCutiSales('/api/v2/detail_cuti', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowCutiSalesResponse.fromJson(res.body);
@@ -1228,7 +1306,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitCutiSales(SubmitCutiSalesRequest data) async {
     try {
       final res = await apiProvider
-          .submitCutiSales('/api/simpan_cuti', data)
+          .submitCutiSales('/api/v2/simpan_cuti', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1243,10 +1321,11 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateApprovalCutiSales(
-      UpdateApprovalCutiSalesRequest data) async {
+    UpdateApprovalCutiSalesRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .updateApprovalCutiSales('/api/approve_cuti', data)
+          .updateApprovalCutiSales('/api/v2/approve_cuti', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1261,11 +1340,13 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateCutiSales(
-      String id, SubmitCutiSalesRequest data) async {
+    String id,
+    SubmitCutiSalesRequest data,
+  ) async {
     print(data);
     try {
       final res = await apiProvider
-          .updateCutiSales('/api/v1/izin/set-done/' + id, data)
+          .updateCutiSales('/api/v2/v1/izin/set-done/' + id, data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200 || res.statusCode == 401) {
@@ -1283,7 +1364,7 @@ class ApiRepository {
   Future<ErrorResponse?> sumbmitDialogMood(SubmitDialogMoodRequest data) async {
     try {
       final res = await apiProvider
-          .submitDialogMood('/api/simpan_emo', data)
+          .submitDialogMood('/api/v2/simpan_emo', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1298,10 +1379,11 @@ class ApiRepository {
   }
 
   Future<DashboardKunjunganResponse?> getDashboardKunjungan(
-      DashboardRequest data) async {
+    DashboardRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .getDashboardKunjungan('/api/jumlah_kunjungan', data)
+          .getDashboardKunjungan('/api/v2/jumlah_kunjungan', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return DashboardKunjunganResponse.fromJson(res.body);
@@ -1316,10 +1398,11 @@ class ApiRepository {
   }
 
   Future<ShowProspekV2Response?> showProspekV2(
-      ShowProspectV2Request data) async {
+    ShowProspectV2Request data,
+  ) async {
     try {
       final res = await apiProvider
-          .getShowProspekV2('/api/detail_prospek', data)
+          .getShowProspekV2('/api/v2/detail_prospek', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowProspekV2Response.fromJson(res.body);
@@ -1336,7 +1419,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitProspectV2(SubmitProspekV2Request data) async {
     try {
       final res = await apiProvider
-          .submitProspectV2('/api/simpan_prospek', data)
+          .submitProspectV2('/api/v2/simpan_prospek', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200) {
         return ErrorResponse.fromJson(res.body);
@@ -1353,7 +1436,7 @@ class ApiRepository {
   Future<ProspekV2Response?> listProspekV2(UserIdRequest data) async {
     try {
       final res = await apiProvider
-          .getProspekV2('/api/list_prospek', data)
+          .getProspekV2('/api/v2/list_prospek', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ProspekV2Response.fromJson(res.body);
@@ -1370,7 +1453,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitAgent(SubmitAgentRequest data) async {
     try {
       final res = await apiProvider
-          .submitAgent('/api/simpan_leads', data)
+          .submitAgent('/api/v2/simpan_leads', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1387,7 +1470,7 @@ class ApiRepository {
   Future<AgentResponse?> listAgent({required UserIdRequest data}) async {
     try {
       final res = await apiProvider
-          .getAgent('/api/get_leads', data)
+          .getAgent('/api/v2/get_leads', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return AgentResponse.fromJson(res.body);
@@ -1402,10 +1485,11 @@ class ApiRepository {
   }
 
   Future<ShowProspekV2Response?> submitStatusLead(
-      SubmitStatusLeadRequest data) async {
+    SubmitStatusLeadRequest data,
+  ) async {
     try {
       final res = await apiProvider
-          .submitStatusLead('/api/update_leads', data)
+          .submitStatusLead('/api/v2/update_leads', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowProspekV2Response.fromJson(res.body);

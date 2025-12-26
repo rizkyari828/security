@@ -5,6 +5,7 @@ import 'package:sales/models/response/izin/show_izin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sales/modules/home/base_controller.dart';
+import 'package:sales/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LeaveDetailController extends BaseController {
@@ -59,8 +60,12 @@ class LeaveDetailController extends BaseController {
   void getDetailIzin() async {
     final res =
         await apiRepository.showIzin(ShowLeaveRequest(id: argm.toString()));
-    print(res!.data!);
-    detail.value = res.data!.first;
+    final data = res?.data;
+    if (data == null || data.isEmpty) {
+      CommonWidget.errorSnackBar('Gagal memuat detail izin');
+      return;
+    }
+    detail.value = data.first;
   }
 
   void approval({

@@ -19,11 +19,10 @@ class LoadingTracker {
   }
 
   static void end(Request request) {
-    if (request.headers[headerKey] != '1') return;
+    if (!shouldShow(request)) return;
     if (_inflight > 0) _inflight -= 1;
     if (_inflight == 0) {
       EasyLoading.dismiss();
     }
   }
 }
-

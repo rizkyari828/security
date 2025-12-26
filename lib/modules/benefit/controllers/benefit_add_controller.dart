@@ -93,11 +93,11 @@ class BenefitAddController extends GetxController {
           note: noteController.text,
           leaveTypeId: nameItem.value),
     );
-    if (res!.data != null) {
+    if (res?.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
       Get.back();
     } else {
-      EasyLoading.showError('Gagal disimpan');
+      EasyLoading.showError(res?.message ?? 'Gagal disimpan');
     }
   }
 

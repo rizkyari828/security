@@ -41,6 +41,8 @@ class AttendanceController extends FaceRecognitionController {
   late MeTab meTab;
   late LatLng myLocation = LatLng(0, 0);
   late ValidateData userSchedule;
+  final RxString distanceToOffice = ''.obs;
+  final Rxn<LatLng> officeLocation = Rxn<LatLng>();
 
   String? namaLokasi;
   RxBool isClockIn = false.obs;
@@ -59,7 +61,8 @@ class AttendanceController extends FaceRecognitionController {
   var imageFileList = <XFile>[].obs;
 
   set _imageFile(XFile? value) {
-    imageFileList.addAll((value == null ? null : <XFile>[value])!);
+    if (value == null) return;
+    imageFileList.add(value);
   }
 
   dynamic pickImageError;
@@ -99,7 +102,12 @@ class AttendanceController extends FaceRecognitionController {
           ),
         ),
       );
-      if (res!.message == "berhasil absen masuk") {
+      if (res == null) {
+        EasyLoading.showError('Gagal mengirim absensi');
+        return;
+      }
+
+      if (res.message == "berhasil absen masuk") {
         if (type == 'Clock In') {
           EasyLoading.showSuccess('Berhasil Clock In');
           var now = new DateTime.now();
@@ -142,7 +150,12 @@ class AttendanceController extends FaceRecognitionController {
         ),
       ));
       print(res);
-      if (res!.message == "berhasil absen keluar") {
+      if (res == null) {
+        EasyLoading.showError('Gagal mengirim absensi');
+        return;
+      }
+
+      if (res.message == "berhasil absen keluar") {
         EasyLoading.showSuccess('Berhasil Clock Out');
         var now = new DateTime.now();
         timeOut.value = DateFormat("HH:mm:ss").format(now);
@@ -283,7 +296,9 @@ class AttendanceController extends FaceRecognitionController {
             imageQuality: quality,
           );
 
-          imageFileList.addAll(pickedFileList!);
+          if (pickedFileList != null) {
+            imageFileList.addAll(pickedFileList);
+          }
         } catch (e) {
           pickImageError = e;
         }
@@ -438,6 +453,8 @@ class AttendanceController extends FaceRecognitionController {
     timeIn.value = '--:--';
     timeOut.value = '--:--';
     duration.value = '--:--';
+    distanceToOffice.value = '';
+    officeLocation.value = null;
     markers.clear();
     determinePosition();
     getSchedule();
@@ -488,17 +505,21 @@ class AttendanceController extends FaceRecognitionController {
               token: token.value.toString()));
       print(res);
       userSchedule = res?.data?.first ?? userSchedule;
+      distanceToOffice.value = res?.data?.first.jarak?.toString() ?? '';
 
       LatLng _myOffice = LatLng(
           res?.data?.first.latitude ?? 0.0, res?.data?.first.longitude ?? 0.0);
+      officeLocation.value = _myOffice;
 
       circles.add(Circle(
         circleId: CircleId('A1'),
         center: _myOffice,
         radius: 150,
-        fillColor: CommonWidget.setOpacity(ColorConstants.secondaryAppColor, 0.9),
+        fillColor:
+            CommonWidget.setOpacity(ColorConstants.secondaryAppColor, 0.9),
         strokeWidth: 3,
-        strokeColor: CommonWidget.setOpacity(ColorConstants.secondaryAppColor, 0.9),
+        strokeColor:
+            CommonWidget.setOpacity(ColorConstants.secondaryAppColor, 0.9),
       ));
 
       if (res?.data?.first.flag == "1") {
@@ -514,14 +535,53 @@ class AttendanceController extends FaceRecognitionController {
           // DateTime parseDateIn =
           //     DateTime.parse(res?.data?.first.absenIn.toString() ?? '');
           timeOut.value = res?.data?.first.absenOut.toString() ?? '';
-          // duration.value = _printDuration(parseDateOut.difference(parseDateIn));
         }
       } else {
         isClockIn.value = false;
       }
+
+      _updateDuration();
     } catch (e) {
+      distanceToOffice.value = '';
+      officeLocation.value = null;
       isClockIn.value = false;
     }
+  }
+
+  void _updateDuration() {
+    final inTime = _tryParseClockTime(timeIn.value);
+    final outTime = _tryParseClockTime(timeOut.value);
+    if (inTime == null || outTime == null) {
+      duration.value = '--:--';
+      return;
+    }
+
+    var diff = outTime.difference(inTime);
+    if (diff.isNegative) {
+      diff += const Duration(days: 1);
+    }
+
+    duration.value = _formatDuration(diff);
+  }
+
+  DateTime? _tryParseClockTime(String value) {
+    final raw = value.trim();
+    if (raw.isEmpty || raw == '--:--') return null;
+
+    try {
+      final t = DateFormat('HH:mm:ss', 'id_ID').parseLoose(raw);
+      final now = DateTime.now();
+      return DateTime(now.year, now.month, now.day, t.hour, t.minute, t.second);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String _formatDuration(Duration d) {
+    final hours = d.inHours;
+    final minutes = d.inMinutes.remainder(60);
+    if (hours <= 0) return '${minutes}m';
+    return '${hours}j ${minutes}m';
   }
 
   void switchTab(index) {

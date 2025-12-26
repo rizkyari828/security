@@ -28,19 +28,20 @@ class RecapHistoryResponse {
         status: json["status"] == null ? null : json["status"],
         message: json["message"] == null ? null : json["message"],
         error: json["error"] == null ? null : json["error"],
-        data: json["Data"] == null
-            ? null
-            : List<DataHistory>.from(
-                json["Data"].map((x) => DataHistory.fromJson(x))),
+        data: (json["Data"] is List)
+            ? (json["Data"] as List)
+                .whereType<Map>()
+                .map((x) => DataHistory.fromJson(Map<String, dynamic>.from(x)))
+                .toList()
+            : <DataHistory>[],
       );
 
   Map<String, dynamic> toJson() => {
         "status": status == null ? null : status,
         "message": message == null ? null : message,
         "error": error == null ? null : error,
-        "Data": data == null
-            ? null
-            : List<dynamic>.from(data!.map((x) => x.toJson())),
+        "Data": List<dynamic>.from(
+            (data ?? <DataHistory>[]).map((x) => x.toJson())),
       };
 }
 

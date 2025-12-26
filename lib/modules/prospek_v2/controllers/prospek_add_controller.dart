@@ -245,7 +245,12 @@ class ProspekV2AddController extends BaseController {
     masterData.clear();
     final resListLeadSource =
         await apiRepository.getMasterData2('Status Order');
-    masterData.value = resListLeadSource!.data!;
+    final statusOrderData = resListLeadSource?.data;
+    if (statusOrderData != null) {
+      masterData.value = statusOrderData;
+    } else {
+      masterData.clear();
+    }
     for (var element in masterData) {
       listSourceOfOrder.add(element);
     }
@@ -253,7 +258,12 @@ class ProspekV2AddController extends BaseController {
     masterData.clear();
     final resListLeadCategory =
         await apiRepository.getMasterData2('Status Prospek');
-    masterData.value = resListLeadCategory!.data!;
+    final statusProspekData = resListLeadCategory?.data;
+    if (statusProspekData != null) {
+      masterData.value = statusProspekData;
+    } else {
+      masterData.clear();
+    }
     for (var element in masterData) {
       listStatusProspect.add(element);
     }
@@ -261,7 +271,12 @@ class ProspekV2AddController extends BaseController {
     masterData.clear();
     final resListStatusLead =
         await apiRepository.getMasterData2('Media Prospek');
-    masterData.value = resListStatusLead!.data!;
+    final mediaProspekData = resListStatusLead?.data;
+    if (mediaProspekData != null) {
+      masterData.value = mediaProspekData;
+    } else {
+      masterData.clear();
+    }
     for (var element in masterData) {
       listMediaCommuncation.add(element);
     }
@@ -269,7 +284,12 @@ class ProspekV2AddController extends BaseController {
     masterData.clear();
     final resListMinatProduct =
         await apiRepository.getMasterData2('Produk', userId: userId.value);
-    masterData.value = resListMinatProduct!.data!;
+    final produkData = resListMinatProduct?.data;
+    if (produkData != null) {
+      masterData.value = produkData;
+    } else {
+      masterData.clear();
+    }
     for (var element in masterData) {
       listMinatProduct.add(element);
     }
@@ -277,8 +297,9 @@ class ProspekV2AddController extends BaseController {
     masterData.clear();
     final resListStatusPekerjaan =
         await apiRepository.getMasterData2('Status Kerja Leads');
-    if (resListStatusPekerjaan!.data != null) {
-      masterData.value = resListStatusPekerjaan.data!;
+    final statusPekerjaanData = resListStatusPekerjaan?.data;
+    if (statusPekerjaanData != null) {
+      masterData.value = statusPekerjaanData;
       for (var element in masterData) {
         listStatusPekerjaan.add(element);
       }

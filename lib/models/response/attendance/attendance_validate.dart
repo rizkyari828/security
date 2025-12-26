@@ -25,14 +25,19 @@ class AttendanceValidateResponse {
       AttendanceValidateResponse(
         status: json["status"],
         message: json["message"].toString(),
-        data: List<ValidateData>.from(
-            json["Data"].map((x) => ValidateData.fromJson(x))),
+        data: (json["Data"] is List)
+            ? (json["Data"] as List)
+                .whereType<Map>()
+                .map((x) => ValidateData.fromJson(Map<String, dynamic>.from(x)))
+                .toList()
+            : <ValidateData>[],
       );
 
   Map<String, dynamic> toJson() => {
         "status": status,
         "message": message.toString(),
-        "Data": List<dynamic>.from(data!.map((x) => x.toJson())),
+        "Data": List<dynamic>.from(
+            (data ?? <ValidateData>[]).map((x) => x.toJson())),
       };
 }
 

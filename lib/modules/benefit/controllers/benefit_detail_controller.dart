@@ -4,6 +4,7 @@ import 'package:sales/models/request/cuti/update_approval_request.dart';
 import 'package:sales/models/response/benefit/show_benefit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sales/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BenefitDetailController extends GetxController {
@@ -60,7 +61,12 @@ class BenefitDetailController extends GetxController {
 
   void getDetailCuti() async {
     final res = await apiRepository.showCuti(argm.toString());
-    detail.value = res!.data!;
+    final data = res?.data;
+    if (data == null) {
+      CommonWidget.errorSnackBar('Gagal memuat detail cuti');
+      return;
+    }
+    detail.value = data;
     noRequestController.text = detail.value.code ?? '';
     noteController.text = detail.value.note ?? '';
     noteApprovalController.text = detail.value.noteApproval ?? '';

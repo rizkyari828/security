@@ -14,7 +14,8 @@ class LeaveController extends GetxController {
   var imageFileList = <XFile>[].obs;
 
   set _imageFile(XFile? value) {
-    imageFileList.addAll((value == null ? null : <XFile>[value])!);
+    if (value == null) return;
+    imageFileList.add(value);
   }
 
   dynamic pickImageError;
@@ -57,7 +58,9 @@ class LeaveController extends GetxController {
             imageQuality: quality,
           );
 
-          imageFileList.addAll(pickedFileList!);
+          if (pickedFileList != null) {
+            imageFileList.addAll(pickedFileList);
+          }
         } catch (e) {
           pickImageError = e;
         }

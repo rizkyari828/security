@@ -120,7 +120,10 @@ class ProspekDetailController extends GetxController {
 
   void getMasterDataProspek() async {
     final res = await apiRepository.getMasterData();
-    masterData.value = res!.data!;
+    final data = res?.data;
+    if (data == null || data.isEmpty) return;
+
+    masterData.value = data;
     for (var element in masterData) {
       if (element.flag == "1") {
         listSourceOfOrder.add(element);
@@ -136,15 +139,21 @@ class ProspekDetailController extends GetxController {
 
   void getMasterStatusProspek() async {
     final res = await apiRepository.getMasterStatus();
-    masterStatus.value = res!.data!;
+    final data = res?.data;
+    if (data == null || data.isEmpty) return;
+
+    masterStatus.value = data;
     // for (var element in masterStatus) {
-    listStatusOrder.addAll(res.data!);
+    listStatusOrder.addAll(data);
     // }
   }
 
   void getMasteIdProspek() async {
     final res = await apiRepository.getMasterIdProspek();
-    masterId.value = res!.data!;
+    final data = res?.data;
+    if (data == null || data.isEmpty) return;
+
+    masterId.value = data;
   }
 
   void submit() async {
@@ -249,8 +258,13 @@ class ProspekDetailController extends GetxController {
   void getDetailProspek() async {
     final res = await apiRepository.showProspek(
         argm.toString(), GetListRequest(id: '0', token: ''));
-    detail.value = res?.data!.first ?? ProspekDetail();
-    print(res?.data!.first.noTrans);
+    final data = res?.data;
+    if (data == null || data.isEmpty) {
+      CommonWidget.errorSnackBar('Gagal memuat detail prospek');
+      detail.value = ProspekDetail();
+      return;
+    }
+    detail.value = data.first;
     noRequestController.text = detail.value.noTrans ?? '';
     nicknameController.text = detail.value.nama ?? '';
     sourceController.text = detail.value.source ?? '';

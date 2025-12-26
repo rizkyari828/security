@@ -56,7 +56,12 @@ class LeadsDetailController extends BaseController {
   void getMasterData() async {
     masterData.clear();
     final resListStatusLead = await apiRepository.getMasterData2('Status Lead');
-    masterData.value = resListStatusLead!.data!;
+    final statusLeadData = resListStatusLead?.data;
+    if (statusLeadData == null || statusLeadData.isEmpty) {
+      EasyLoading.showError('Gagal memuat master data');
+      return;
+    }
+    masterData.value = statusLeadData;
     for (var element in masterData) {
       listStatusLead.add(element);
     }

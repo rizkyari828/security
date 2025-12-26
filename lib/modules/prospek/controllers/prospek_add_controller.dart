@@ -74,7 +74,10 @@ class ProspekAddController extends GetxController {
 
   void getMasterDataProspek() async {
     final res = await apiRepository.getMasterData();
-    masterData.value = res!.data!;
+    final data = res?.data;
+    if (data == null || data.isEmpty) return;
+
+    masterData.value = data;
     for (var element in masterData) {
       if (element.flag == "1") {
         listSourceOfOrder.add(element);

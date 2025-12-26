@@ -4,6 +4,7 @@ import 'package:sales/models/response/reliver/show_reliver_response.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:sales/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReliverDetailController extends GetxController {
@@ -54,8 +55,12 @@ class ReliverDetailController extends GetxController {
   void getDetail() async {
     final res =
         await apiRepository.showReliver(ShowEventRequest(id: argm.toString()));
-    print(res!.data!);
-    detail.value = res.data!.first;
+    final data = res?.data;
+    if (data == null || data.isEmpty) {
+      CommonWidget.errorSnackBar('Gagal memuat detail event');
+      return;
+    }
+    detail.value = data.first;
   }
 
   void approval({

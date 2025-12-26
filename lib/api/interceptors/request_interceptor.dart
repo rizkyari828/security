@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
+import 'package:sales/api/api_constants.dart';
 import 'package:sales/shared/constants/colors.dart';
 import 'package:sales/shared/utils/common_widget.dart';
 import 'package:sales/shared/utils/size_config.dart';
@@ -59,24 +60,16 @@ FutureOr<Request?> requestInterceptor(Request request) async {
       EasyLoading.showError("Tidak ada koneksi internet");
     });
     return null; // Batalkan request
-  } else {
-    try {
-      final connection = await InternetAddress.lookup('google.com');
-      if (connection.isNotEmpty && connection[0].rawAddress.isNotEmpty) {
-        // Internet OK
-        if (LoadingTracker.shouldShow(request)) LoadingTracker.begin(request);
-        return request;
-      } else {
-        Future.delayed(Duration.zero, () {
-          EasyLoading.showError("Tidak ada koneksi internet");
-        });
-        return null; // Batalkan request
-      }
-    } catch (e) {
-      Future.delayed(Duration.zero, () {
-        EasyLoading.showError("Tidak ada koneksi internet");
-      });
-      return null; // Batalkan request
-    }
   }
+
+  // Catatan: pengecekan DNS `google.com` sering flaky/blocked di beberapa jaringan
+  // sehingga request jadi "timeout" padahal API bisa diakses.
+  // Jika lookup gagal, biarkan request tetap jalan dan biarkan layer HTTP yang menangani.
+  try {
+    final host = Uri.parse(ApiConstants.baseUrl).host;
+    await InternetAddress.lookup(host).timeout(const Duration(seconds: 2));
+  } catch (_) {}
+
+  if (LoadingTracker.shouldShow(request)) LoadingTracker.begin(request);
+  return request;
 }

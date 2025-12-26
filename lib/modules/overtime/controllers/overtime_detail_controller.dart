@@ -5,6 +5,7 @@ import 'package:sales/models/request/lembur/update_approval_request.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sales/models/response/lembur/show_lembur.dart';
+import 'package:sales/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OvertimeDetailController extends GetxController {
@@ -58,8 +59,12 @@ class OvertimeDetailController extends GetxController {
   void getDetailLembur() async {
     final res =
         await apiRepository.showLembur(ShowLemburRequest(id: argm.toString()));
-    print(res!.data!);
-    detail.value = res.data!.first;
+    final data = res?.data;
+    if (data == null || data.isEmpty) {
+      CommonWidget.errorSnackBar('Gagal memuat detail lembur');
+      return;
+    }
+    detail.value = data.first;
     statusApproval.value = detail.value.statusLembur.toString().toLowerCase();
     String idRoleDetail =
         stringRoletoId(detail.value.levelApproval.toString().toLowerCase());

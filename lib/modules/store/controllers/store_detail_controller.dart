@@ -79,7 +79,8 @@ class StoreDetailController extends BaseController {
   dynamic pickImageError;
 
   set _imageFile(XFile? value) {
-    imageFileList.addAll((value == null ? null : <XFile>[value])!);
+    if (value == null) return;
+    imageFileList.add(value);
   }
 
   void showMaps() {
@@ -126,8 +127,9 @@ class StoreDetailController extends BaseController {
         ShowDetailKunjunganRequest(
             id: idStore.value, type: typeStore.value, idUser: userId.value));
     // print(res!.data!);
-    if (res != null || res?.data != null) {
-      detail.value = res!.data!.first;
+    final data = res?.data;
+    if (data != null && data.isNotEmpty) {
+      detail.value = data.first;
 
       final lat = double.tryParse(detail.value.latToko ?? '');
       final lng = double.tryParse(detail.value.langToko ?? '');
@@ -135,14 +137,18 @@ class StoreDetailController extends BaseController {
       if (lat != null && lng != null) {
         try {
           List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-          locationStore.value =
-              "${placemarks[2].street}, ${placemarks[2].subLocality}, ${placemarks[2].locality}, ${placemarks[2].administrativeArea}";
+          final place = placemarks.isNotEmpty ? placemarks.first : null;
+          locationStore.value = place == null
+              ? ''
+              : "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}";
         } catch (e) {
           EasyLoading.showError('Location Toko tidak valid');
         }
       } else {
         EasyLoading.showError('Location Toko tidak valid');
       }
+    } else {
+      EasyLoading.showError('Gagal memuat detail toko');
     }
   }
 
@@ -418,7 +424,9 @@ class StoreDetailController extends BaseController {
             imageQuality: quality,
           );
 
-          imageFileList.addAll(pickedFileList!);
+          if (pickedFileList != null) {
+            imageFileList.addAll(pickedFileList);
+          }
         } catch (e) {
           pickImageError = e;
         }
@@ -521,8 +529,10 @@ class StoreDetailController extends BaseController {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
 
-      locationDetail.value =
-          "${placemarks[2].street}, ${placemarks[2].subLocality}, ${placemarks[2].locality}, ${placemarks[2].administrativeArea}";
+      final place = placemarks.isNotEmpty ? placemarks.first : null;
+      locationDetail.value = place == null
+          ? ''
+          : "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}";
     } catch (e) {
       EasyLoading.showError('Location Toko tidak valid');
     }
