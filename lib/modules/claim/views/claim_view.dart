@@ -1,71 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/widgets/button.dart';
-import '../controllers/claim_controller.dart';
+import 'package:intl/intl.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:sales/modules/claim/controllers/claim_list_controller.dart';
+import 'package:sales/shared/constants/constants.dart';
+import 'package:sales/shared/widgets/approval.dart';
+import 'package:sales/shared/widgets/custom_card.dart';
 
-class ClaimView extends GetView<ClaimController> {
+class ClaimView extends GetView<ClaimListController> {
   const ClaimView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConstants.lightGray,
-      appBar: CommonWidget.appBar(title: 'List Claim'),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16.0),
-            border: Border.all(width: 1.0, color: ColorConstants.borderColor),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 14,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 12),
-              Icon(Icons.medical_services_rounded, size: 64, color: Colors.grey),
-              const SizedBox(height: 10),
-              CommonWidget.subtitleText(
-                text: 'Claim kesehatan (new)',
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-              ),
-              const SizedBox(height: 6),
-              CommonWidget.subtitleMultilineText(
-                text:
-                    'Belum ada data untuk ditampilkan.\nNanti akan berisi list claim + status + detail.',
-                color: Colors.grey,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 22),
-              CustomButton(
-                buttonText: 'AJUKAN CLAIM (DRAFT)',
-                width: MediaQuery.of(context).size.width,
-                onPressed: () {
-                  Get.snackbar(
-                    'Draft',
-                    'Form claim belum dibuat.\n'
-                        'Field rencana: tanggal, provider, nominal, lampiran.',
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-                },
-              ),
-              const SizedBox(height: 4),
-            ],
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: ColorConstants.black),
+        centerTitle: false,
+        title: const Text(
+          'List Claim',
+          style: TextStyle(
+            color: ColorConstants.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontFamily: 'Poppins',
           ),
         ),
+        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
+        elevation: 0.0,
+        actions: [
+          Obx(
+            () => ApprovalFlow.addButtonApproval(
+              controller: controller,
+              onPressed: controller.goToAddPages,
+              showId: '1',
+            ),
+          ),
+        ],
+      ),
+      body: Obx(() => _getItems(controller)),
+    );
+  }
+
+  SmartRefresher _getItems(ClaimListController controller) {
+    return SmartRefresher(
+      enablePullDown: true,
+      enablePullUp: true,
+      header: const WaterDropHeader(),
+      controller: controller.refreshController,
+      onRefresh: controller.onRefresh,
+      onLoading: controller.onLoading,
+      child: ListView.builder(
+        itemCount: controller.listClaim.length,
+        itemBuilder: (context, i) {
+          final item = controller.listClaim[i];
+          return InkWell(
+            onTap: () => controller.goToDetailPages(
+              id: item.idClaim?.toString() ?? '',
+            ),
+            child: CustomExpandedCardView(
+              name: item.user ?? '',
+              firstParagraf:
+                  '${DateFormat("EEEE, d MMMM yyyy", "id_ID").format(item.tanggalClaim ?? DateTime.now())}',
+              secondParagrafLabel: 'Nominal',
+              secondParagrafValue: item.nominal ?? '-',
+              approval: item.statusClaim ?? '',
+              levelApproval: item.levelApproval ?? '',
+            ),
+          );
+        },
       ),
     );
   }
 }
+

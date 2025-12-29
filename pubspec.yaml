@@ -62,6 +62,8 @@ dependencies:
   face_camera: ^0.1.4
   detect_fake_location: ^2.2.0+1
   signature: ^6.3.0
+  path_provider: ^2.1.5
+  open_filex: ^4.7.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3

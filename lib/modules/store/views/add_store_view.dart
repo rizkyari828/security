@@ -19,7 +19,7 @@ class AddStoreView extends GetView<StoreAddController> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: CustomAppBarWithNetwork(
-          title: 'Tambah Kunjungan',
+          title: 'Tambah Patroli',
           networkStatus: controller.qualityNetwork,
         ),
         body: SingleChildScrollView(
@@ -41,7 +41,7 @@ class AddStoreView extends GetView<StoreAddController> {
                     InputInputField(
                       keyboardType: TextInputType.text,
                       controller: controller.nameController,
-                      labelText: "Nama yang dikunjungi",
+                      labelText: "Nama yang dipatroli",
                       isRequired: true,
                       showError: controller.showInputError.value,
                     ),
@@ -60,7 +60,7 @@ class AddStoreView extends GetView<StoreAddController> {
                       listItem: controller.listAgenda.map((item) {
                         return item.nama.toString();
                       }).toList(),
-                      labelText: "Aktivitas Kunjungan",
+                      labelText: "Aktivitas Patroli",
                       onChanged: (value) async {
                         controller.agenda.value = value;
                         controller.agendaId.value = value;
@@ -74,7 +74,7 @@ class AddStoreView extends GetView<StoreAddController> {
                       listItem: controller.listStatus.map((item) {
                         return item.nama.toString();
                       }).toList(),
-                      labelText: "Status Kunjungan",
+                      labelText: "Status Patroli",
                       onChanged: (value) async {
                         controller.status.value = value;
                         controller.statusId.value = value;
@@ -82,7 +82,7 @@ class AddStoreView extends GetView<StoreAddController> {
                       },
                     ),
                     SizedBox(height: 10.0),
-                    CommonWidget.bodyText(text: "Catatan Kunjungan"),
+                    CommonWidget.bodyText(text: "Catatan Patroli"),
                     SizedBox(height: 10.0),
                     TextAreaField(
                       controller: controller.visitNoteController,
@@ -99,7 +99,7 @@ class AddStoreView extends GetView<StoreAddController> {
                     ),
                     SizedBox(height: 10.0),
                     CommonWidget.minSubtitleText(
-                        text: "Silahkan upload bukti Foto kunjungan anda"),
+                        text: "Silahkan upload bukti Foto patroli anda"),
                     SizedBox(height: 10.0),
                     Padding(
                       padding: EdgeInsets.all(8.0),

@@ -16,7 +16,7 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
                   ),
           centerTitle: false,
           title: Text(
-            'Hasil Kunjungan',
+            'Hasil Patroli',
             style: TextStyle(
               color: ColorConstants.black,
               fontWeight: FontWeight.w600,
@@ -72,7 +72,7 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
                             CommonWidget.subtitleText(
                                 text: 'Jadwal ', color: ColorConstants.black),
                             CommonWidget.minHeadText(
-                                text: 'Kunjungan', color: ColorConstants.black),
+                                text: 'Patroli', color: ColorConstants.black),
                           ],
                         ),
                       ),
@@ -132,13 +132,13 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            headerTextSummary('Total Kunjungan', '0', Colors.grey),
+            headerTextSummary('Total Patroli', '0', Colors.grey),
             Divider(
               color: ColorConstants.backgroundTextField,
             ),
             textSummary('Berhasil', '0', Colors.green),
             textSummary('Gagal', '0', Colors.orange),
-            textSummary('Tidak Dikunjungi', '0', Colors.red)
+            textSummary('Tidak Dipatroli', '0', Colors.red)
           ],
         ),
       ),

@@ -41,10 +41,14 @@ import 'package:sales/modules/store/views/detail_store_view.dart';
 import 'package:sales/modules/store/views/result_kunjungan.dart';
 import 'package:sales/modules/store/views/store_view.dart';
 import 'package:sales/modules/claim/bindings/claim_binding.dart';
+import 'package:sales/modules/claim/views/add_claim_view.dart';
 import 'package:sales/modules/claim/views/claim_view.dart';
+import 'package:sales/modules/claim/views/detail_claim_view.dart';
 import 'package:sales/modules/payslip/bindings/payslip_binding.dart';
 import 'package:sales/modules/payslip/views/payslip_view.dart';
 import 'package:sales/modules/shift_swap/bindings/shift_swap_binding.dart';
+import 'package:sales/modules/shift_swap/views/add_shift_swap_view.dart';
+import 'package:sales/modules/shift_swap/views/detail_shift_swap_view.dart';
 import 'package:sales/modules/shift_swap/views/shift_swap_view.dart';
 
 import '../modules/notification/bindings/notification_binding.dart';
@@ -277,8 +281,28 @@ class AppPages {
       binding: ShiftSwapBinding(),
     ),
     GetPage(
+      name: Routes.ADD_SHIFT_SWAP,
+      page: () => const AddShiftSwapView(),
+      binding: ShiftSwapBinding(),
+    ),
+    GetPage(
+      name: Routes.DETAIL_SHIFT_SWAP,
+      page: () => const ShiftSwapDetailView(),
+      binding: ShiftSwapBinding(),
+    ),
+    GetPage(
       name: Routes.CLAIM,
       page: () => const ClaimView(),
+      binding: ClaimBinding(),
+    ),
+    GetPage(
+      name: Routes.ADD_CLAIM,
+      page: () => const AddClaimView(),
+      binding: ClaimBinding(),
+    ),
+    GetPage(
+      name: Routes.DETAIL_CLAIM,
+      page: () => const ClaimDetailView(),
       binding: ClaimBinding(),
     ),
     GetPage(

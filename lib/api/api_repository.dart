@@ -1,10 +1,16 @@
 import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 import 'package:sales/models/models.dart';
 import 'package:sales/models/request/agent/submit_agent.dart';
 import 'package:sales/models/request/attendance/attendance_wrapper.dart';
 import 'package:sales/models/request/attendance/submit_attendance.dart';
 import 'package:sales/models/request/attendance/validate_attenance.dart';
 import 'package:sales/models/request/benefit_request.dart';
+import 'package:sales/models/request/claim/detail_claim_request.dart';
+import 'package:sales/models/request/claim/submit_claim_request.dart';
+import 'package:sales/models/request/claim/update_approval_claim_request.dart';
 import 'package:sales/models/request/cuti/submit_cuti_request.dart';
 import 'package:sales/models/request/cuti/update_approval_request.dart';
 import 'package:sales/models/request/cuti_sales/detail_request_cuti.dart';
@@ -32,6 +38,7 @@ import 'package:sales/models/request/overtime/submit_overtime_client_request.dar
 import 'package:sales/models/request/overtime/submit_request_overtime.dart';
 import 'package:sales/models/request/overtime/update_approval_overtime_request.dart';
 import 'package:sales/models/request/pagination_request.dart';
+import 'package:sales/models/request/payslip/download_payslip_request.dart';
 import 'package:sales/models/request/prospek_v2/detail_request_cuti.dart';
 import 'package:sales/models/request/prospek_v2/submit_request_prospek_v2.dart';
 import 'package:sales/models/request/rate/submit_rate_request.dart';
@@ -40,6 +47,9 @@ import 'package:sales/models/request/reliver/create_reliver_request.dart';
 import 'package:sales/models/request/store/detail_request_leave.dart';
 import 'package:sales/models/request/store/update_qty_request.dart';
 import 'package:sales/models/request/submit_mood_request.dart';
+import 'package:sales/models/request/shift_swap/detail_shift_swap_request.dart';
+import 'package:sales/models/request/shift_swap/submit_shift_swap_request.dart';
+import 'package:sales/models/request/shift_swap/update_approval_shift_swap_request.dart';
 import 'package:sales/models/request/update_fcm_profile_request.dart';
 import 'package:sales/models/request/update_photo_profile_request.dart';
 import 'package:sales/models/request/user_id_request.dart';
@@ -64,9 +74,14 @@ import 'package:sales/models/response/lembur/list_lembur.dart';
 import 'package:sales/models/response/lembur/show_lembur.dart';
 import 'package:sales/models/response/master_data_2_response.dart';
 import 'package:sales/models/response/name_tad_list_response.dart';
+import 'package:sales/models/response/claim/list_claim_response.dart';
+import 'package:sales/models/response/claim/show_claim_response.dart';
+import 'package:sales/models/response/payslip/payslip_download_result.dart';
 import 'package:sales/models/response/prospek/list.dart';
 import 'package:sales/models/response/prospek/master_data_response.dart';
 import 'package:sales/models/response/prospek/master_id_response.dart';
+import 'package:sales/models/response/shift_swap/list_shift_swap_response.dart';
+import 'package:sales/models/response/shift_swap/show_shift_swap_response.dart';
 import 'package:sales/models/response/prospek/master_status_response.dart';
 import 'package:sales/models/response/prospek/show.dart';
 import 'package:sales/models/response/prospek_v2/detail_prospek_v2_response.dart';
@@ -114,14 +129,36 @@ class ApiRepository {
         }
         throw FormatException('Unexpected response body: ${body.runtimeType}');
       } else {
-        EasyLoading.showError('Connection Timeout. Please try again later');
+        if (kDebugMode) {
+          print(
+              '[HTTP] login failed: status=${res.statusCode} bodyType=${res.body.runtimeType}');
+          print('[HTTP] login failed: statusText=${res.statusText}');
+          if (res.body != null) print(res.body);
+        }
+
+        if (res.statusCode == -1) {
+          EasyLoading.showError('Tidak ada koneksi internet');
+        } else if (res.status.connectionError) {
+          EasyLoading.showError(
+              'Gagal terhubung ke server. Coba ganti jaringan / matikan IPv6.');
+        } else {
+          EasyLoading.showError('Login gagal (${res.statusCode})');
+        }
         EasyLoading.dismiss();
       }
     } on TimeoutException catch (_) {
       EasyLoading.showError('Connection Timeout. Please try again later');
       EasyLoading.dismiss();
-    } catch (exception) {
-      print(exception);
+    } catch (exception, stackTrace) {
+      final message = exception.toString();
+      if (message.contains('Request dibatalkan')) return null;
+
+      if (kDebugMode) {
+        print('[HTTP] login exception: $exception');
+        print(stackTrace);
+      }
+      EasyLoading.showError('Terjadi kesalahan. Silakan coba lagi.');
+      EasyLoading.dismiss();
     }
     return null;
   }
@@ -1361,6 +1398,194 @@ class ApiRepository {
     return null;
   }
 
+  //START SHIFT SWAP
+  Future<ShiftSwapListResponse?> listShiftSwap(
+      {required UserIdRequest data}) async {
+    try {
+      final res = await apiProvider
+          .getShiftSwap('/api/v2/list_tukar_shift', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ShiftSwapListResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ShowShiftSwapResponse?> showShiftSwap(ShowShiftSwapRequest data) async {
+    try {
+      final res = await apiProvider
+          .getShowShiftSwap('/api/v2/detail_tukar_shift', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ShowShiftSwapResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ErrorResponse?> submitShiftSwap(SubmitShiftSwapRequest data) async {
+    try {
+      final res = await apiProvider
+          .submitShiftSwap('/api/v2/simpan_tukar_shift', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ErrorResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ErrorResponse?> updateApprovalShiftSwap(
+      UpdateApprovalShiftSwapRequest data) async {
+    try {
+      final res = await apiProvider
+          .updateApprovalShiftSwap('/api/v2/approve_tukar_shift', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ErrorResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+  //END SHIFT SWAP
+
+  //START CLAIM
+  Future<ClaimListResponse?> listClaim({required UserIdRequest data}) async {
+    try {
+      final res = await apiProvider
+          .getClaim('/api/v2/list_claim', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ClaimListResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ShowClaimResponse?> showClaim(ShowClaimRequest data) async {
+    try {
+      final res = await apiProvider
+          .getShowClaim('/api/v2/detail_claim', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ShowClaimResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ErrorResponse?> submitClaim(SubmitClaimRequest data) async {
+    try {
+      final res = await apiProvider
+          .submitClaim('/api/v2/simpan_claim', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ErrorResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ErrorResponse?> updateApprovalClaim(UpdateApprovalClaimRequest data) async {
+    try {
+      final res = await apiProvider
+          .updateApprovalClaim('/api/v2/approve_claim', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ErrorResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+  //END CLAIM
+
+  //START PAYSLIP
+  Future<PayslipDownloadResult?> downloadPayslipExcel(
+      DownloadPayslipRequest data) async {
+    try {
+      final res = await apiProvider
+          .downloadPayslipExcel('/api/v2/payslip/excel', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode != 200 && res.statusCode != 401) return null;
+
+      final contentType = _headerValue(res.headers, 'content-type') ?? '';
+      if (contentType.toLowerCase().contains('application/json')) {
+        try {
+          final message = ErrorResponse.fromJson(res.body);
+          if (message.error == true) {
+            EasyLoading.showError(message.message ?? 'Gagal download payslip');
+          }
+        } catch (_) {
+          EasyLoading.showError('Gagal download payslip');
+        }
+        return null;
+      }
+
+      final bytes = await _collectBodyBytes(res.bodyBytes);
+      if (bytes == null || bytes.isEmpty) {
+        EasyLoading.showError('File kosong / tidak ditemukan');
+        return null;
+      }
+
+      final filename = _filenameFromContentDisposition(
+        _headerValue(res.headers, 'content-disposition'),
+      );
+      return PayslipDownloadResult(
+        bytes: bytes,
+        filename: filename,
+        mimeType: contentType.isEmpty ? null : contentType,
+      );
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+  //END PAYSLIP
+
   Future<ErrorResponse?> sumbmitDialogMood(SubmitDialogMoodRequest data) async {
     try {
       final res = await apiProvider
@@ -1374,6 +1599,41 @@ class ApiRepository {
       EasyLoading.dismiss();
     } catch (exception) {
       print(exception);
+    }
+    return null;
+  }
+
+  String? _headerValue(Map<String, String>? headers, String name) {
+    if (headers == null) return null;
+    final lowerName = name.toLowerCase();
+    for (final entry in headers.entries) {
+      if (entry.key.toLowerCase() == lowerName) return entry.value;
+    }
+    return null;
+  }
+
+  String? _filenameFromContentDisposition(String? contentDisposition) {
+    if (contentDisposition == null) return null;
+    final value = contentDisposition;
+    final match = RegExp(r"filename\\*=UTF-8''([^;]+)", caseSensitive: false)
+            .firstMatch(value) ??
+        RegExp(r'filename="?([^";]+)"?', caseSensitive: false).firstMatch(value);
+    if (match == null) return null;
+    final raw = match.group(1);
+    if (raw == null || raw.trim().isEmpty) return null;
+    return Uri.decodeFull(raw.trim());
+  }
+
+  Future<Uint8List?> _collectBodyBytes(dynamic bodyBytes) async {
+    if (bodyBytes == null) return null;
+    if (bodyBytes is Uint8List) return bodyBytes;
+    if (bodyBytes is List<int>) return Uint8List.fromList(bodyBytes);
+    if (bodyBytes is Stream<List<int>>) {
+      final builder = BytesBuilder(copy: false);
+      await for (final chunk in bodyBytes) {
+        builder.add(chunk);
+      }
+      return builder.takeBytes();
     }
     return null;
   }

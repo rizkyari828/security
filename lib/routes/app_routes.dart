@@ -45,6 +45,10 @@ abstract class Routes {
   static const DETAIL_AGENT = '/detail-agent';
   static const ADD_AGENT = '/add-agent';
   static const SHIFT_SWAP = '/shift-swap';
+  static const ADD_SHIFT_SWAP = '/add-shift-swap';
+  static const DETAIL_SHIFT_SWAP = '/detail-shift-swap';
   static const CLAIM = '/claim';
+  static const ADD_CLAIM = '/add-claim';
+  static const DETAIL_CLAIM = '/detail-claim';
   static const PAYSLIP = '/payslip';
 }

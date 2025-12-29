@@ -189,7 +189,7 @@ class AddLeadsView extends GetView<LeadsController> {
                     ),
                     SizedBox(height: 10.0),
                     CommonWidget.minSubtitleText(
-                        text: "Silahkan upload bukti Foto kunjungan anda"),
+                        text: "Silahkan upload bukti Foto patroli anda"),
                     SizedBox(height: 10.0),
                     Padding(
                       padding: EdgeInsets.all(8.0),

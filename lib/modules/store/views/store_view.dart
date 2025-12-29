@@ -14,7 +14,7 @@ class StoreView extends GetView<StoreListController> {
     double scaleWidth = MediaQuery.of(context).size.width / 360;
     return Obx(() => Scaffold(
         appBar: CustomAppBarWithNetwork(
-          title: 'Kunjungan',
+          title: 'Patroli',
           networkStatus: controller.qualityNetwork,
           addButton: ApprovalFlow.addButtonApproval(
               controller: controller, onPressed: controller.goToAddPages),
@@ -48,13 +48,13 @@ class StoreView extends GetView<StoreListController> {
                           Expanded(
                             child: Obx(() => pendingTask(
                                   '${controller.dailyProgressCount.value}',
-                                  'Kunjungan hari ini',
+                                  'Patroli hari ini',
                                 )),
                           ),
                           Expanded(
                             child: Obx(() => pendingTask(
                                   '${controller.montlyProgressCount.value}',
-                                  'Kunjungan bulan ini',
+                                  'Patroli bulan ini',
                                 )),
                           ),
                           SizedBox(width: 20),
@@ -83,8 +83,8 @@ class StoreView extends GetView<StoreListController> {
                   name: controller.listStore[i].namaToko ?? '',
                   photo: controller.listStore[i].pathToko ?? '',
                   type: controller.listStore[i].typList == '1'
-                      ? 'Kunjungan Terjadwal'
-                      : 'Kunjungan Tidak Terjadwal',
+                      ? 'Patroli Terjadwal'
+                      : 'Patroli Tidak Terjadwal',
                   address: controller.listStore[i].alamatToko ?? '',
                   statusKunjungan:
                       controller.listStore[i].statusKunjungan ?? ''),
@@ -96,7 +96,7 @@ class StoreView extends GetView<StoreListController> {
   }
 
   Widget pendingTask(String value, String title) {
-    // Pilih icon sesuai jenis kunjungan
+    // Pilih icon sesuai jenis patroli
     IconData iconData;
     Color iconColor;
     if (title.toLowerCase().contains('bulan')) {

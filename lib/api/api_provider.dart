@@ -5,6 +5,9 @@ import 'package:sales/models/request/attendance/attendance_wrapper.dart';
 import 'package:sales/models/request/attendance/submit_attendance.dart';
 import 'package:sales/models/request/attendance/validate_attenance.dart';
 import 'package:sales/models/request/benefit_request.dart';
+import 'package:sales/models/request/claim/detail_claim_request.dart';
+import 'package:sales/models/request/claim/submit_claim_request.dart';
+import 'package:sales/models/request/claim/update_approval_claim_request.dart';
 import 'package:sales/models/request/cuti/submit_cuti_request.dart';
 import 'package:sales/models/request/cuti/update_approval_request.dart';
 import 'package:sales/models/request/cuti_sales/detail_request_cuti.dart';
@@ -32,6 +35,7 @@ import 'package:sales/models/request/overtime/submit_overtime_client_request.dar
 import 'package:sales/models/request/overtime/submit_request_overtime.dart';
 import 'package:sales/models/request/overtime/update_approval_overtime_request.dart';
 import 'package:sales/models/request/pagination_request.dart';
+import 'package:sales/models/request/payslip/download_payslip_request.dart';
 import 'package:sales/models/request/prospek_v2/detail_request_cuti.dart';
 import 'package:sales/models/request/prospek_v2/submit_request_prospek_v2.dart';
 import 'package:sales/models/request/rate/submit_rate_request.dart';
@@ -40,6 +44,9 @@ import 'package:sales/models/request/reliver/create_reliver_request.dart';
 import 'package:sales/models/request/store/detail_request_leave.dart';
 import 'package:sales/models/request/store/update_qty_request.dart';
 import 'package:sales/models/request/submit_mood_request.dart';
+import 'package:sales/models/request/shift_swap/detail_shift_swap_request.dart';
+import 'package:sales/models/request/shift_swap/submit_shift_swap_request.dart';
+import 'package:sales/models/request/shift_swap/update_approval_shift_swap_request.dart';
 import 'package:sales/models/request/update_fcm_profile_request.dart';
 import 'package:sales/models/request/update_photo_profile_request.dart';
 import 'package:get/get.dart';
@@ -47,7 +54,12 @@ import 'package:sales/models/request/user_id_request.dart';
 
 class ApiProvider extends BaseProvider {
   Future<Response> login(String path, LoginRequest data) {
-    return post(path, data.toJson());
+    return post(
+      path,
+      data.toJson(),
+      contentType: 'application/json',
+      headers: const {'accept': 'application/json'},
+    );
   }
 
   Future<Response> logout(String path, LogoutRequest data) {
@@ -392,6 +404,57 @@ class ApiProvider extends BaseProvider {
     return post(path, data.toJson());
   }
   //ENDIZIN
+
+  //START SHIFT SWAP
+  Future<Response> getShiftSwap(String path, UserIdRequest data) {
+    return post(path, data.toJson());
+  }
+
+  Future<Response> getShowShiftSwap(String path, ShowShiftSwapRequest data) {
+    return post(path, data.toJson());
+  }
+
+  Future<Response> submitShiftSwap(String path, SubmitShiftSwapRequest data) {
+    print(data.toJson());
+    return post(path, data.toJson());
+  }
+
+  Future<Response> updateApprovalShiftSwap(
+      String path, UpdateApprovalShiftSwapRequest data) {
+    return post(path, data.toJson());
+  }
+  //END SHIFT SWAP
+
+  //START CLAIM
+  Future<Response> getClaim(String path, UserIdRequest data) {
+    return post(path, data.toJson());
+  }
+
+  Future<Response> getShowClaim(String path, ShowClaimRequest data) {
+    return post(path, data.toJson());
+  }
+
+  Future<Response> submitClaim(String path, SubmitClaimRequest data) {
+    print(data.toJson());
+    return post(path, data.toJson());
+  }
+
+  Future<Response> updateApprovalClaim(
+      String path, UpdateApprovalClaimRequest data) {
+    return post(path, data.toJson());
+  }
+  //END CLAIM
+
+  //START PAYSLIP
+  Future<Response> downloadPayslipExcel(
+      String path, DownloadPayslipRequest data) {
+    final uri = Uri.parse(path).replace(queryParameters: data.toQuery());
+    return get(
+      uri.toString(),
+      headers: const {'X-Show-Error': '1'},
+    );
+  }
+  //END PAYSLIP
 
   Future<Response> getDashboard(String path) {
     return get(path);

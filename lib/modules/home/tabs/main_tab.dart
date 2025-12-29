@@ -121,7 +121,7 @@ class MainTab extends GetView<HomeController> {
                       // Row(
                       //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       //   children: [
-                      //     _cardMenu(Icons.store, "Kunjungan",
+                      //     _cardMenu(Icons.store, "Patroli",
                       //         controller.goToStorePages, Colors.indigo),
                       //     CommonWidget.rowWidth(width: sw * .03),
                       //     _cardMenu(Icons.search_rounded, "Leads",
@@ -1025,8 +1025,8 @@ class MainTab extends GetView<HomeController> {
                       name: controller.listStore[i].namaToko ?? '',
                       photo: controller.listStore[i].pathToko ?? '',
                       type: controller.listStore[i].typList == '1'
-                          ? 'Kunjungan Terjadwal'
-                          : 'Kunjungan Tidak Terjadwal',
+                          ? 'Patroli Terjadwal'
+                          : 'Patroli Tidak Terjadwal',
                       address: controller.listStore[i].alamatToko ?? '',
                       statusKunjungan:
                           controller.listStore[i].statusKunjungan ?? '',
@@ -1058,7 +1058,7 @@ class MainTab extends GetView<HomeController> {
                             ),
                             CommonWidget.rowHeight(height: 5),
                             CommonWidget.subtitleText(
-                              text: 'Belum ada jadwal kunjungan',
+                              text: 'Belum ada jadwal patroli',
                               color: ColorConstants.black,
                               fontWeight: FontWeight.normal,
                             ),
@@ -1089,11 +1089,11 @@ class MainTab extends GetView<HomeController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            headerTextSummary('Total Kunjungan', '0', Colors.grey),
+            headerTextSummary('Total Patroli', '0', Colors.grey),
             Divider(color: ColorConstants.backgroundTextField),
             textSummary('Berhasil', '0', Colors.green),
             textSummary('Gagal', '0', Colors.orange),
-            textSummary('Tidak Dikunjungi', '0', Colors.red),
+            textSummary('Tidak Dipatroli', '0', Colors.red),
           ],
         ),
       ),
@@ -1457,7 +1457,7 @@ class MainTab extends GetView<HomeController> {
                       ),
                       SizedBox(width: 10),
                       CommonWidget.subtitleText(
-                        text: 'Kunjungan',
+                        text: 'Patroli',
                         color: Colors.black,
                       ),
                     ],

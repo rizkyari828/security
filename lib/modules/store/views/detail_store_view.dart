@@ -17,7 +17,7 @@ class StoreDetailView extends GetView<StoreDetailController> {
     double scaleWidth = MediaQuery.of(context).size.width / 360;
     return Obx(() => Scaffold(
         appBar: CustomAppBarWithNetwork(
-          title: 'Detail Kunjungan',
+          title: 'Detail Patroli',
           networkStatus: controller.qualityNetwork,
         ),
         floatingActionButton: controller.isConnectedToInternetWidget.value
@@ -173,7 +173,7 @@ class StoreDetailView extends GetView<StoreDetailController> {
                 isSubtitle: false),
             SizedBox(height: 20.0),
             CommonWidget.minSubtitleText(
-                text: "Silahkan upload bukti Foto kunjungan anda"),
+                text: "Silahkan upload bukti Foto patroli anda"),
             SizedBox(height: 10.0),
             Padding(
               padding: EdgeInsets.all(8.0),
@@ -232,9 +232,9 @@ class StoreDetailView extends GetView<StoreDetailController> {
           isDisabled: controller.imageFileList.length < 1,
           buttonText: controller.isConnectedToInternetWidget.value
               ? 'SIMPAN SEMENTARA'
-              : 'SIMPAN KUNJUNGAN',
+              : 'SIMPAN PATROLI',
           width: MediaQuery.of(context).size.width / 1.13,
-          onPressed: () => controller.submit('Kunjungan'),
+          onPressed: () => controller.submit('Patroli'),
         ),
       ),
     );

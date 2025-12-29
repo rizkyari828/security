@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:detect_fake_location/detect_fake_location.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +17,16 @@ import 'package:sales/shared/widgets/button.dart';
 
 import 'loading_tracker.dart';
 
+const Duration _preflightTimeout = Duration(seconds: 3);
+
+bool _isAuthRequest(Request request) {
+  final path = request.url.path.toLowerCase();
+  return path.endsWith('/login') || path.endsWith('/register');
+}
+
 FutureOr<Request?> requestInterceptor(Request request) async {
+  final stopwatch = Stopwatch()..start();
+
   // Tambahkan header dasar
   request.headers['X-Requested-With'] = 'XMLHttpRequest';
   // var prefs = Get.find<SharedPreferences>();
@@ -24,11 +34,19 @@ FutureOr<Request?> requestInterceptor(Request request) async {
   // request.headers['Authorization'] = 'Bearer $token';
 
   bool isFakeLocation = false;
-  try {
-    isFakeLocation = await DetectFakeLocation().detectFakeLocation();
-    // isFakeLocation = false;
-  } catch (e) {
-    isFakeLocation = false;
+  if (!_isAuthRequest(request)) {
+    try {
+      isFakeLocation = await DetectFakeLocation()
+          .detectFakeLocation()
+          .timeout(_preflightTimeout, onTimeout: () => false);
+      // isFakeLocation = false;
+    } catch (_) {
+      isFakeLocation = false;
+    }
+  }
+  if (kDebugMode) {
+    print(
+        '[HTTP][preflight] fakeLocation=$isFakeLocation ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)');
   }
   if (isFakeLocation) {
     Future.delayed(Duration.zero, () {
@@ -54,8 +72,21 @@ FutureOr<Request?> requestInterceptor(Request request) async {
     return null;
   }
 
-  var result = await Connectivity().checkConnectivity();
-  if (result == ConnectivityResult.none) {
+  List<ConnectivityResult> result;
+  try {
+    result = await Connectivity()
+        .checkConnectivity()
+        .timeout(_preflightTimeout,
+            onTimeout: () => const <ConnectivityResult>[ConnectivityResult.other]);
+  } catch (_) {
+    result = const <ConnectivityResult>[ConnectivityResult.other];
+  }
+  if (kDebugMode) {
+    print(
+        '[HTTP][preflight] connectivity=$result ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)');
+  }
+  final isOffline = result.isEmpty || result.every((r) => r == ConnectivityResult.none);
+  if (isOffline) {
     Future.delayed(Duration.zero, () {
       EasyLoading.showError("Tidak ada koneksi internet");
     });
@@ -69,6 +100,10 @@ FutureOr<Request?> requestInterceptor(Request request) async {
     final host = Uri.parse(ApiConstants.baseUrl).host;
     await InternetAddress.lookup(host).timeout(const Duration(seconds: 2));
   } catch (_) {}
+  if (kDebugMode) {
+    print(
+        '[HTTP][preflight] dns-ok ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)');
+  }
 
   if (LoadingTracker.shouldShow(request)) LoadingTracker.begin(request);
   return request;
