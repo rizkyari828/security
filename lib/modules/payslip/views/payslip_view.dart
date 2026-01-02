@@ -57,14 +57,14 @@ class PayslipView extends GetView<PayslipController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CommonWidget.subtitleText(
-                              text: 'Download Payslip (Excel)',
+                              text: 'Download Payslip (PDF)',
                               color: ColorConstants.black,
                               fontWeight: FontWeight.w700,
                             ),
                             const SizedBox(height: 2),
                             CommonWidget.subtitleMultilineText(
                               text:
-                                  'Pilih bulan & tahun, lalu download file Excel payslip.',
+                                  'Pilih bulan & tahun, lalu download file PDF payslip.',
                               color: Colors.grey,
                             ),
                           ],
@@ -104,7 +104,7 @@ class PayslipView extends GetView<PayslipController> {
                         Text(
                           controller.isDownloading.value
                               ? 'MENGUNDUH...'
-                              : 'DOWNLOAD EXCEL',
+                              : 'DOWNLOAD PDF',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -113,7 +113,7 @@ class PayslipView extends GetView<PayslipController> {
                         ),
                       ],
                     ),
-                    onPressed: controller.downloadExcel,
+                    onPressed: controller.downloadPdf,
                   ),
                   if ((controller.lastSavedPath.value ?? '').isNotEmpty) ...[
                     const SizedBox(height: 18),
@@ -155,4 +155,3 @@ class PayslipView extends GetView<PayslipController> {
     );
   }
 }
-

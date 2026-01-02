@@ -454,12 +454,28 @@ class ApiProvider extends BaseProvider {
       headers: const {'X-Show-Error': '1'},
     );
   }
+
+  Future<Response> downloadPayslipPdf(
+      String path, DownloadPayslipRequest data) {
+    return post(
+      path,
+      data.toListPayslipJson(),
+      contentType: 'application/json',
+      headers: const {'X-Show-Error': '1', 'accept': 'application/json'},
+    );
+  }
+
+  Future<Response> downloadFileFromUrl(String url) {
+    return get(
+      url,
+      headers: const {'X-Show-Error': '1', 'accept': 'application/pdf'},
+    );
+  }
   //END PAYSLIP
 
   Future<Response> getDashboard(String path) {
     return get(path);
   }
-
 
   Future<Response> getDashboardKunjungan(String path, DashboardRequest data) {
     print(data.toJson());

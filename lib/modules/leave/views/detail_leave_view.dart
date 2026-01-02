@@ -10,7 +10,7 @@ class LeaveDetailView extends GetView<LeaveDetailController> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: CommonWidget.appBar(title: 'Detail Leave'),
+        appBar: CommonWidget.appBar(title: 'Detail Izin'),
         body: SingleChildScrollView(
             child: Padding(
           padding: const EdgeInsets.all(25.0),

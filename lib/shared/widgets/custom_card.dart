@@ -168,168 +168,289 @@ class CustomExpandedCardView extends StatelessWidget {
     this.onPressedDelete,
   });
 
+  bool _hasText(String value) => value.trim().isNotEmpty;
+
+  IconData? _iconForTitle(String text) {
+    final hasYear = RegExp(r'\\d{4}').hasMatch(text);
+    if (hasYear && text.contains(',')) return Icons.event_rounded;
+    return null;
+  }
+
+  IconData? _iconForName(String text) {
+    if (text.contains('@')) return Icons.mail_outline_rounded;
+    return null;
+  }
+
+  IconData? _iconForLabel(String label) {
+    final lower = label.trim().toLowerCase();
+    if (lower.contains('mulai') || lower.contains('awal')) {
+      return Icons.play_circle_outline_rounded;
+    }
+    if (lower.contains('selesai') || lower.contains('akhir')) {
+      return Icons.flag_outlined;
+    }
+    if (lower.contains('tanggal') || lower.contains('date')) {
+      return Icons.calendar_month_outlined;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final sh = SizeConfig().screenHeight;
-    return Container(
-      margin: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
-      height: levelApproval != ""
-          ? sh * .17
-          : name == ''
-              ? sh * .15
-              : sh * .16,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(width: 2.0, color: ColorConstants.borderColor),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: CommonWidget.setOpacity(Colors.black, 0.3),
-        //     blurRadius: 20.0,
-        //     spreadRadius: 4.0,
-        //     offset: Offset(
-        //       -10.0,
-        //       10.0,
-        //     ),
-        //   ),
-        // ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
+    final normalizedApproval = approval.trim().toLowerCase();
+    final tone = _ApprovalTone.from(normalizedApproval);
+
+    final titleStyle = const TextStyle(
+      fontFamily: 'Poppins',
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+      color: ColorConstants.black,
+      height: 1.15,
+    );
+
+    final subtitleStyle = TextStyle(
+      fontFamily: 'Poppins',
+      fontSize: 12.5,
+      fontWeight: FontWeight.w500,
+      color: Colors.black.withValues(alpha: 0.68),
+      height: 1.2,
+    );
+
+    final detailLabelStyle = TextStyle(
+      fontFamily: 'Poppins',
+      fontSize: 12.5,
+      fontWeight: FontWeight.w600,
+      color: Colors.black.withValues(alpha: 0.72),
+      height: 1.2,
+    );
+
+    final detailValueStyle = TextStyle(
+      fontFamily: 'Poppins',
+      fontSize: 12.5,
+      fontWeight: FontWeight.w500,
+      color: Colors.black.withValues(alpha: 0.78),
+      height: 1.2,
+    );
+
+    Widget infoLine({required String label, required String value}) {
+      final trimmedLabel = label.trim();
+      final icon = _iconForLabel(trimmedLabel);
+      final iconColor = Colors.black.withValues(alpha: 0.55);
+
+      if (trimmedLabel.isEmpty) {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  firstParagraf == ''
-                      ? SizedBox(height: 0)
-                      : CommonWidget.subtitleText(
-                          text: firstParagraf, fontWeight: FontWeight.bold),
-                  name == ''
-                      ? SizedBox(height: 0)
-                      : CommonWidget.subtitleText(text: name),
-                  secondParagrafValue == ''
-                      ? SizedBox(height: 0)
-                      : Row(
-                          children: [
-                            CommonWidget.subtitleText(
-                                text: secondParagrafLabel),
-                            CommonWidget.subtitleText(
-                                text: ': ' + secondParagrafValue),
-                          ],
-                        ),
-                  thirdParagrafValue == ''
-                      ? SizedBox(height: 0)
-                      : Row(
-                          children: [
-                            CommonWidget.subtitleText(text: thirdParagrafLabel),
-                            CommonWidget.subtitleText(
-                                text: ': ' + thirdParagrafValue),
-                          ],
-                        ),
-                  forthParagraf == ''
-                      ? SizedBox(height: 0)
-                      : CommonWidget.subtitleText(text: forthParagraf),
-                ],
+            if (icon != null) ...[
+              Icon(icon, size: 16, color: iconColor),
+              const SizedBox(width: 8),
+            ],
+            Expanded(
+              child: Text(
+                value,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: detailValueStyle,
               ),
             ),
-            
-            approval != ''
-                ? updateDelete
-                    ? Expanded(
-                        child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                                icon: Icon(
-                                  Icons.create,
-                                  color: Colors.orange,
-                                  size: 30,
-                                ),
-                                onPressed: onPressedEdit),
-                            SizedBox(
-                              width: 5,
+          ],
+        );
+      }
+
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 16, color: iconColor),
+            const SizedBox(width: 8),
+          ],
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: '$trimmedLabel: ', style: detailLabelStyle),
+                  TextSpan(text: value, style: detailValueStyle),
+                ],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      );
+    }
+
+    Widget headline({
+      required String text,
+      required TextStyle style,
+      IconData? icon,
+    }) {
+      final iconColor = Colors.black.withValues(alpha: 0.60);
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 18, color: iconColor),
+            const SizedBox(width: 8),
+          ],
+          Expanded(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: style,
+            ),
+          ),
+        ],
+      );
+    }
+
+    Widget pill({
+      required String text,
+      required Color bg,
+      required Color fg,
+      IconData? icon,
+    }) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: fg.withValues(alpha: 0.18)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 14, color: fg),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+                color: fg,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(left: 16.0, right: 16.0, top: 10.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(
+          width: 1.0,
+          color: ColorConstants.borderColor.withValues(alpha: 0.85),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18.0,
+            spreadRadius: 0.0,
+            offset: const Offset(0.0, 8.0),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_hasText(firstParagraf))
+              headline(
+                text: firstParagraf,
+                style: titleStyle,
+                icon: _iconForTitle(firstParagraf),
+              ),
+            if (_hasText(firstParagraf) && _hasText(name))
+              const SizedBox(height: 2),
+            if (_hasText(name))
+              headline(
+                text: name,
+                style: subtitleStyle,
+                icon: _iconForName(name),
+              ),
+            if (_hasText(secondParagrafValue) ||
+                _hasText(thirdParagrafValue) ||
+                _hasText(forthParagraf))
+              const SizedBox(height: 8),
+            if (_hasText(secondParagrafValue))
+              infoLine(label: secondParagrafLabel, value: secondParagrafValue),
+            if (_hasText(secondParagrafValue) && _hasText(thirdParagrafValue))
+              const SizedBox(height: 4),
+            if (_hasText(thirdParagrafValue))
+              infoLine(label: thirdParagrafLabel, value: thirdParagrafValue),
+            if ((_hasText(secondParagrafValue) ||
+                    _hasText(thirdParagrafValue)) &&
+                _hasText(forthParagraf))
+              const SizedBox(height: 4),
+            if (_hasText(forthParagraf))
+              Text(
+                forthParagraf,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: detailValueStyle,
+              ),
+            if (updateDelete || _hasText(approval))
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: updateDelete
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(
+                              Icons.create_outlined,
+                              color: Colors.orange,
+                              size: 22,
                             ),
-                            IconButton(
-                                icon: Icon(
-                                  Icons.restore_from_trash_rounded,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                                onPressed: onPressedDelete),
-                          ],
-                        ),
-                      ))
-                    : Expanded(
-                        child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: approval.toString().toLowerCase() ==
-                                        "approved"
-                                    ? Colors.green[100]
-                                    : approval.toString().toLowerCase() ==
-                                                "pengajuan" ||
-                                            approval.toString().toLowerCase() ==
-                                                "proses"
-                                        ? Colors.yellow[100]
-                                        : Colors.red[100],
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 5.0, right: 5.0, top: 8, bottom: 8),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    levelApproval != ""
-                                        ? CommonWidget.captionText(
-                                            text: levelApproval.toUpperCase(),
-                                            color: ColorConstants.black)
-                                        : SizedBox(),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          (approval.toString().toLowerCase() ==
-                                                  "approved")
-                                              ? Icons.check_circle_outlined
-                                              : (approval
-                                                              .toString()
-                                                              .toLowerCase() ==
-                                                          "pengajuan" ||
-                                                      approval
-                                                              .toString()
-                                                              .toLowerCase() ==
-                                                          "proses")
-                                                  ? Icons.access_time_outlined
-                                                  : Icons.close,
-                                          color: ColorConstants.mainColor,
-                                          size: 20,
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        CommonWidget.captionText(
-                                          text: approval.toUpperCase(),
-                                          color: ColorConstants.mainColor,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )),
+                            onPressed: onPressedEdit,
+                          ),
+                          const SizedBox(width: 10),
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.red,
+                              size: 22,
+                            ),
+                            onPressed: onPressedDelete,
+                          ),
+                        ],
                       )
-                : Container()
+                    : Row(
+                        children: [
+                          if (_hasText(levelApproval))
+                            pill(
+                              text: levelApproval.toUpperCase(),
+                              bg: Colors.black.withValues(alpha: 0.04),
+                              fg: Colors.black.withValues(alpha: 0.62),
+                            ),
+                          const Spacer(),
+                          pill(
+                            text: approval.toUpperCase(),
+                            bg: tone.bg,
+                            fg: tone.fg,
+                            icon: tone.icon,
+                          ),
+                        ],
+                      ),
+              ),
           ],
         ),
       ),
@@ -371,6 +492,47 @@ class CustomExpandedCardView extends StatelessWidget {
 //       ],
 //     );
 //   }
+}
+
+class _ApprovalTone {
+  const _ApprovalTone({required this.bg, required this.fg, required this.icon});
+
+  final Color bg;
+  final Color fg;
+  final IconData icon;
+
+  static _ApprovalTone from(String normalizedApproval) {
+    final approval = normalizedApproval.trim();
+    final isApproved =
+        approval == 'approved' || approval == 'approve' || approval == 'ok';
+    final isPending = approval == 'pengajuan' ||
+        approval == 'proses' ||
+        approval == 'process' ||
+        approval == 'waiting' ||
+        approval == 'pending';
+
+    if (isApproved) {
+      return _ApprovalTone(
+        bg: const Color(0xFFE7F7EE),
+        fg: const Color(0xFF1B7F3B),
+        icon: Icons.check_circle_outline_rounded,
+      );
+    }
+
+    if (isPending) {
+      return _ApprovalTone(
+        bg: const Color(0xFFFFF3E6),
+        fg: const Color(0xFFB54708),
+        icon: Icons.access_time_rounded,
+      );
+    }
+
+    return _ApprovalTone(
+      bg: const Color(0xFFFDECEC),
+      fg: const Color(0xFFB42318),
+      icon: Icons.cancel_outlined,
+    );
+  }
 }
 
 class CustomExpandedImageCardView extends StatelessWidget {

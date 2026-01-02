@@ -323,12 +323,14 @@ class _RecapRowCard extends StatelessWidget {
         border: Border.all(color: ColorConstants.borderColor, width: 1),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     day,
@@ -355,14 +357,21 @@ class _RecapRowCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _TimePill(label: 'Masuk', value: inText),
-                const SizedBox(height: 8),
-                _TimePill(label: 'Pulang', value: outText),
-                const SizedBox(height: 8),
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    _TimePill(label: 'Masuk', value: inText),
+                    _TimePill(label: 'Pulang', value: outText),
+                  ],
+                ),
+                const SizedBox(height: 6),
                 _StatusPillSmall(isComplete: isComplete),
               ],
             ),
@@ -390,10 +399,10 @@ class _TimePill extends StatelessWidget {
         : ColorConstants.mainColor;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: fg.withValues(alpha: 0.18)),
       ),
       child: Row(
@@ -435,7 +444,7 @@ class _StatusPillSmall extends StatelessWidget {
     final fg = isComplete ? const Color(0xFF1B7F3B) : const Color(0xFFB54708);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(999),

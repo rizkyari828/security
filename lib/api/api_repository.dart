@@ -7,7 +7,6 @@ import 'package:sales/models/request/agent/submit_agent.dart';
 import 'package:sales/models/request/attendance/attendance_wrapper.dart';
 import 'package:sales/models/request/attendance/submit_attendance.dart';
 import 'package:sales/models/request/attendance/validate_attenance.dart';
-import 'package:sales/models/request/benefit_request.dart';
 import 'package:sales/models/request/claim/detail_claim_request.dart';
 import 'package:sales/models/request/claim/submit_claim_request.dart';
 import 'package:sales/models/request/claim/update_approval_claim_request.dart';
@@ -59,7 +58,6 @@ import 'package:sales/models/response/attendance/attendance_submit.dart';
 import 'package:sales/models/response/attendance/attendance_validate.dart';
 import 'package:sales/models/response/benefit/benefit_dashboard_response.dart';
 import 'package:sales/models/response/branch_response.dart';
-import 'package:sales/models/response/benefit/list_benefit.dart';
 import 'package:sales/models/response/benefit/show_benefit.dart';
 import 'package:sales/models/response/benefit/type_cuti.dart';
 import 'package:sales/models/response/cuti_sales/list_cuti_sales.dart';
@@ -77,6 +75,7 @@ import 'package:sales/models/response/name_tad_list_response.dart';
 import 'package:sales/models/response/claim/list_claim_response.dart';
 import 'package:sales/models/response/claim/show_claim_response.dart';
 import 'package:sales/models/response/payslip/payslip_download_result.dart';
+import 'package:sales/models/response/payslip/payslip_list_response.dart';
 import 'package:sales/models/response/prospek/list.dart';
 import 'package:sales/models/response/prospek/master_data_response.dart';
 import 'package:sales/models/response/prospek/master_id_response.dart';
@@ -131,7 +130,8 @@ class ApiRepository {
       } else {
         if (kDebugMode) {
           print(
-              '[HTTP] login failed: status=${res.statusCode} bodyType=${res.body.runtimeType}');
+            '[HTTP] login failed: status=${res.statusCode} bodyType=${res.body.runtimeType}',
+          );
           print('[HTTP] login failed: statusText=${res.statusText}');
           if (res.body != null) print(res.body);
         }
@@ -140,7 +140,8 @@ class ApiRepository {
           EasyLoading.showError('Tidak ada koneksi internet');
         } else if (res.status.connectionError) {
           EasyLoading.showError(
-              'Gagal terhubung ke server. Coba ganti jaringan / matikan IPv6.');
+            'Gagal terhubung ke server. Coba ganti jaringan / matikan IPv6.',
+          );
         } else {
           EasyLoading.showError('Login gagal (${res.statusCode})');
         }
@@ -182,7 +183,7 @@ class ApiRepository {
   }
 
   Future<UserScheduleResponse?> getUserSchedule() async {
-    final res = await apiProvider.getUserSchedule('/api/v2/v1/user/schedule');
+    final res = await apiProvider.getUserSchedule('/api/v2/user/schedule');
     if (res.statusCode == 200) {
       return UserScheduleResponse.fromJson(res.body);
     }
@@ -464,34 +465,6 @@ class ApiRepository {
     return null;
   }
   //END PROSPEK
-
-  //START BENEFIT
-  Future<BenefitResponse?> listBenefit(
-    BenefitRequest data, {
-    int page = 1,
-    int limit = 10,
-  }) async {
-    try {
-      final res = await apiProvider
-          .getBenefit(
-            '/api/v2/listBenefit?page=' +
-                page.toString() +
-                '&limit=' +
-                limit.toString(),
-            data,
-          )
-          .timeout(Duration(seconds: timeout));
-      if (res.statusCode == 200 || res.statusCode == 401) {
-        return BenefitResponse.fromJson(res.body);
-      }
-    } on TimeoutException catch (_) {
-      EasyLoading.showError('Connection Timeout. Please try again later');
-      EasyLoading.dismiss();
-    } catch (exception) {
-      print(exception);
-    }
-    return null;
-  }
 
   Future<TypeCutiResponse?> typeCuti({int page = 1, int limit = 10}) async {
     try {
@@ -1399,8 +1372,9 @@ class ApiRepository {
   }
 
   //START SHIFT SWAP
-  Future<ShiftSwapListResponse?> listShiftSwap(
-      {required UserIdRequest data}) async {
+  Future<ShiftSwapListResponse?> listShiftSwap({
+    required UserIdRequest data,
+  }) async {
     try {
       final res = await apiProvider
           .getShiftSwap('/api/v2/list_tukar_shift', data)
@@ -1417,7 +1391,9 @@ class ApiRepository {
     return null;
   }
 
-  Future<ShowShiftSwapResponse?> showShiftSwap(ShowShiftSwapRequest data) async {
+  Future<ShowShiftSwapResponse?> showShiftSwap(
+    ShowShiftSwapRequest data,
+  ) async {
     try {
       final res = await apiProvider
           .getShowShiftSwap('/api/v2/detail_tukar_shift', data)
@@ -1452,7 +1428,8 @@ class ApiRepository {
   }
 
   Future<ErrorResponse?> updateApprovalShiftSwap(
-      UpdateApprovalShiftSwapRequest data) async {
+    UpdateApprovalShiftSwapRequest data,
+  ) async {
     try {
       final res = await apiProvider
           .updateApprovalShiftSwap('/api/v2/approve_tukar_shift', data)
@@ -1522,7 +1499,9 @@ class ApiRepository {
     return null;
   }
 
-  Future<ErrorResponse?> updateApprovalClaim(UpdateApprovalClaimRequest data) async {
+  Future<ErrorResponse?> updateApprovalClaim(
+    UpdateApprovalClaimRequest data,
+  ) async {
     try {
       final res = await apiProvider
           .updateApprovalClaim('/api/v2/approve_claim', data)
@@ -1542,7 +1521,8 @@ class ApiRepository {
 
   //START PAYSLIP
   Future<PayslipDownloadResult?> downloadPayslipExcel(
-      DownloadPayslipRequest data) async {
+    DownloadPayslipRequest data,
+  ) async {
     try {
       final res = await apiProvider
           .downloadPayslipExcel('/api/v2/payslip/excel', data)
@@ -1584,6 +1564,84 @@ class ApiRepository {
     }
     return null;
   }
+
+  Future<PayslipDownloadResult?> downloadPayslipPdf(
+    DownloadPayslipRequest data,
+  ) async {
+    try {
+      final listRes = await apiProvider
+          .downloadPayslipPdf('/api/v2/listPaySlip', data)
+          .timeout(Duration(seconds: timeout));
+      if (listRes.statusCode != 200 && listRes.statusCode != 401) return null;
+
+      PayslipListResponse? parsed;
+      try {
+        final body = listRes.body;
+        if (body is Map<String, dynamic>) {
+          parsed = PayslipListResponse.fromJson(body);
+        } else if (body is Map) {
+          parsed =
+              PayslipListResponse.fromJson(Map<String, dynamic>.from(body));
+        } else if (body is String) {
+          parsed = payslipListResponseFromJson(body);
+        }
+      } catch (_) {
+        parsed = null;
+      }
+
+      String? path;
+      for (final item in parsed?.data ?? const <PayslipListItem>[]) {
+        final candidate = (item.path ?? '').trim();
+        if (candidate.isNotEmpty) {
+          path = candidate;
+          break;
+        }
+      }
+      if (path == null || path.isEmpty) {
+        EasyLoading.showError(parsed?.message ?? 'Payslip tidak ditemukan');
+        return null;
+      }
+
+      final fileRes = await apiProvider
+          .downloadFileFromUrl(path)
+          .timeout(Duration(seconds: timeout));
+      if (fileRes.statusCode != 200 && fileRes.statusCode != 401) return null;
+
+      final contentType = _headerValue(fileRes.headers, 'content-type') ?? '';
+      if (contentType.toLowerCase().contains('application/json')) {
+        try {
+          final message = ErrorResponse.fromJson(fileRes.body);
+          if (message.error == true) {
+            EasyLoading.showError(message.message ?? 'Gagal download payslip');
+          }
+        } catch (_) {
+          EasyLoading.showError('Gagal download payslip');
+        }
+        return null;
+      }
+
+      final bytes = await _collectBodyBytes(fileRes.bodyBytes);
+      if (bytes == null || bytes.isEmpty) {
+        EasyLoading.showError('File kosong / tidak ditemukan');
+        return null;
+      }
+
+      final filename = _filenameFromContentDisposition(
+              _headerValue(fileRes.headers, 'content-disposition')) ??
+          Uri.tryParse(path)?.pathSegments.last;
+      return PayslipDownloadResult(
+        bytes: bytes,
+        filename: filename,
+        mimeType: contentType.isEmpty ? 'application/pdf' : contentType,
+      );
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
   //END PAYSLIP
 
   Future<ErrorResponse?> sumbmitDialogMood(SubmitDialogMoodRequest data) async {
@@ -1615,9 +1673,14 @@ class ApiRepository {
   String? _filenameFromContentDisposition(String? contentDisposition) {
     if (contentDisposition == null) return null;
     final value = contentDisposition;
-    final match = RegExp(r"filename\\*=UTF-8''([^;]+)", caseSensitive: false)
-            .firstMatch(value) ??
-        RegExp(r'filename="?([^";]+)"?', caseSensitive: false).firstMatch(value);
+    final match = RegExp(
+          r"filename\\*=UTF-8''([^;]+)",
+          caseSensitive: false,
+        ).firstMatch(value) ??
+        RegExp(
+          r'filename="?([^";]+)"?',
+          caseSensitive: false,
+        ).firstMatch(value);
     if (match == null) return null;
     final raw = match.group(1);
     if (raw == null || raw.trim().isEmpty) return null;

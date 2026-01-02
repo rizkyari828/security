@@ -14,6 +14,7 @@ import 'package:sales/shared/constants/colors.dart';
 import 'package:sales/shared/utils/common_widget.dart';
 import 'package:sales/shared/utils/size_config.dart';
 import 'package:sales/shared/widgets/button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'loading_tracker.dart';
 
@@ -29,9 +30,20 @@ FutureOr<Request?> requestInterceptor(Request request) async {
 
   // Tambahkan header dasar
   request.headers['X-Requested-With'] = 'XMLHttpRequest';
-  // var prefs = Get.find<SharedPreferences>();
-  // final token = prefs.getString('token') ?? "";
-  // request.headers['Authorization'] = 'Bearer $token';
+  request.headers['accept'] ??= 'application/json';
+
+  if (!_isAuthRequest(request) &&
+      !request.headers.containsKey('Authorization')) {
+    try {
+      if (Get.isRegistered<SharedPreferences>()) {
+        final prefs = Get.find<SharedPreferences>();
+        final token = (prefs.getString('token') ?? '').trim();
+        if (token.isNotEmpty) {
+          request.headers['Authorization'] = 'Bearer $token';
+        }
+      }
+    } catch (_) {}
+  }
 
   bool isFakeLocation = false;
   if (!_isAuthRequest(request)) {
@@ -74,10 +86,8 @@ FutureOr<Request?> requestInterceptor(Request request) async {
 
   List<ConnectivityResult> result;
   try {
-    result = await Connectivity()
-        .checkConnectivity()
-        .timeout(_preflightTimeout,
-            onTimeout: () => const <ConnectivityResult>[ConnectivityResult.other]);
+    result = await Connectivity().checkConnectivity().timeout(_preflightTimeout,
+        onTimeout: () => const <ConnectivityResult>[ConnectivityResult.other]);
   } catch (_) {
     result = const <ConnectivityResult>[ConnectivityResult.other];
   }
@@ -85,7 +95,8 @@ FutureOr<Request?> requestInterceptor(Request request) async {
     print(
         '[HTTP][preflight] connectivity=$result ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)');
   }
-  final isOffline = result.isEmpty || result.every((r) => r == ConnectivityResult.none);
+  final isOffline =
+      result.isEmpty || result.every((r) => r == ConnectivityResult.none);
   if (isOffline) {
     Future.delayed(Duration.zero, () {
       EasyLoading.showError("Tidak ada koneksi internet");

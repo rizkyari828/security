@@ -56,6 +56,11 @@ class PayslipController extends BaseController {
   }
 
   Future<void> downloadExcel() async {
+    // Backward-compatible alias (button now uses PDF).
+    await downloadPdf();
+  }
+
+  Future<void> downloadPdf() async {
     if (userId.value.trim().isEmpty) {
       EasyLoading.showError('User tidak valid');
       return;
@@ -66,9 +71,10 @@ class PayslipController extends BaseController {
     final year = selectedPeriode.value.year.toString();
 
     isDownloading.value = true;
-    EasyLoading.show(status: 'Mengunduh payslip...');
+    EasyLoading.show(status: 'Menyiapkan payslip...');
     try {
-      final result = await apiRepository.downloadPayslipExcel(
+      EasyLoading.show(status: 'Mengambil link payslip...');
+      final result = await apiRepository.downloadPayslipPdf(
         DownloadPayslipRequest(
           userId: userId.value,
           month: month,
@@ -77,20 +83,30 @@ class PayslipController extends BaseController {
       );
       if (result == null) return;
 
+      EasyLoading.show(status: 'Mengunduh file payslip...');
       final fileName = _sanitizeFilename(
-        result.filename ?? 'payslip_${year}_$month.xlsx',
+        _ensurePdfExtension(result.filename ?? 'payslip_${year}_$month.pdf'),
       );
-      final directory = await getApplicationDocumentsDirectory();
-      final payslipDirPath =
-          '${directory.path}${Platform.pathSeparator}payslips';
-      await Directory(payslipDirPath).create(recursive: true);
-      final filePath = '$payslipDirPath${Platform.pathSeparator}$fileName';
 
-      final file = File(filePath);
-      await file.writeAsBytes(result.bytes, flush: true);
+      var directory = await _resolveDownloadDirectory();
+      var filePath = '${directory.path}${Platform.pathSeparator}$fileName';
+      var savedInDownload = directory.path.toLowerCase().contains('download');
+
+      try {
+        final file = File(filePath);
+        await file.writeAsBytes(result.bytes, flush: true);
+      } on FileSystemException {
+        directory = await _resolveAppPayslipsDirectory();
+        filePath = '${directory.path}${Platform.pathSeparator}$fileName';
+        savedInDownload = false;
+        final file = File(filePath);
+        await file.writeAsBytes(result.bytes, flush: true);
+      }
+
       lastSavedPath.value = filePath;
-
-      EasyLoading.showSuccess('Payslip tersimpan');
+      EasyLoading.showSuccess(
+        savedInDownload ? 'Payslip tersimpan di Download' : 'Payslip tersimpan',
+      );
       await OpenFilex.open(filePath);
     } catch (e) {
       EasyLoading.showError('Gagal download payslip');
@@ -108,7 +124,44 @@ class PayslipController extends BaseController {
 
   String _sanitizeFilename(String input) {
     final cleaned = input.replaceAll(RegExp(r'[\\\\/:*?\"<>|]'), '_').trim();
-    return cleaned.isEmpty ? 'payslip.xlsx' : cleaned;
+    return cleaned.isEmpty ? 'payslip.pdf' : cleaned;
+  }
+
+  String _ensurePdfExtension(String input) {
+    final trimmed = input.trim();
+    if (trimmed.isEmpty) return 'payslip.pdf';
+    if (trimmed.toLowerCase().endsWith('.pdf')) return trimmed;
+    return '$trimmed.pdf';
+  }
+
+  Future<Directory> _resolveDownloadDirectory() async {
+    if (Platform.isAndroid) {
+      final candidates = <String>[
+        '${Platform.pathSeparator}storage${Platform.pathSeparator}emulated${Platform.pathSeparator}0${Platform.pathSeparator}Download',
+        '${Platform.pathSeparator}sdcard${Platform.pathSeparator}Download',
+      ];
+      for (final path in candidates) {
+        try {
+          final dir = Directory(path);
+          if (await dir.exists()) return dir;
+        } catch (_) {}
+      }
+    }
+
+    try {
+      final downloads = await getDownloadsDirectory();
+      if (downloads != null) return downloads;
+    } catch (_) {}
+
+    return _resolveAppPayslipsDirectory();
+  }
+
+  Future<Directory> _resolveAppPayslipsDirectory() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final fallback =
+        Directory('${directory.path}${Platform.pathSeparator}payslips');
+    await fallback.create(recursive: true);
+    return fallback;
   }
 
   @override
@@ -117,4 +170,3 @@ class PayslipController extends BaseController {
     super.onClose();
   }
 }
-

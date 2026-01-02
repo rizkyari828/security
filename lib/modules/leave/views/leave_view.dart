@@ -12,28 +12,33 @@ class LeaveView extends GetView<LeaveListController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme:
-              IconThemeData(color: ColorConstants.black //change your color here
-                  ),
-          centerTitle: false,
-          title: Text(
-            'List Cuti',
-            style: TextStyle(
-              color: ColorConstants.black,
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              fontFamily: 'Poppins',
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: ColorConstants.black, //change your color here
+        ),
+        centerTitle: false,
+        title: Text(
+          'List Izin',
+          style: TextStyle(
+            color: ColorConstants.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontFamily: 'Poppins',
+          ),
+        ),
+        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
+        elevation: 0.0,
+        actions: [
+          Obx(
+            () => ApprovalFlow.addButtonApproval(
+              controller: controller,
+              onPressed: controller.goToAddPages,
             ),
           ),
-          backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
-          elevation: 0.0,
-          actions: [
-            Obx(() => ApprovalFlow.addButtonApproval(
-                controller: controller, onPressed: controller.goToAddPages))
-          ],
-        ),
-        body: Obx(() => _getItems(controller)));
+        ],
+      ),
+      body: Obx(() => _getItems(controller)),
+    );
   }
 
   SmartRefresher _getItems(LeaveListController controller) {
@@ -49,7 +54,8 @@ class LeaveView extends GetView<LeaveListController> {
         itemBuilder: (context, i) => InkWell(
           onTap: () {
             controller.goToDetailPages(
-                id: controller.listIzin[i].id.toString());
+              id: controller.listIzin[i].id.toString(),
+            );
           },
           child: CustomExpandedCardView(
             name:

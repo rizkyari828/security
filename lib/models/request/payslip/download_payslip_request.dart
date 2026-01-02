@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:get/get.dart';
+
 DownloadPayslipRequest downloadPayslipRequestFromJson(String str) =>
     DownloadPayslipRequest.fromJson(json.decode(str));
 
@@ -35,5 +37,16 @@ class DownloadPayslipRequest {
         'month': month,
         'year': year,
       };
-}
 
+  FormData toListPayslipFormData() => FormData({
+        'id_user': userId,
+        'bulan': month,
+        'tahun': year,
+      });
+
+  Map<String, dynamic> toListPayslipJson() => {
+        'id_user': userId,
+        'tahun': year,
+        'bulan': month,
+      };
+}
