@@ -45,6 +45,9 @@ dependencies:
   pull_to_refresh:
     git:
       url: https://github.com/rizkyari828/pull_to_refresh
+  face_camera:
+    git:
+      url: https://github.com/rizkyari828/face_camera
   timer_builder: ^2.0.0
   image_picker: ^1.1.2
   dropdown_search: ^6.0.2
@@ -59,7 +62,6 @@ dependencies:
   get_storage: ^2.1.1
   flutter_network_monitor: ^0.0.4
   percent_indicator: ^4.2.5
-  face_camera: ^0.1.4
   detect_fake_location: ^2.2.0+1
   signature: ^6.3.0
   path_provider: ^2.1.5

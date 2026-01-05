@@ -236,10 +236,11 @@ packages:
   face_camera:
     dependency: "direct main"
     description:
-      name: face_camera
-      sha256: f386abf51935efd943b0a9c71ffe01071dd460d606a2d420fa1c58cdd0d57ab0
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: da727192f4dbf131712fd490a4a2d71602ecb4b0
+      url: "https://github.com/rizkyari828/face_camera"
+    source: git
     version: "0.1.4"
   fake_async:
     dependency: transitive
