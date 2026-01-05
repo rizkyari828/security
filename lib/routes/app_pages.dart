@@ -1,51 +1,51 @@
 import 'package:get/get.dart';
-import 'package:sales/modules/agent/bindings/agent_binding.dart';
-import 'package:sales/modules/agent/views/add_agent_view.dart';
-import 'package:sales/modules/agent/views/agent_view.dart';
-import 'package:sales/modules/agent/views/detail_agent_view.dart';
-import 'package:sales/modules/cuti/bindings/cuti_binding.dart';
-import 'package:sales/modules/cuti/views/add_cuti_view.dart';
-import 'package:sales/modules/cuti/views/detail_cuti_view.dart';
-import 'package:sales/modules/cuti/views/list_cuti.dart';
-import 'package:sales/modules/input/bindings/input_binding.dart';
-import 'package:sales/modules/input/views/add_input_view.dart';
-import 'package:sales/modules/kuisioner/bindings/kuisioner_binding.dart';
-import 'package:sales/modules/kuisioner/views/add_kuisioner_view.dart';
-import 'package:sales/modules/kuisioner/views/input_data_kuisioner_view.dart';
-import 'package:sales/modules/leads/bindings/leads_binding.dart';
-import 'package:sales/modules/leads/views/add_leads_view.dart';
-import 'package:sales/modules/leads/views/detail_leads_view.dart';
-import 'package:sales/modules/leads/views/leads_view.dart';
-import 'package:sales/modules/leave/bindings/leave_binding.dart';
-import 'package:sales/modules/leave/views/add_leave_view.dart';
-import 'package:sales/modules/leave/views/detail_leave_view.dart';
-import 'package:sales/modules/leave/views/leave_view.dart';
-import 'package:sales/modules/overtime/bindings/overtime_binding.dart';
-import 'package:sales/modules/overtime/views/add_overtime_view.dart';
-import 'package:sales/modules/overtime/views/detail_overtime_view.dart';
-import 'package:sales/modules/overtime/views/leave_overtime.dart';
-import 'package:sales/modules/prospek/bindings/prospek_binding.dart';
-import 'package:sales/modules/prospek/views/add_prospek_view.dart';
-import 'package:sales/modules/prospek/views/detail_prospek_view.dart';
-import 'package:sales/modules/prospek/views/prospek_view.dart';
-import 'package:sales/modules/prospek_v2/bindings/prospek_v2_binding.dart';
-import 'package:sales/modules/prospek_v2/views/add_prospek_view.dart';
-import 'package:sales/modules/prospek_v2/views/prospek_view.dart';
-import 'package:sales/modules/store/bindings/store_binding.dart';
-import 'package:sales/modules/store/views/add_store_view.dart';
-import 'package:sales/modules/store/views/detail_store_view.dart';
-import 'package:sales/modules/store/views/result_kunjungan.dart';
-import 'package:sales/modules/store/views/store_view.dart';
-import 'package:sales/modules/claim/bindings/claim_binding.dart';
-import 'package:sales/modules/claim/views/add_claim_view.dart';
-import 'package:sales/modules/claim/views/claim_view.dart';
-import 'package:sales/modules/claim/views/detail_claim_view.dart';
-import 'package:sales/modules/payslip/bindings/payslip_binding.dart';
-import 'package:sales/modules/payslip/views/payslip_view.dart';
-import 'package:sales/modules/shift_swap/bindings/shift_swap_binding.dart';
-import 'package:sales/modules/shift_swap/views/add_shift_swap_view.dart';
-import 'package:sales/modules/shift_swap/views/detail_shift_swap_view.dart';
-import 'package:sales/modules/shift_swap/views/shift_swap_view.dart';
+import 'package:staffku/modules/agent/bindings/agent_binding.dart';
+import 'package:staffku/modules/agent/views/add_agent_view.dart';
+import 'package:staffku/modules/agent/views/agent_view.dart';
+import 'package:staffku/modules/agent/views/detail_agent_view.dart';
+import 'package:staffku/modules/cuti/bindings/cuti_binding.dart';
+import 'package:staffku/modules/cuti/views/add_cuti_view.dart';
+import 'package:staffku/modules/cuti/views/detail_cuti_view.dart';
+import 'package:staffku/modules/cuti/views/list_cuti.dart';
+import 'package:staffku/modules/input/bindings/input_binding.dart';
+import 'package:staffku/modules/input/views/add_input_view.dart';
+import 'package:staffku/modules/kuisioner/bindings/kuisioner_binding.dart';
+import 'package:staffku/modules/kuisioner/views/add_kuisioner_view.dart';
+import 'package:staffku/modules/kuisioner/views/input_data_kuisioner_view.dart';
+import 'package:staffku/modules/leads/bindings/leads_binding.dart';
+import 'package:staffku/modules/leads/views/add_leads_view.dart';
+import 'package:staffku/modules/leads/views/detail_leads_view.dart';
+import 'package:staffku/modules/leads/views/leads_view.dart';
+import 'package:staffku/modules/leave/bindings/leave_binding.dart';
+import 'package:staffku/modules/leave/views/add_leave_view.dart';
+import 'package:staffku/modules/leave/views/detail_leave_view.dart';
+import 'package:staffku/modules/leave/views/leave_view.dart';
+import 'package:staffku/modules/overtime/bindings/overtime_binding.dart';
+import 'package:staffku/modules/overtime/views/add_overtime_view.dart';
+import 'package:staffku/modules/overtime/views/detail_overtime_view.dart';
+import 'package:staffku/modules/overtime/views/leave_overtime.dart';
+import 'package:staffku/modules/prospek/bindings/prospek_binding.dart';
+import 'package:staffku/modules/prospek/views/add_prospek_view.dart';
+import 'package:staffku/modules/prospek/views/detail_prospek_view.dart';
+import 'package:staffku/modules/prospek/views/prospek_view.dart';
+import 'package:staffku/modules/prospek_v2/bindings/prospek_v2_binding.dart';
+import 'package:staffku/modules/prospek_v2/views/add_prospek_view.dart';
+import 'package:staffku/modules/prospek_v2/views/prospek_view.dart';
+import 'package:staffku/modules/store/bindings/store_binding.dart';
+import 'package:staffku/modules/store/views/add_store_view.dart';
+import 'package:staffku/modules/store/views/detail_store_view.dart';
+import 'package:staffku/modules/store/views/result_kunjungan.dart';
+import 'package:staffku/modules/store/views/store_view.dart';
+import 'package:staffku/modules/claim/bindings/claim_binding.dart';
+import 'package:staffku/modules/claim/views/add_claim_view.dart';
+import 'package:staffku/modules/claim/views/claim_view.dart';
+import 'package:staffku/modules/claim/views/detail_claim_view.dart';
+import 'package:staffku/modules/payslip/bindings/payslip_binding.dart';
+import 'package:staffku/modules/payslip/views/payslip_view.dart';
+import 'package:staffku/modules/shift_swap/bindings/shift_swap_binding.dart';
+import 'package:staffku/modules/shift_swap/views/add_shift_swap_view.dart';
+import 'package:staffku/modules/shift_swap/views/detail_shift_swap_view.dart';
+import 'package:staffku/modules/shift_swap/views/shift_swap_view.dart';
 
 import '../modules/notification/bindings/notification_binding.dart';
 import '../modules/notification/views/notification_view.dart';
@@ -216,11 +216,7 @@ class AppPages {
       page: () => InputDataKuisionerView(),
       binding: KusionerBinding(),
     ),
-    GetPage(
-      name: Routes.CUTI,
-      page: () => CutiView(),
-      binding: CutiBinding(),
-    ),
+    GetPage(name: Routes.CUTI, page: () => CutiView(), binding: CutiBinding()),
     GetPage(
       name: Routes.ADD_CUTI_SALES,
       page: () => AddCutiView(),

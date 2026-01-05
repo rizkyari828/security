@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/modules/payslip/controllers/payslip_controller.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/widgets/button.dart';
-import 'package:sales/shared/widgets/input_field.dart';
+import 'package:staffku/modules/payslip/controllers/payslip_controller.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/widgets/button.dart';
+import 'package:staffku/shared/widgets/input_field.dart';
 
 class PayslipView extends GetView<PayslipController> {
   const PayslipView({super.key});
@@ -42,8 +42,9 @@ class PayslipView extends GetView<PayslipController> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: ColorConstants.secondaryColor
-                              .withAlpha((0.15 * 255).toInt()),
+                          color: ColorConstants.secondaryColor.withAlpha(
+                            (0.15 * 255).toInt(),
+                          ),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -69,7 +70,7 @@ class PayslipView extends GetView<PayslipController> {
                             ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 18),
@@ -115,6 +116,45 @@ class PayslipView extends GetView<PayslipController> {
                     ),
                     onPressed: controller.downloadPdf,
                   ),
+                  if ((controller.lastDownloadMessage.value ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: (controller.lastDownloadSuccess.value
+                                ? Colors.green
+                                : Colors.red)
+                            .withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: (controller.lastDownloadSuccess.value
+                                  ? Colors.green
+                                  : Colors.red)
+                              .withValues(alpha: 0.18),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            controller.lastDownloadSuccess.value
+                                ? Icons.check_circle_rounded
+                                : Icons.error_rounded,
+                            color: controller.lastDownloadSuccess.value
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: CommonWidget.subtitleMultilineText(
+                              text: controller.lastDownloadMessage.value ?? '',
+                              color: Colors.black.withValues(alpha: 0.72),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   if ((controller.lastSavedPath.value ?? '').isNotEmpty) ...[
                     const SizedBox(height: 18),
                     Divider(color: ColorConstants.borderColor),
@@ -123,6 +163,20 @@ class PayslipView extends GetView<PayslipController> {
                       text: 'File terakhir',
                       fontWeight: FontWeight.w600,
                     ),
+                    const SizedBox(height: 6),
+                    CommonWidget.subtitleText(
+                      text: controller.lastSavedFilename(),
+                      fontWeight: FontWeight.w700,
+                      color: ColorConstants.black,
+                    ),
+                    const SizedBox(height: 6),
+                    if ((controller.lastSavedLocationLabel.value ?? '')
+                        .isNotEmpty)
+                      CommonWidget.subtitleText(
+                        text:
+                            'Lokasi: ${controller.lastSavedLocationLabel.value}',
+                        color: Colors.grey,
+                      ),
                     const SizedBox(height: 6),
                     CommonWidget.subtitleMultilineText(
                       text: controller.lastSavedPath.value ?? '',
@@ -137,13 +191,34 @@ class PayslipView extends GetView<PayslipController> {
                       buttonText: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Icon(Icons.open_in_new_rounded,
-                              color: ColorConstants.black),
+                          Icon(
+                            Icons.open_in_new_rounded,
+                            color: ColorConstants.black,
+                          ),
                           SizedBox(width: 10),
                           Text('BUKA FILE'),
                         ],
                       ),
                       onPressed: controller.openLastFile,
+                    ),
+                    const SizedBox(height: 10),
+                    CustomButton(
+                      width: MediaQuery.of(context).size.width,
+                      buttonColor: Colors.white,
+                      borderColor: ColorConstants.borderColor,
+                      buttonTextColor: ColorConstants.black,
+                      buttonText: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            Icons.copy_rounded,
+                            color: ColorConstants.black,
+                          ),
+                          SizedBox(width: 10),
+                          Text('SALIN LOKASI'),
+                        ],
+                      ),
+                      onPressed: controller.copyLastSavedPath,
                     ),
                   ],
                 ],

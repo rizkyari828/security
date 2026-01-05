@@ -1,16 +1,16 @@
-import 'package:sales/api/api_repository.dart';
+import 'package:staffku/api/api_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/models/request/cuti_sales/submit_izin_request.dart';
-import 'package:sales/modules/home/base_controller.dart';
+import 'package:staffku/models/request/cuti_sales/submit_izin_request.dart';
+import 'package:staffku/modules/home/base_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CutiController extends BaseController {
   CutiController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
   var imageFileList = <XFile>[].obs;
 
   set _imageFile(XFile? value) {
@@ -41,11 +41,17 @@ class CutiController extends BaseController {
 
   RxString validationDate = "".obs;
 
-  Future<void> onImageButtonPressed(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
+  Future<void> onImageButtonPressed(
+    ImageSource source, {
+    BuildContext? context,
+    bool isMultiImage = false,
+  }) async {
     if (isMultiImage) {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final List<XFile>? pickedFileList = await _picker.pickMultiImage(
             maxWidth: maxWidth,
@@ -61,8 +67,11 @@ class CutiController extends BaseController {
         }
       });
     } else {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
@@ -139,7 +148,9 @@ class CutiController extends BaseController {
   }
 
   selectDateStart(
-      BuildContext context, TextEditingController controller) async {
+    BuildContext context,
+    TextEditingController controller,
+  ) async {
     final DateTime? selected = await showDatePicker(
       context: context,
       initialDate: selectedDate,
@@ -147,12 +158,16 @@ class CutiController extends BaseController {
       lastDate: DateTime(2028),
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
-    controller.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    controller.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   Future<void> selectTime(
-      BuildContext context, TextEditingController controller) async {
+    BuildContext context,
+    TextEditingController controller,
+  ) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),

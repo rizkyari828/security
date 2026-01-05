@@ -1,17 +1,17 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/leads/submit_status_lead.dart';
-import 'package:sales/models/response/Lead/list_lead_respone.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/leads/submit_status_lead.dart';
+import 'package:staffku/models/response/Lead/list_lead_respone.dart';
 import 'package:get/get.dart';
-import 'package:sales/models/response/master_data_2_response.dart';
-import 'package:sales/models/response/prospek_v2/detail_prospek_v2_response.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/models/response/master_data_2_response.dart';
+import 'package:staffku/models/response/prospek_v2/detail_prospek_v2_response.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LeadsDetailController extends BaseController {
   LeadsDetailController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   final argm = Get.arguments;
   var detail = DataLead().obs;
@@ -82,7 +82,9 @@ class LeadsDetailController extends BaseController {
 
     final res = await apiRepository.submitStatusLead(
       SubmitStatusLeadRequest(
-          idStatusLead: statusLeadId.value, idLead: detail.value.idLead),
+        idStatusLead: statusLeadId.value,
+        idLead: detail.value.idLead,
+      ),
     );
     if (res?.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');

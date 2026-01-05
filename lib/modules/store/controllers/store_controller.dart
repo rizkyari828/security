@@ -1,21 +1,21 @@
 import 'package:get_storage/get_storage.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/store/update_qty_request.dart';
-import 'package:sales/models/request/user_id_request.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/store/update_qty_request.dart';
+import 'package:staffku/models/request/user_id_request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:sales/models/response/store/list_items.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/widgets/button.dart';
-import 'package:sales/shared/widgets/input_field.dart';
+import 'package:staffku/models/response/store/list_items.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/widgets/button.dart';
+import 'package:staffku/shared/widgets/input_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StoreController extends BaseController {
   StoreController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   final TextEditingController jumlah = TextEditingController();
   final TextEditingController note = TextEditingController();
@@ -30,13 +30,16 @@ class StoreController extends BaseController {
 
   var listProduct = <Items>[].obs;
   RxInt page = 1.obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
   final box = GetStorage();
 
   void getItems(page) async {
     final res = await apiRepository.listItems(
-        page: page, data: UserIdRequest(id: idUser.value));
+      page: page,
+      data: UserIdRequest(id: idUser.value),
+    );
     listProduct.addAll(res?.data ?? []);
   }
 
@@ -62,7 +65,11 @@ class StoreController extends BaseController {
       box.write(
         'barang',
         QtyUpdateRequest(
-            userId: idUser.value, barangId: idBarang, tokoId: argm, qty: qty),
+          userId: idUser.value,
+          barangId: idBarang,
+          tokoId: argm,
+          qty: qty,
+        ),
       );
 
       print(box.read('barang'));
@@ -70,7 +77,11 @@ class StoreController extends BaseController {
 
     final res = await apiRepository.decreaseQtyItems(
       QtyUpdateRequest(
-          userId: idUser.value, barangId: idBarang, tokoId: argm, qty: qty),
+        userId: idUser.value,
+        barangId: idBarang,
+        tokoId: argm,
+        qty: qty,
+      ),
     );
 
     if (res?.error == false) {
@@ -120,67 +131,65 @@ class StoreController extends BaseController {
     idUser.value = prefs.getString('userId') ?? "";
   }
 
-  void inputDataSheet(
-    BuildContext context,
-    String idBarang,
-    String itemName,
-  ) {
+  void inputDataSheet(BuildContext context, String idBarang, String itemName) {
     Get.bottomSheet(
-        Container(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Column(
-                  children: [
-                    CommonWidget.rowHeight(),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CommonWidget.subtitleText(text: 'Update Stock '),
-                            CommonWidget.minHeadText(text: itemName),
-                          ],
-                        ),
+      Container(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                children: [
+                  CommonWidget.rowHeight(),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CommonWidget.subtitleText(text: 'Update Stock '),
+                          CommonWidget.minHeadText(text: itemName),
+                        ],
                       ),
                     ),
-                    CommonWidget.rowHeight(),
-                    InputInputField(
-                      keyboardType: TextInputType.number,
-                      controller: jumlah,
-                      labelText: "Jumlah",
-                    ),
-                    InputInputField(
-                      keyboardType: TextInputType.text,
-                      controller: note,
-                      labelText: "Catatan (Optional)",
-                    ),
-                    CommonWidget.rowHeight(),
-                    CustomButton(
-                      buttonText: 'SIMPAN',
-                      width: MediaQuery.of(context).size.width,
-                      onPressed: () {
-                        submitData(idBarang, jumlah.text);
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                  CommonWidget.rowHeight(),
+                  InputInputField(
+                    keyboardType: TextInputType.number,
+                    controller: jumlah,
+                    labelText: "Jumlah",
+                  ),
+                  InputInputField(
+                    keyboardType: TextInputType.text,
+                    controller: note,
+                    labelText: "Catatan (Optional)",
+                  ),
+                  CommonWidget.rowHeight(),
+                  CustomButton(
+                    buttonText: 'SIMPAN',
+                    width: MediaQuery.of(context).size.width,
+                    onPressed: () {
+                      submitData(idBarang, jumlah.text);
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        elevation: 20.0,
-        enableDrag: false,
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
+      ),
+      elevation: 20.0,
+      enableDrag: false,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),
           topRight: Radius.circular(30.0),
-        )));
+        ),
+      ),
+    );
   }
 
   @override

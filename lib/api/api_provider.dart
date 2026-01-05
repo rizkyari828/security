@@ -1,56 +1,56 @@
-import 'package:sales/api/base_provider.dart';
-import 'package:sales/models/models.dart';
-import 'package:sales/models/request/agent/submit_agent.dart';
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
-import 'package:sales/models/request/attendance/submit_attendance.dart';
-import 'package:sales/models/request/attendance/validate_attenance.dart';
-import 'package:sales/models/request/benefit_request.dart';
-import 'package:sales/models/request/claim/detail_claim_request.dart';
-import 'package:sales/models/request/claim/submit_claim_request.dart';
-import 'package:sales/models/request/claim/update_approval_claim_request.dart';
-import 'package:sales/models/request/cuti/submit_cuti_request.dart';
-import 'package:sales/models/request/cuti/update_approval_request.dart';
-import 'package:sales/models/request/cuti_sales/detail_request_cuti.dart';
-import 'package:sales/models/request/cuti_sales/submit_izin_request.dart';
-import 'package:sales/models/request/cuti_sales/update_approval_request.dart';
-import 'package:sales/models/request/dashboard_request.dart';
-import 'package:sales/models/request/detail_request.dart';
-import 'package:sales/models/request/detail_request_leave.dart';
-import 'package:sales/models/request/id_request.dart';
-import 'package:sales/models/request/input_request.dart';
-import 'package:sales/models/request/izin/submit_izin_request.dart';
-import 'package:sales/models/request/izin/update_approval_request.dart';
-import 'package:sales/models/request/kuisioner/kuisioner_input_data_request.dart';
-import 'package:sales/models/request/kuisioner/kuisioner_request.dart';
-import 'package:sales/models/request/kunjungan/non_schedule_request.dart';
-import 'package:sales/models/request/leads/submit_lead.dart';
-import 'package:sales/models/request/leads/submit_status_lead.dart';
-import 'package:sales/models/request/lembur/detail_request_lembur.dart';
-import 'package:sales/models/request/lembur/submit_izin_request.dart';
-import 'package:sales/models/request/lembur/update_approval_request.dart';
-import 'package:sales/models/request/logout_request.dart';
-import 'package:sales/models/request/overtime/get_list.dart';
-import 'package:sales/models/request/overtime/set_done_overtime_request.dart';
-import 'package:sales/models/request/overtime/submit_overtime_client_request.dart';
-import 'package:sales/models/request/overtime/submit_request_overtime.dart';
-import 'package:sales/models/request/overtime/update_approval_overtime_request.dart';
-import 'package:sales/models/request/pagination_request.dart';
-import 'package:sales/models/request/payslip/download_payslip_request.dart';
-import 'package:sales/models/request/prospek_v2/detail_request_cuti.dart';
-import 'package:sales/models/request/prospek_v2/submit_request_prospek_v2.dart';
-import 'package:sales/models/request/rate/submit_rate_request.dart';
-import 'package:sales/models/request/reliver/approve_reliver_request.dart';
-import 'package:sales/models/request/reliver/create_reliver_request.dart';
-import 'package:sales/models/request/store/detail_request_leave.dart';
-import 'package:sales/models/request/store/update_qty_request.dart';
-import 'package:sales/models/request/submit_mood_request.dart';
-import 'package:sales/models/request/shift_swap/detail_shift_swap_request.dart';
-import 'package:sales/models/request/shift_swap/submit_shift_swap_request.dart';
-import 'package:sales/models/request/shift_swap/update_approval_shift_swap_request.dart';
-import 'package:sales/models/request/update_fcm_profile_request.dart';
-import 'package:sales/models/request/update_photo_profile_request.dart';
+import 'package:staffku/api/base_provider.dart';
+import 'package:staffku/models/models.dart';
+import 'package:staffku/models/request/agent/submit_agent.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/attendance/submit_attendance.dart';
+import 'package:staffku/models/request/attendance/validate_attenance.dart';
+import 'package:staffku/models/request/benefit_request.dart';
+import 'package:staffku/models/request/claim/detail_claim_request.dart';
+import 'package:staffku/models/request/claim/submit_claim_request.dart';
+import 'package:staffku/models/request/claim/update_approval_claim_request.dart';
+import 'package:staffku/models/request/cuti/submit_cuti_request.dart';
+import 'package:staffku/models/request/cuti/update_approval_request.dart';
+import 'package:staffku/models/request/cuti_sales/detail_request_cuti.dart';
+import 'package:staffku/models/request/cuti_sales/submit_izin_request.dart';
+import 'package:staffku/models/request/cuti_sales/update_approval_request.dart';
+import 'package:staffku/models/request/dashboard_request.dart';
+import 'package:staffku/models/request/detail_request.dart';
+import 'package:staffku/models/request/detail_request_leave.dart';
+import 'package:staffku/models/request/id_request.dart';
+import 'package:staffku/models/request/input_request.dart';
+import 'package:staffku/models/request/izin/submit_izin_request.dart';
+import 'package:staffku/models/request/izin/update_approval_request.dart';
+import 'package:staffku/models/request/kuisioner/kuisioner_input_data_request.dart';
+import 'package:staffku/models/request/kuisioner/kuisioner_request.dart';
+import 'package:staffku/models/request/kunjungan/non_schedule_request.dart';
+import 'package:staffku/models/request/leads/submit_lead.dart';
+import 'package:staffku/models/request/leads/submit_status_lead.dart';
+import 'package:staffku/models/request/lembur/detail_request_lembur.dart';
+import 'package:staffku/models/request/lembur/submit_izin_request.dart';
+import 'package:staffku/models/request/lembur/update_approval_request.dart';
+import 'package:staffku/models/request/logout_request.dart';
+import 'package:staffku/models/request/overtime/get_list.dart';
+import 'package:staffku/models/request/overtime/set_done_overtime_request.dart';
+import 'package:staffku/models/request/overtime/submit_overtime_client_request.dart';
+import 'package:staffku/models/request/overtime/submit_request_overtime.dart';
+import 'package:staffku/models/request/overtime/update_approval_overtime_request.dart';
+import 'package:staffku/models/request/pagination_request.dart';
+import 'package:staffku/models/request/payslip/download_payslip_request.dart';
+import 'package:staffku/models/request/prospek_v2/detail_request_cuti.dart';
+import 'package:staffku/models/request/prospek_v2/submit_request_prospek_v2.dart';
+import 'package:staffku/models/request/rate/submit_rate_request.dart';
+import 'package:staffku/models/request/reliver/approve_reliver_request.dart';
+import 'package:staffku/models/request/reliver/create_reliver_request.dart';
+import 'package:staffku/models/request/store/detail_request_leave.dart';
+import 'package:staffku/models/request/store/update_qty_request.dart';
+import 'package:staffku/models/request/submit_mood_request.dart';
+import 'package:staffku/models/request/shift_swap/detail_shift_swap_request.dart';
+import 'package:staffku/models/request/shift_swap/submit_shift_swap_request.dart';
+import 'package:staffku/models/request/shift_swap/update_approval_shift_swap_request.dart';
+import 'package:staffku/models/request/update_fcm_profile_request.dart';
+import 'package:staffku/models/request/update_photo_profile_request.dart';
 import 'package:get/get.dart';
-import 'package:sales/models/request/user_id_request.dart';
+import 'package:staffku/models/request/user_id_request.dart';
 
 class ApiProvider extends BaseProvider {
   Future<Response> login(String path, LoginRequest data) {
@@ -83,13 +83,18 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> submitAttendance(
-      String path, AttendanceSubmitRequest data) async {
+    String path,
+    AttendanceSubmitRequest data,
+  ) async {
     try {
       print(data.toFormData().fields);
       print(data.toJson());
 
-      final response = await post(path, data.toFormData(),
-          contentType: "multipart/form-data");
+      final response = await post(
+        path,
+        data.toFormData(),
+        contentType: "multipart/form-data",
+      );
       return response;
     } catch (e, stackTrace) {
       print('Error saat submit attendance: $e');
@@ -99,7 +104,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> validateAttendance(
-      String path, AttendanceValidateRequest request) {
+    String path,
+    AttendanceValidateRequest request,
+  ) {
     return post(path, request.toJson());
   }
 
@@ -119,7 +126,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> submitOvertimeClient(
-      String path, SubmitOvertimeClientRequest data) {
+    String path,
+    SubmitOvertimeClientRequest data,
+  ) {
     return post(path, data.toJson());
   }
 
@@ -128,7 +137,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updateApprovalOvertime(
-      String path, UpdateApprovalOvertimeRequest data) {
+    String path,
+    UpdateApprovalOvertimeRequest data,
+  ) {
     print(data.toJson());
     return post(path, data.toJson());
   }
@@ -165,7 +176,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updateApprovalCuti(
-      String path, UpdateApprovalCutiRequest data) {
+    String path,
+    UpdateApprovalCutiRequest data,
+  ) {
     return patch(path, data.toJson());
   }
   //END BENEFIT
@@ -192,7 +205,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updateApprovalIzin(
-      String path, UpdateApprovalIzinRequest data) {
+    String path,
+    UpdateApprovalIzinRequest data,
+  ) {
     return patch(path, data.toJson());
   }
   //ENDIZIN
@@ -211,7 +226,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updateApprovalReliver(
-      String path, ApproveReliverRequest data) {
+    String path,
+    ApproveReliverRequest data,
+  ) {
     return patch(path, data.toJson());
   }
   //ENDIZIN
@@ -256,7 +273,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updatePhotoProfile(
-      String path, UpdatePhotoProfileRequest data) {
+    String path,
+    UpdatePhotoProfileRequest data,
+  ) {
     print(data.toJson());
     return patch(path, data.toJson());
   }
@@ -281,7 +300,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> submitInputDataKuisioner(
-      String path, KuisionerInputDataRequest data) {
+    String path,
+    KuisionerInputDataRequest data,
+  ) {
     print(data.toJson());
     return post(path, data.toJson());
   }
@@ -326,7 +347,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updateApprovalLembur(
-      String path, UpdateApprovalLemburRequest data) {
+    String path,
+    UpdateApprovalLemburRequest data,
+  ) {
     return post(path, data.toJson());
   }
 
@@ -336,7 +359,9 @@ class ApiProvider extends BaseProvider {
   //ENDIZIN
 
   Future<Response> submitKunjungan(
-      String path, AttendanceSubmitRequestWrapper data) async {
+    String path,
+    AttendanceSubmitRequestWrapper data,
+  ) async {
     try {
       print(data.toJson());
       // Kirim sebagai JSON, bukan multipart
@@ -350,7 +375,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> submitNonKunjungan(
-      String path, NonScheduleSubmitRequest data) async {
+    String path,
+    NonScheduleSubmitRequest data,
+  ) async {
     try {
       print(data.toJson());
       // Kirim sebagai JSON, bukan multipart
@@ -376,7 +403,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> getShowKunjungan(
-      String path, ShowDetailKunjunganRequest data) {
+    String path,
+    ShowDetailKunjunganRequest data,
+  ) {
     print(data.toJson());
     return post(path, data.toJson());
   }
@@ -400,7 +429,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updateApprovalCutiSales(
-      String path, UpdateApprovalCutiSalesRequest data) {
+    String path,
+    UpdateApprovalCutiSalesRequest data,
+  ) {
     return post(path, data.toJson());
   }
   //ENDIZIN
@@ -420,7 +451,9 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updateApprovalShiftSwap(
-      String path, UpdateApprovalShiftSwapRequest data) {
+    String path,
+    UpdateApprovalShiftSwapRequest data,
+  ) {
     return post(path, data.toJson());
   }
   //END SHIFT SWAP
@@ -440,23 +473,26 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> updateApprovalClaim(
-      String path, UpdateApprovalClaimRequest data) {
+    String path,
+    UpdateApprovalClaimRequest data,
+  ) {
     return post(path, data.toJson());
   }
   //END CLAIM
 
   //START PAYSLIP
   Future<Response> downloadPayslipExcel(
-      String path, DownloadPayslipRequest data) {
+    String path,
+    DownloadPayslipRequest data,
+  ) {
     final uri = Uri.parse(path).replace(queryParameters: data.toQuery());
-    return get(
-      uri.toString(),
-      headers: const {'X-Show-Error': '1'},
-    );
+    return get(uri.toString(), headers: const {'X-Show-Error': '1'});
   }
 
   Future<Response> downloadPayslipPdf(
-      String path, DownloadPayslipRequest data) {
+    String path,
+    DownloadPayslipRequest data,
+  ) {
     return post(
       path,
       data.toListPayslipJson(),

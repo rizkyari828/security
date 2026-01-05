@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/shared/shared.dart';
 
 class CustomButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -13,23 +13,23 @@ class CustomButton extends StatelessWidget {
   final EdgeInsetsGeometry outerPadding;
   final double? elevation;
 
-  const CustomButton(
-      {Key? key,
-      this.onPressed,
-      required this.buttonText,
-      this.borderColor = Colors.transparent,
-      this.isDisabled = false,
-      this.isAutoFocus = false,
-      this.width = 88.0,
-      this.height = 50,
-      this.borderRadius = 7.0,
-      this.outerPadding = const EdgeInsets.fromLTRB(32.0, 2.0, 32.0, 2.0),
-      this.fontSize = 14.0,
-      this.buttonColor = ColorConstants.mainColor,
-      this.buttonTextColor = Colors.white,
-      this.elevation,
-      this.buttonTextWeight = FontWeight.bold})
-      : super(key: key);
+  const CustomButton({
+    Key? key,
+    this.onPressed,
+    required this.buttonText,
+    this.borderColor = Colors.transparent,
+    this.isDisabled = false,
+    this.isAutoFocus = false,
+    this.width = 88.0,
+    this.height = 50,
+    this.borderRadius = 7.0,
+    this.outerPadding = const EdgeInsets.fromLTRB(32.0, 2.0, 32.0, 2.0),
+    this.fontSize = 14.0,
+    this.buttonColor = ColorConstants.mainColor,
+    this.buttonTextColor = Colors.white,
+    this.elevation,
+    this.buttonTextWeight = FontWeight.bold,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,36 +38,37 @@ class CustomButton extends StatelessWidget {
       height: height,
       child: ElevatedButton(
         style: ButtonStyle(
-            elevation: WidgetStateProperty.all(elevation),
-            shape: WidgetStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(10),
-                side: BorderSide(color: borderColor),
-              ),
+          elevation: WidgetStateProperty.all(elevation),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(10),
+              side: BorderSide(color: borderColor),
             ),
-            backgroundColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.disabled)) {
-                return CommonWidget.setOpacity(
-                    ColorConstants.disableButton, 0.7);
-              } else {
-                return buttonColor;
-              }
-            }),
-            textStyle: WidgetStateProperty.all(TextStyle(
-              color: buttonTextColor,
-              letterSpacing: 1.25,
-            ))),
+          ),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.disabled)) {
+              return CommonWidget.setOpacity(ColorConstants.disableButton, 0.7);
+            } else {
+              return buttonColor;
+            }
+          }),
+          textStyle: WidgetStateProperty.all(
+            TextStyle(color: buttonTextColor, letterSpacing: 1.25),
+          ),
+        ),
         autofocus: isAutoFocus,
         onPressed: isDisabled ? null : onPressed,
         child: buttonText is String
-            ? Text(buttonText,
+            ? Text(
+                buttonText,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: fontSize,
                   color: buttonTextColor,
                   fontWeight: buttonTextWeight,
                   letterSpacing: 1.25,
-                ))
+                ),
+              )
             : buttonText,
       ),
     );

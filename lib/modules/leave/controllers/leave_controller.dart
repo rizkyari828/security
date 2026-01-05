@@ -1,6 +1,6 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/izin/submit_izin_request.dart';
-import 'package:sales/models/response/izin/type_izin.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/izin/submit_izin_request.dart';
+import 'package:staffku/models/response/izin/type_izin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -46,11 +46,17 @@ class LeaveController extends GetxController {
   RxString validationDate = "".obs;
   var listType = <DataTypeIzin>[].obs;
 
-  Future<void> onImageButtonPressed(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
+  Future<void> onImageButtonPressed(
+    ImageSource source, {
+    BuildContext? context,
+    bool isMultiImage = false,
+  }) async {
     if (isMultiImage) {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final List<XFile>? pickedFileList = await _picker.pickMultiImage(
             maxWidth: maxWidth,
@@ -66,8 +72,11 @@ class LeaveController extends GetxController {
         }
       });
     } else {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
@@ -96,12 +105,13 @@ class LeaveController extends GetxController {
   void submitData() async {
     final res = await apiRepository.submitIzin(
       SubmitIzinRequest(
-          idUser: idUser.value,
-          dateStart: startDateController.text,
-          dateEnd: endDateController.text,
-          note: noteController.text,
-          leaveTypeId: idType.value,
-          token: token.value),
+        idUser: idUser.value,
+        dateStart: startDateController.text,
+        dateEnd: endDateController.text,
+        note: noteController.text,
+        leaveTypeId: idType.value,
+        token: token.value,
+      ),
     );
     if (res?.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
@@ -147,8 +157,10 @@ class LeaveController extends GetxController {
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
     startDate = selectedDate;
-    startDateController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    startDateController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   selectDateEnd(BuildContext context) async {
@@ -160,8 +172,10 @@ class LeaveController extends GetxController {
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
     endDate = selectedDate;
-    endDateController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    endDateController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   void getType() async {

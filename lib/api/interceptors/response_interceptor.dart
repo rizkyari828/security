@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:sales/models/models.dart';
-import 'package:sales/routes/routes.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/models/models.dart';
+import 'package:staffku/routes/routes.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:shared_preferences/shared_preferences.dart';

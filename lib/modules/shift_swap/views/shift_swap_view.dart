@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:sales/modules/shift_swap/controllers/shift_swap_list_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/widgets/approval.dart';
-import 'package:sales/shared/widgets/custom_card.dart';
+import 'package:staffku/modules/shift_swap/controllers/shift_swap_list_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/widgets/approval.dart';
+import 'package:staffku/shared/widgets/custom_card.dart';
 
 class ShiftSwapView extends GetView<ShiftSwapListController> {
   const ShiftSwapView({super.key});
@@ -55,7 +55,8 @@ class ShiftSwapView extends GetView<ShiftSwapListController> {
           final item = controller.listShiftSwap[i];
           return InkWell(
             onTap: () => controller.goToDetailPages(
-                id: item.idTukarShift?.toString() ?? ''),
+              id: item.idTukarShift?.toString() ?? '',
+            ),
             child: CustomExpandedCardView(
               name: item.user ?? '',
               firstParagraf:
@@ -73,4 +74,3 @@ class ShiftSwapView extends GetView<ShiftSwapListController> {
     );
   }
 }
-

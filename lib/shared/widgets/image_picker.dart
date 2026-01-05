@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'package:sales/models/response/Lead/list_lead_respone.dart';
-import 'package:sales/modules/home/home_controller.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/models/response/Lead/list_lead_respone.dart';
+import 'package:staffku/modules/home/home_controller.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,9 @@ class CustomImagePicker {
       return CommonWidget.bodyText(text: "Loading", color: Colors.grey);
     } else {
       return CommonWidget.bodyText(
-          text: "Anda belum memilih foto", color: Colors.grey);
+        text: "Anda belum memilih foto",
+        color: Colors.grey,
+      );
     }
   }
 
@@ -44,30 +46,27 @@ class CustomImagePicker {
           mainAxisSpacing: 10.0,
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(), // <--- ini penting!
-          children: List.generate(
-            controller.imageFileList.length,
-            (index) {
-              final item = controller.imageFileList[index];
-              // Cek apakah item punya properti 'img' (dari API)
-              if (item is Foto && (item.img == null || item.img!.isEmpty)) {
-                return const Icon(Icons.broken_image);
-              } else if (item is Foto && item.img!.startsWith('http')) {
-                return Semantics(
-                  label: 'image_picker_example_picked_image',
-                  child: Image.network(item.img!),
-                );
-              } else if (item.path != null) {
-                return Semantics(
-                  label: 'image_picker_example_picked_image',
-                  child: kIsWeb
-                      ? Image.network(item.path)
-                      : Image.file(File(item.path)),
-                );
-              } else {
-                return const Icon(Icons.broken_image);
-              }
-            },
-          ),
+          children: List.generate(controller.imageFileList.length, (index) {
+            final item = controller.imageFileList[index];
+            // Cek apakah item punya properti 'img' (dari API)
+            if (item is Foto && (item.img == null || item.img!.isEmpty)) {
+              return const Icon(Icons.broken_image);
+            } else if (item is Foto && item.img!.startsWith('http')) {
+              return Semantics(
+                label: 'image_picker_example_picked_image',
+                child: Image.network(item.img!),
+              );
+            } else if (item.path != null) {
+              return Semantics(
+                label: 'image_picker_example_picked_image',
+                child: kIsWeb
+                    ? Image.network(item.path)
+                    : Image.file(File(item.path)),
+              );
+            } else {
+              return const Icon(Icons.broken_image);
+            }
+          }),
         ),
         label: 'image_picker_example_picked_images',
       );
@@ -77,10 +76,7 @@ class CustomImagePicker {
         textAlign: TextAlign.center,
       );
     } else {
-      return const Text(
-        '',
-        textAlign: TextAlign.center,
-      );
+      return const Text('', textAlign: TextAlign.center);
     }
   }
 
@@ -94,37 +90,31 @@ class CustomImagePicker {
           mainAxisSpacing: 10.0,
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          children: List.generate(
-            imageFileList.length,
-            (index) {
-              final item = imageFileList[index];
-              if (item is Foto && (item.img == null || item.img!.isEmpty)) {
-                return const Icon(Icons.broken_image);
-              } else if (item is Foto && item.img!.startsWith('http')) {
-                return Semantics(
-                  label: label ?? 'image_picker_example_picked_image',
-                  child: Image.network(item.img!),
-                );
-              } else if (item.path != null) {
-                return Semantics(
-                  label: label ?? 'image_picker_example_picked_image',
-                  child: kIsWeb
-                      ? Image.network(item.path)
-                      : Image.file(File(item.path)),
-                );
-              } else {
-                return const Icon(Icons.broken_image);
-              }
-            },
-          ),
+          children: List.generate(imageFileList.length, (index) {
+            final item = imageFileList[index];
+            if (item is Foto && (item.img == null || item.img!.isEmpty)) {
+              return const Icon(Icons.broken_image);
+            } else if (item is Foto && item.img!.startsWith('http')) {
+              return Semantics(
+                label: label ?? 'image_picker_example_picked_image',
+                child: Image.network(item.img!),
+              );
+            } else if (item.path != null) {
+              return Semantics(
+                label: label ?? 'image_picker_example_picked_image',
+                child: kIsWeb
+                    ? Image.network(item.path)
+                    : Image.file(File(item.path)),
+              );
+            } else {
+              return const Icon(Icons.broken_image);
+            }
+          }),
         ),
         label: label ?? 'image_picker_example_picked_images',
       );
     } else {
-      return const Text(
-        '',
-        textAlign: TextAlign.center,
-      );
+      return const Text('', textAlign: TextAlign.center);
     }
   }
 
@@ -150,8 +140,10 @@ class CustomImagePicker {
         ),
         InkWell(
           onTap: () {
-            controller.onImageButtonPressed(ImageSource.camera,
-                context: context);
+            controller.onImageButtonPressed(
+              ImageSource.camera,
+              context: context,
+            );
           },
           child: DottedBorder(
             options: RectDottedBorderOptions(
@@ -165,14 +157,12 @@ class CustomImagePicker {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.camera_alt,
-                    color: Colors.grey,
-                    size: 30,
-                  ),
+                  Icon(Icons.camera_alt, color: Colors.grey, size: 30),
                   SizedBox(width: 10.0),
                   CommonWidget.bodyText(
-                      text: "Ambil Photo", color: Colors.grey),
+                    text: "Ambil Photo",
+                    color: Colors.grey,
+                  ),
                 ],
               ),
             ),
@@ -200,9 +190,7 @@ class FullScreenImage extends StatelessWidget {
         child: Center(
           child: Hero(
             tag: 'imageHero',
-            child: Image.network(
-              'https://picsum.photos/250?image=9',
-            ),
+            child: Image.network('https://picsum.photos/250?image=9'),
           ),
         ),
       ),

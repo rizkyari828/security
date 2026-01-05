@@ -5,12 +5,12 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
-import 'package:sales/models/request/kunjungan/non_schedule_request.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/utils/size_config.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/kunjungan/non_schedule_request.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/size_config.dart';
 import 'package:flutter_network_monitor/flutter_network_monitor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -81,7 +81,8 @@ class BaseController extends GetxController {
       qualityNetwork.value = quality.name;
 
       print(
-          'Connection Quality: ${ConnectionQualityDeterminer.getQualityString(quality)}');
+        'Connection Quality: ${ConnectionQualityDeterminer.getQualityString(quality)}',
+      );
     } catch (e) {
       qualityNetwork.value = 'no internet';
     }
@@ -126,18 +127,11 @@ class BaseController extends GetxController {
                   color: CommonWidget.setOpacity(Colors.black, 0.3),
                   blurRadius: 20.0,
                   spreadRadius: 4.0,
-                  offset: Offset(
-                    -10.0,
-                    10.0,
-                  ),
+                  offset: Offset(-10.0, 10.0),
                 ),
               ],
             ),
-            margin: EdgeInsets.only(
-              top: sh / 20,
-              left: 10.0,
-              right: 10.0,
-            ),
+            margin: EdgeInsets.only(top: sh / 20, left: 10.0, right: 10.0),
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Row(
@@ -146,9 +140,7 @@ class BaseController extends GetxController {
                     flex: 5,
                     child: Row(
                       children: [
-                        SizedBox(
-                          width: 10,
-                        ),
+                        SizedBox(width: 10),
                         Container(
                           width: 40, // Diameter lingkaran
                           height: 40,
@@ -170,9 +162,7 @@ class BaseController extends GetxController {
                                   color: Colors.white,
                                 ),
                         ),
-                        SizedBox(
-                          width: 10,
-                        ),
+                        SizedBox(width: 10),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,18 +171,22 @@ class BaseController extends GetxController {
                                 ? CommonWidget.subtitleText(
                                     text: "Internet Terputus",
                                     color: ColorConstants.black,
-                                    fontWeight: FontWeight.bold)
+                                    fontWeight: FontWeight.bold,
+                                  )
                                 : CommonWidget.subtitleText(
                                     text: "Internet Tersambung",
                                     color: ColorConstants.black,
-                                    fontWeight: FontWeight.bold),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             isConnectedToInternet.value == false
                                 ? CommonWidget.subtitleText(
                                     text: "Segera periksa jaringan internet mu",
-                                    color: ColorConstants.black)
+                                    color: ColorConstants.black,
+                                  )
                                 : CommonWidget.subtitleText(
                                     text: "Kamu Terkoneksi dengan internet",
-                                    color: ColorConstants.black),
+                                    color: ColorConstants.black,
+                                  ),
                           ],
                         ),
                       ],
@@ -207,11 +201,7 @@ class BaseController extends GetxController {
                         color: Colors.grey[400],
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.close,
-                        size: 20.0,
-                        color: Colors.white,
-                      ),
+                      child: Icon(Icons.close, size: 20.0, color: Colors.white),
                     ),
                   ),
                 ],
@@ -274,7 +264,8 @@ class BaseController extends GetxController {
   }
 
   Future<bool> _nonSubmitAttendance(
-      AttendanceSubmitRequestWrapper wrapper) async {
+    AttendanceSubmitRequestWrapper wrapper,
+  ) async {
     try {
       final nonScheduleRequest = NonScheduleSubmitRequest(
         latitude: wrapper.latitude,
@@ -290,8 +281,9 @@ class BaseController extends GetxController {
         planExecution: wrapper.planExecution,
       );
 
-      final res =
-          await apiRepository.submitNonScheduleVisited(nonScheduleRequest);
+      final res = await apiRepository.submitNonScheduleVisited(
+        nonScheduleRequest,
+      );
       return res?.message == "sukses";
     } catch (e) {
       print("Error saat submit: $e");

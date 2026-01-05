@@ -1,7 +1,7 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/user_id_request.dart';
-import 'package:sales/models/response/prospek_v2/detail_prospek_v2_response.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/user_id_request.dart';
+import 'package:staffku/models/response/prospek_v2/detail_prospek_v2_response.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,8 +20,9 @@ class ProspekV2Controller extends GetxController {
   DateTime? selectedDate;
 
   RxInt page = 1.obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
   RxString monthLabel = "".obs;
 
   void onLoading() async {
@@ -60,7 +61,8 @@ class ProspekV2Controller extends GetxController {
 
   void getProspek(page) async {
     final res = await apiRepository.listProspekV2(
-        UserIdRequest(id: userId.value, page: page.toString(), limit: '10'));
+      UserIdRequest(id: userId.value, page: page.toString(), limit: '10'),
+    );
     listProspek.addAll(res?.data ?? []);
   }
 

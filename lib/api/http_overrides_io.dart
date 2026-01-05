@@ -2,12 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:sales/api/api_constants.dart';
+import 'package:staffku/api/api_constants.dart';
 
-const List<String> _fallbackIpv4 = <String>[
-  '104.21.82.161',
-  '172.67.159.90',
-];
+const List<String> _fallbackIpv4 = <String>['104.21.82.161', '172.67.159.90'];
 
 void applySalesHttpOverrides() {
   final host = Uri.parse(ApiConstants.baseUrl).host.trim();
@@ -24,7 +21,8 @@ void applySalesHttpOverrides() {
 
   if (kDebugMode) {
     print(
-        '[HTTP] HttpOverrides enabled for host=$host fallback=${fallback.map((e) => e.address).toList(growable: false)}');
+      '[HTTP] HttpOverrides enabled for host=$host fallback=${fallback.map((e) => e.address).toList(growable: false)}',
+    );
   }
 }
 
@@ -38,8 +36,8 @@ final class _SalesHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     final client = super.createHttpClient(context);
 
-    client.connectionFactory =
-        (Uri url, String? proxyHost, int? proxyPort) async {
+    client
+        .connectionFactory = (Uri url, String? proxyHost, int? proxyPort) async {
       // If a proxy is configured, HttpClient will handle CONNECT + TLS itself.
       if (proxyHost != null && proxyPort != null) {
         return Socket.startConnect(proxyHost, proxyPort);
@@ -63,10 +61,7 @@ final class _SalesHttpOverrides extends HttpOverrides {
         );
       }
 
-      return _startSecureConnect(
-        host: url.host,
-        port: port,
-      );
+      return _startSecureConnect(host: url.host, port: port);
     };
 
     // Avoid env proxy surprises; keep consistent with mobile expectations.

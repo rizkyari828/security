@@ -9,11 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
-import 'package:sales/api/api_constants.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/utils/size_config.dart';
-import 'package:sales/shared/widgets/button.dart';
+import 'package:staffku/api/api_constants.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/size_config.dart';
+import 'package:staffku/shared/widgets/button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'loading_tracker.dart';
@@ -48,9 +48,10 @@ FutureOr<Request?> requestInterceptor(Request request) async {
   bool isFakeLocation = false;
   if (!_isAuthRequest(request)) {
     try {
-      isFakeLocation = await DetectFakeLocation()
-          .detectFakeLocation()
-          .timeout(_preflightTimeout, onTimeout: () => false);
+      isFakeLocation = await DetectFakeLocation().detectFakeLocation().timeout(
+        _preflightTimeout,
+        onTimeout: () => false,
+      );
       // isFakeLocation = false;
     } catch (_) {
       isFakeLocation = false;
@@ -58,7 +59,8 @@ FutureOr<Request?> requestInterceptor(Request request) async {
   }
   if (kDebugMode) {
     print(
-        '[HTTP][preflight] fakeLocation=$isFakeLocation ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)');
+      '[HTTP][preflight] fakeLocation=$isFakeLocation ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)',
+    );
   }
   if (isFakeLocation) {
     Future.delayed(Duration.zero, () {
@@ -66,7 +68,8 @@ FutureOr<Request?> requestInterceptor(Request request) async {
         AlertDialog(
           title: CommonWidget.bodyText(text: 'Fake Location Terdeteksi'),
           content: CommonWidget.subtitleMultilineText(
-              text: 'Matikan aplikasi lokasi palsu untuk melanjutkan.'),
+            text: 'Matikan aplikasi lokasi palsu untuk melanjutkan.',
+          ),
           actions: [
             CustomButton(
               buttonColor: ColorConstants.mainColor,
@@ -86,14 +89,17 @@ FutureOr<Request?> requestInterceptor(Request request) async {
 
   List<ConnectivityResult> result;
   try {
-    result = await Connectivity().checkConnectivity().timeout(_preflightTimeout,
-        onTimeout: () => const <ConnectivityResult>[ConnectivityResult.other]);
+    result = await Connectivity().checkConnectivity().timeout(
+      _preflightTimeout,
+      onTimeout: () => const <ConnectivityResult>[ConnectivityResult.other],
+    );
   } catch (_) {
     result = const <ConnectivityResult>[ConnectivityResult.other];
   }
   if (kDebugMode) {
     print(
-        '[HTTP][preflight] connectivity=$result ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)');
+      '[HTTP][preflight] connectivity=$result ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)',
+    );
   }
   final isOffline =
       result.isEmpty || result.every((r) => r == ConnectivityResult.none);
@@ -113,7 +119,8 @@ FutureOr<Request?> requestInterceptor(Request request) async {
   } catch (_) {}
   if (kDebugMode) {
     print(
-        '[HTTP][preflight] dns-ok ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)');
+      '[HTTP][preflight] dns-ok ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)',
+    );
   }
 
   if (LoadingTracker.shouldShow(request)) LoadingTracker.begin(request);

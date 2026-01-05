@@ -9,24 +9,24 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
-import 'package:sales/models/request/store/detail_request_leave.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/store/detail_request_leave.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/models/response/store/detail_store_response.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/constants/storage.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/utils/size_config.dart';
-import 'package:sales/shared/widgets/button.dart';
+import 'package:staffku/models/response/store/detail_store_response.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/constants/storage.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/size_config.dart';
+import 'package:staffku/shared/widgets/button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geocoding/geocoding.dart';
 
 class StoreDetailController extends BaseController {
   StoreDetailController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   final argm = Get.arguments;
   var detail = DetailStore().obs;
@@ -68,10 +68,10 @@ class StoreDetailController extends BaseController {
 
   RxString? retrieveDataError;
 
-  RxString dateNow = DateFormat("dd MMMM yyyy HH:mm:ss", "id_ID")
-      .format(DateTime.now())
-      .toString()
-      .obs;
+  RxString dateNow = DateFormat(
+    "dd MMMM yyyy HH:mm:ss",
+    "id_ID",
+  ).format(DateTime.now()).toString().obs;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -124,8 +124,12 @@ class StoreDetailController extends BaseController {
 
   void getDetail() async {
     final res = await apiRepository.showDetailKunjungan(
-        ShowDetailKunjunganRequest(
-            id: idStore.value, type: typeStore.value, idUser: userId.value));
+      ShowDetailKunjunganRequest(
+        id: idStore.value,
+        type: typeStore.value,
+        idUser: userId.value,
+      ),
+    );
     // print(res!.data!);
     final data = res?.data;
     if (data != null && data.isNotEmpty) {
@@ -157,98 +161,107 @@ class StoreDetailController extends BaseController {
     final sw = SizeConfig().screenWidth;
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
     Get.bottomSheet(
-        Container(
-          child: Column(
-            children: [
-              Padding(
-                  padding: const EdgeInsets.all(25.0),
-                  child: Column(
-                    children: [
-                      CommonWidget.rowHeight(),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 10.0),
-                          child: CommonWidget.minHeadText(
-                              text: 'Unggah Foto Anda'),
-                        ),
+      Container(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                children: [
+                  CommonWidget.rowHeight(),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: CommonWidget.minHeadText(text: 'Unggah Foto Anda'),
+                    ),
+                  ),
+                  CommonWidget.rowHeight(),
+                  Obx(
+                    () => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: new BorderRadius.circular(10.0),
                       ),
-                      CommonWidget.rowHeight(),
-                      Obx(() => Container(
-                            decoration: BoxDecoration(
-                              borderRadius: new BorderRadius.circular(10.0),
+                      height: sw * .4,
+                      width: sw * .4,
+                      child: imageFileList.isNotEmpty
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                20,
+                              ), // Image border
+                              child: Image.file(File(imageFileList.first.path)),
+                            )
+                          : Center(
+                              child: CommonWidget.bodyText(
+                                text: "Anda belum memilih foto",
+                                color: Colors.grey,
+                              ),
                             ),
-                            height: sw * .4,
-                            width: sw * .4,
-                            child: imageFileList.isNotEmpty
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                        20), // Image border
-                                    child: Image.file(
-                                        File(imageFileList.first.path)),
-                                  )
-                                : Center(
-                                    child: CommonWidget.bodyText(
-                                        text: "Anda belum memilih foto",
-                                        color: Colors.grey),
-                                  ),
-                          )),
-                      CommonWidget.rowHeight(),
-                      InkWell(
-                        onTap: () {
-                          onImageButtonPressed(ImageSource.gallery,
-                              context: Get.context);
-                        },
-                        child: DottedBorder(
-                          options: RectDottedBorderOptions(
-                            color: Colors.grey,
-                            dashPattern: [8, 4],
-                            strokeWidth: 1,
-                          ),
-                          child: Container(
-                            height: 50,
-                            width: sw,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.grey,
-                                  size: 30,
-                                ),
-                                SizedBox(width: 10.0),
-                                CommonWidget.bodyText(
-                                    text: "Ambil Photo", color: Colors.grey),
-                              ],
-                            ),
-                          ),
-                        ),
+                    ),
+                  ),
+                  CommonWidget.rowHeight(),
+                  InkWell(
+                    onTap: () {
+                      onImageButtonPressed(
+                        ImageSource.gallery,
+                        context: Get.context,
+                      );
+                    },
+                    child: DottedBorder(
+                      options: RectDottedBorderOptions(
+                        color: Colors.grey,
+                        dashPattern: [8, 4],
+                        strokeWidth: 1,
                       ),
-                      CommonWidget.rowHeight(),
-                      CustomButton(
-                        buttonColor: ColorConstants.mainColor,
-                        buttonText: 'SIMPAN',
+                      child: Container(
+                        height: 50,
                         width: sw,
-                        onPressed: () {
-                          // type == 'Clock In' ? submitIn() : submitOut();
-                          submit(type);
-                          // submitPhoto();
-                          // controller.approval(action: 'approve');
-                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.camera_alt,
+                              color: Colors.grey,
+                              size: 30,
+                            ),
+                            SizedBox(width: 10.0),
+                            CommonWidget.bodyText(
+                              text: "Ambil Photo",
+                              color: Colors.grey,
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  )),
-            ],
-          ),
+                    ),
+                  ),
+                  CommonWidget.rowHeight(),
+                  CustomButton(
+                    buttonColor: ColorConstants.mainColor,
+                    buttonText: 'SIMPAN',
+                    width: sw,
+                    onPressed: () {
+                      // type == 'Clock In' ? submitIn() : submitOut();
+                      submit(type);
+                      // submitPhoto();
+                      // controller.approval(action: 'approve');
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        elevation: 20.0,
-        enableDrag: false,
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
+      ),
+      elevation: 20.0,
+      enableDrag: false,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),
           topRight: Radius.circular(30.0),
-        )));
+        ),
+      ),
+    );
     // });
   }
 
@@ -264,7 +277,9 @@ class StoreDetailController extends BaseController {
       return CommonWidget.bodyText(text: "Loading", color: Colors.grey);
     } else {
       return CommonWidget.bodyText(
-          text: "Anda belum memilih foto", color: Colors.grey);
+        text: "Anda belum memilih foto",
+        color: Colors.grey,
+      );
     }
   }
 
@@ -286,10 +301,7 @@ class StoreDetailController extends BaseController {
       final photoBase64 = base64Encode(photoBytes);
 
       attachments.add(
-        PhotoAttachment(
-          img: photoBase64,
-          filename: file.path.split('/').last,
-        ),
+        PhotoAttachment(img: photoBase64, filename: file.path.split('/').last),
       );
     }
 
@@ -378,10 +390,9 @@ class StoreDetailController extends BaseController {
 
     for (final file in imageFiles) {
       final bytes = await file.readAsBytes();
-      photoList.add(PhotoAttachment(
-        img: base64Encode(bytes),
-        filename: file.name,
-      ));
+      photoList.add(
+        PhotoAttachment(img: base64Encode(bytes), filename: file.name),
+      );
     }
 
     final wrapper = AttendanceSubmitRequestWrapper(
@@ -411,12 +422,18 @@ class StoreDetailController extends BaseController {
     }
   }
 
-  Future<void> onImageButtonPressed(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
+  Future<void> onImageButtonPressed(
+    ImageSource source, {
+    BuildContext? context,
+    bool isMultiImage = false,
+  }) async {
     // imageFileList.clear();
     if (isMultiImage) {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final List<XFile>? pickedFileList = await _picker.pickMultiImage(
             maxWidth: maxWidth,
@@ -432,8 +449,11 @@ class StoreDetailController extends BaseController {
         }
       });
     } else {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
@@ -517,17 +537,21 @@ class StoreDetailController extends BaseController {
         forwardAnimationCurve: Curves.easeOutBack,
       );
       print(
-          "Location permissions are permanently denied, we cannot request permissions.");
+        "Location permissions are permanently denied, we cannot request permissions.",
+      );
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     final position = await _geolocatorPlatform.getCurrentPosition();
     myLocation = LatLng(position.latitude, position.longitude);
 
     try {
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
       final place = placemarks.isNotEmpty ? placemarks.first : null;
       locationDetail.value = place == null

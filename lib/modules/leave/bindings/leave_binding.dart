@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:sales/modules/leave/controllers/leave_detail_controller.dart';
-import 'package:sales/modules/leave/controllers/leave_list_controller.dart';
+import 'package:staffku/modules/leave/controllers/leave_detail_controller.dart';
+import 'package:staffku/modules/leave/controllers/leave_list_controller.dart';
 
 import '../controllers/leave_controller.dart';
 

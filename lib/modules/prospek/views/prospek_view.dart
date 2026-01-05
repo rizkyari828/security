@@ -1,14 +1,14 @@
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:sales/modules/prospek/controllers/prospek_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/widgets/approval.dart';
-import 'package:sales/shared/widgets/custom_card.dart';
+import 'package:staffku/modules/prospek/controllers/prospek_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/widgets/approval.dart';
+import 'package:staffku/shared/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:sales/shared/widgets/input_field.dart';
+import 'package:staffku/shared/widgets/input_field.dart';
 
 import '../../../shared/utils/common_widget.dart';
 
@@ -18,24 +18,25 @@ class ProspekView extends GetView<ProspekController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme:
-              IconThemeData(color: ColorConstants.black //change your color here
-                  ),
-          centerTitle: false,
-          title: Text(
-            'List Prospek',
-            style: TextStyle(
-              color: ColorConstants.black,
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              fontFamily: 'Poppins',
-            ),
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: ColorConstants.black, //change your color here
+        ),
+        centerTitle: false,
+        title: Text(
+          'List Prospek',
+          style: TextStyle(
+            color: ColorConstants.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontFamily: 'Poppins',
           ),
-          backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
-          elevation: 0.0,
-          actions: [
-            Obx(() => controller.type.value == "now"
+        ),
+        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
+        elevation: 0.0,
+        actions: [
+          Obx(
+            () => controller.type.value == "now"
                 ? IconButton(
                     onPressed: () {
                       showMonthPicker(
@@ -47,10 +48,10 @@ class ProspekView extends GetView<ProspekController> {
                         if (date != null) {
                           controller.listProspek.clear();
                           controller.selectedDate = date;
-                          controller.monthV.value =
-                              DateFormat("MMMM yyyy", "id_ID")
-                                  .format(date)
-                                  .toString();
+                          controller.monthV.value = DateFormat(
+                            "MMMM yyyy",
+                            "id_ID",
+                          ).format(date).toString();
                           controller.getProspek(1);
                         }
                       });
@@ -58,19 +59,25 @@ class ProspekView extends GetView<ProspekController> {
                     tooltip: 'Pilih Bulan',
                     icon: Icon(Icons.calendar_month_rounded, size: 20),
                   )
-                : Container()),
-            Obx(() => controller.type.value == "now"
+                : Container(),
+          ),
+          Obx(
+            () => controller.type.value == "now"
                 ? ApprovalFlow.addButtonApproval(
-                    controller: controller, onPressed: controller.goToAddPages)
-                : Container())
-            // IconButton(
-            //   onPressed: controller.goToAddPages,
-            //   tooltip: 'Tambah',
-            //   icon: Icon(Icons.add_box_rounded, size: 20),
-            // )
-          ],
-        ),
-        body: Obx(() => _getItems(controller)));
+                    controller: controller,
+                    onPressed: controller.goToAddPages,
+                  )
+                : Container(),
+          ),
+          // IconButton(
+          //   onPressed: controller.goToAddPages,
+          //   tooltip: 'Tambah',
+          //   icon: Icon(Icons.add_box_rounded, size: 20),
+          // )
+        ],
+      ),
+      body: Obx(() => _getItems(controller)),
+    );
   }
 
   SmartRefresher _getItems(ProspekController controller) {
@@ -139,16 +146,19 @@ class ProspekView extends GetView<ProspekController> {
                                           CustomDropDownSearch(
                                             listItem: controller.listStatusOrder
                                                 .map((item) {
-                                              return item.namaCat.toString();
-                                            }).toList(),
+                                                  return item.namaCat
+                                                      .toString();
+                                                })
+                                                .toList(),
                                             labelText: "Filter Status",
                                             onChanged: (value) async {
                                               // controller.nameItem.value = value;
-                                              for (var f in controller
-                                                  .listStatusOrder) {
+                                              for (var f
+                                                  in controller
+                                                      .listStatusOrder) {
                                                 if (f.namaCat == value) {
-                                                  controller.status.value =
-                                                      f.id.toString();
+                                                  controller.status.value = f.id
+                                                      .toString();
                                                   controller.listProspek
                                                       .clear();
                                                   controller.getProspek(1);
@@ -168,15 +178,16 @@ class ProspekView extends GetView<ProspekController> {
                     onTap: () {
                       if (controller.groupId.value == "1") {
                         controller.goToDetailPages(
-                            id: controller.listProspek[i].noTrans.toString());
+                          id: controller.listProspek[i].noTrans.toString(),
+                        );
                       }
                     },
                     child: CustomExpandedCardView(
-                      firstParagraf:
-                          controller.listProspek[i].noTrans.toString(),
+                      firstParagraf: controller.listProspek[i].noTrans
+                          .toString(),
                       secondParagrafLabel: "Nickname",
-                      secondParagrafValue:
-                          controller.listProspek[i].nama.toString(),
+                      secondParagrafValue: controller.listProspek[i].nama
+                          .toString(),
                       thirdParagrafLabel: "Pengajuan",
                       thirdParagrafValue:
                           '${DateFormat("EEEE, d MMMM yyyy", "id_ID").format(controller.listProspek[i].cdate ?? DateTime.now())}',

@@ -1,15 +1,15 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/id_request.dart';
-import 'package:sales/models/response/izin/list_izin.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/id_request.dart';
+import 'package:staffku/models/response/izin/list_izin.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LeaveListController extends BaseController {
   LeaveListController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   var listIzin = <DataIzin>[].obs;
   RxString groupName = "".obs;
@@ -18,8 +18,9 @@ class LeaveListController extends BaseController {
   RxString token = "".obs;
 
   RxInt page = 1.obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   void onLoading() async {
     page.value = page.value + 1;
@@ -58,7 +59,9 @@ class LeaveListController extends BaseController {
 
   void getIzin(page) async {
     final res = await apiRepository.listIzin(
-        page: page, data: IdRequest(id: userId.value, token: token.value));
+      page: page,
+      data: IdRequest(id: userId.value, token: token.value),
+    );
     listIzin.addAll(res?.data ?? []);
   }
 

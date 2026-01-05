@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
@@ -23,9 +23,7 @@ class GradientBackground extends StatelessWidget {
     return needTopSafeArea
         ? Container(
             color: Theme.of(context).colorScheme.primaryContainer,
-            child: SafeArea(
-              child: _buildBackground(context),
-            ),
+            child: SafeArea(child: _buildBackground(context)),
           )
         : _buildBackground(context);
   }
@@ -45,10 +43,7 @@ class GradientBackground extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               stops: [0.1, 0.9],
-              colors: [
-                hexToColor('#405FA3'),
-                hexToColor('#1ED69D'),
-              ],
+              colors: [hexToColor('#405FA3'), hexToColor('#1ED69D')],
             ),
           ),
           child: child,
@@ -63,7 +58,7 @@ class GradientBackground extends StatelessWidget {
                   [hexToColor('#2BA99F'), hexToColor('#22CC9E')],
                   [hexToColor('#2BA99F'), hexToColor('#3BCDAD')],
                   [hexToColor('#3CC8AE'), hexToColor('#22C69E')],
-                  [hexToColor('#55D5B1'), hexToColor('#54D9B1')]
+                  [hexToColor('#55D5B1'), hexToColor('#54D9B1')],
                 ],
                 durations: [35000, 19440, 10800, 6000],
                 heightPercentages: [0.20, 0.23, 0.25, 0.30],
@@ -72,10 +67,7 @@ class GradientBackground extends StatelessWidget {
                 gradientEnd: Alignment.topRight,
               ),
               waveAmplitude: 20,
-              size: Size(
-                MediaQuery.of(context).size.width,
-                60.0,
-              ),
+              size: Size(MediaQuery.of(context).size.width, 60.0),
             ),
           ),
       ],

@@ -1,6 +1,6 @@
-import 'package:sales/modules/event/controllers/event_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/widgets/custom_card.dart';
+import 'package:staffku/modules/event/controllers/event_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -10,24 +10,25 @@ class EventView extends GetView<EventController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme:
-              IconThemeData(color: ColorConstants.black //change your color here
-                  ),
-          centerTitle: false,
-          title: Text(
-            'Event',
-            style: TextStyle(
-              color: ColorConstants.black,
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              fontFamily: 'Poppins',
-            ),
-          ),
-          backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
-          elevation: 0.0,
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: ColorConstants.black, //change your color here
         ),
-        body: Obx(() => _getItems(controller)));
+        centerTitle: false,
+        title: Text(
+          'Event',
+          style: TextStyle(
+            color: ColorConstants.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontFamily: 'Poppins',
+          ),
+        ),
+        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
+        elevation: 0.0,
+      ),
+      body: Obx(() => _getItems(controller)),
+    );
   }
 
   SmartRefresher _getItems(EventController controller) {
@@ -43,7 +44,8 @@ class EventView extends GetView<EventController> {
         itemBuilder: (context, i) => InkWell(
           onTap: () {
             controller.goToDetailPages(
-                id: controller.listEvent[i].id.toString());
+              id: controller.listEvent[i].id.toString(),
+            );
           },
           child: CustomExpandedImageCardView(
             title: controller.listEvent[i].namaEvent ?? '',

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/modules/shift_swap/controllers/shift_swap_controller.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/widgets/button.dart';
-import 'package:sales/shared/widgets/input_field.dart';
+import 'package:staffku/modules/shift_swap/controllers/shift_swap_controller.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/widgets/button.dart';
+import 'package:staffku/shared/widgets/input_field.dart';
 
 class AddShiftSwapView extends GetView<ShiftSwapController> {
   const AddShiftSwapView({super.key});
@@ -23,9 +23,10 @@ class AddShiftSwapView extends GetView<ShiftSwapController> {
               children: [
                 CommonWidget.labelExpanded(
                   label: 'Tanggal Pengajuan',
-                  value: DateFormat('EEEE, d MMMM yyyy', 'id_ID')
-                      .format(DateTime.now())
-                      .toString(),
+                  value: DateFormat(
+                    'EEEE, d MMMM yyyy',
+                    'id_ID',
+                  ).format(DateTime.now()).toString(),
                 ),
                 const SizedBox(height: 10.0),
                 InputInputField(

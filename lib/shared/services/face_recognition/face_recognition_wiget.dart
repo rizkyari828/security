@@ -5,7 +5,7 @@ import 'package:face_camera/face_camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/shared/constants/colors.dart';
+import 'package:staffku/shared/constants/colors.dart';
 
 const bool _forceManualCapture = bool.fromEnvironment(
   'FACE_MANUAL_CAPTURE',

@@ -4,24 +4,24 @@ import 'dart:io';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/agent/submit_agent.dart';
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
-import 'package:sales/models/response/izin/type_izin.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/agent/submit_agent.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/response/izin/type_izin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/models/response/master_data_2_response.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/shared/constants/storage.dart';
+import 'package:staffku/models/response/master_data_2_response.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/shared/constants/storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signature/signature.dart';
 
 class AgentController extends BaseController {
   AgentController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
   var imageFileList = <XFile>[].obs;
 
   set _imageFile(XFile? value) {
@@ -82,15 +82,23 @@ class AgentController extends BaseController {
       lastDate: DateTime(2028),
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
-    controller.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    controller.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
-  Future<void> onImageButtonPressed(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
+  Future<void> onImageButtonPressed(
+    ImageSource source, {
+    BuildContext? context,
+    bool isMultiImage = false,
+  }) async {
     if (isMultiImage) {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final List<XFile>? pickedFileList = await _picker.pickMultiImage(
             maxWidth: maxWidth,
@@ -106,8 +114,11 @@ class AgentController extends BaseController {
         }
       });
     } else {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
@@ -149,19 +160,13 @@ class AgentController extends BaseController {
       final photoBytes = await File(file.path).readAsBytes();
       final photoBase64 = base64Encode(photoBytes);
       photoAttachments.add(
-        PhotoAttachment(
-          img: photoBase64,
-          filename: file.path.split('/').last,
-        ),
+        PhotoAttachment(img: photoBase64, filename: file.path.split('/').last),
       );
     }
 
     // Siapkan lampiran signature
     List<PhotoAttachment> signatureAttachments = [
-      PhotoAttachment(
-        img: signatureBase64,
-        filename: "signature.png",
-      ),
+      PhotoAttachment(img: signatureBase64, filename: "signature.png"),
     ];
 
     // Submit request
@@ -255,17 +260,21 @@ class AgentController extends BaseController {
         forwardAnimationCurve: Curves.easeOutBack,
       );
       print(
-          "Location permissions are permanently denied, we cannot request permissions.");
+        "Location permissions are permanently denied, we cannot request permissions.",
+      );
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     final position = await _geolocatorPlatform.getCurrentPosition();
     myLocation = LatLng(position.latitude, position.longitude);
 
     try {
-      final placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
       final place = placemarks.isNotEmpty ? placemarks.first : null;
       locationDetail.value = place == null
           ? ''
@@ -310,8 +319,9 @@ class AgentController extends BaseController {
     }
 
     masterData.clear();
-    final resListLeadCategory =
-        await apiRepository.getMasterData2('Kategori Lead');
+    final resListLeadCategory = await apiRepository.getMasterData2(
+      'Kategori Lead',
+    );
     final leadCategoryData = resListLeadCategory?.data;
     if (leadCategoryData == null || leadCategoryData.isEmpty) {
       EasyLoading.showError('Gagal memuat master data');

@@ -1,7 +1,7 @@
-import 'package:sales/modules/store/controllers/result_kunjungan_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/utils/size_config.dart';
+import 'package:staffku/modules/store/controllers/result_kunjungan_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -10,24 +10,25 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme:
-              IconThemeData(color: ColorConstants.black //change your color here
-                  ),
-          centerTitle: false,
-          title: Text(
-            'Hasil Patroli',
-            style: TextStyle(
-              color: ColorConstants.black,
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              fontFamily: 'Poppins',
-            ),
-          ),
-          backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
-          elevation: 0.0,
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: ColorConstants.black, //change your color here
         ),
-        body: Obx(() => _getItems(controller)));
+        centerTitle: false,
+        title: Text(
+          'Hasil Patroli',
+          style: TextStyle(
+            color: ColorConstants.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontFamily: 'Poppins',
+          ),
+        ),
+        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
+        elevation: 0.0,
+      ),
+      body: Obx(() => _getItems(controller)),
+    );
   }
 
   SmartRefresher _getItems(ResultKunjunganController controller) {
@@ -47,32 +48,34 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _cardMenu("Hari Ini", () {}, ColorConstants.secondaryAppColor),
+                          _cardMenu(
+                            "Hari Ini",
+                            () {},
+                            ColorConstants.secondaryAppColor,
+                          ),
                           _cardMenu("Minggu Ini", () {}, Colors.grey),
                           _cardMenu("Bulan Ini", () {}, Colors.grey),
                         ],
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: 10),
                       summaryCard(),
-                      SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.only(left: 20.0, top: 20.0),
                         child: Row(
                           children: [
                             CommonWidget.subtitleText(
-                                text: 'Jadwal ', color: ColorConstants.black),
+                              text: 'Jadwal ',
+                              color: ColorConstants.black,
+                            ),
                             CommonWidget.minHeadText(
-                                text: 'Patroli', color: ColorConstants.black),
+                              text: 'Patroli',
+                              color: ColorConstants.black,
+                            ),
                           ],
                         ),
                       ),
@@ -107,9 +110,10 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
           padding: const EdgeInsets.all(10.0),
           child: Center(
             child: CommonWidget.subtitleText(
-                text: title.toUpperCase(),
-                color: Colors.white,
-                fontWeight: FontWeight.w500),
+              text: title.toUpperCase(),
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),
@@ -133,12 +137,10 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             headerTextSummary('Total Patroli', '0', Colors.grey),
-            Divider(
-              color: ColorConstants.backgroundTextField,
-            ),
+            Divider(color: ColorConstants.backgroundTextField),
             textSummary('Berhasil', '0', Colors.green),
             textSummary('Gagal', '0', Colors.orange),
-            textSummary('Tidak Dipatroli', '0', Colors.red)
+            textSummary('Tidak Dipatroli', '0', Colors.red),
           ],
         ),
       ),
@@ -151,18 +153,13 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.data_usage,
-              color: color,
-              size: 20,
-            ),
-            SizedBox(
-              width: 10,
-            ),
+            Icon(Icons.data_usage, color: color, size: 20),
+            SizedBox(width: 10),
             CommonWidget.subtitleText(
-                text: title,
-                fontWeight: FontWeight.bold,
-                color: ColorConstants.mainColor),
+              text: title,
+              fontWeight: FontWeight.bold,
+              color: ColorConstants.mainColor,
+            ),
           ],
         ),
         CommonWidget.minHeadText(text: value, color: ColorConstants.mainColor),
@@ -176,16 +173,12 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.circle,
-              color: color,
-              size: 10,
-            ),
-            SizedBox(
-              width: 10,
-            ),
+            Icon(Icons.circle, color: color, size: 10),
+            SizedBox(width: 10),
             CommonWidget.subtitleText(
-                text: title, color: ColorConstants.mainColor),
+              text: title,
+              color: ColorConstants.mainColor,
+            ),
           ],
         ),
         CommonWidget.minHeadText(text: value, color: ColorConstants.mainColor),
@@ -244,15 +237,11 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
                             color: Colors.black,
                             image: new DecorationImage(
                               fit: BoxFit.cover,
-                              image: new NetworkImage(
-                                photo,
-                              ),
+                              image: new NetworkImage(photo),
                             ),
                           ),
                         ),
-                  SizedBox(
-                    width: 20,
-                  ),
+                  SizedBox(width: 20),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,9 +252,10 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
                         children: [
                           CommonWidget.subtitleText(text: 'alamat : '),
                           CommonWidget.subtitleText(
-                              text: address,
-                              // fontWeight: FontWeight.bold,
-                              color: ColorConstants.mainColor),
+                            text: address,
+                            // fontWeight: FontWeight.bold,
+                            color: ColorConstants.mainColor,
+                          ),
                         ],
                       ),
                     ],
@@ -283,11 +273,16 @@ class ResultKunjunganView extends GetView<ResultKunjunganController> {
                     color: Colors.grey,
                     child: Padding(
                       padding: const EdgeInsets.only(
-                          bottom: 3.0, top: 3, right: 5, left: 5),
+                        bottom: 3.0,
+                        top: 3,
+                        right: 5,
+                        left: 5,
+                      ),
                       child: CommonWidget.captionMultilineText(
-                          text: 'Belum dikunjungi',
-                          color: Colors.white,
-                          textAlign: TextAlign.center),
+                        text: 'Belum dikunjungi',
+                        color: Colors.white,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ],

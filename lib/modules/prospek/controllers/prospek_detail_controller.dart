@@ -1,15 +1,15 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/action.dart';
-import 'package:sales/models/request/overtime/get_list.dart';
-import 'package:sales/models/request/overtime/update_approval_overtime_request.dart';
-import 'package:sales/models/response/prospek/master_data_response.dart';
-import 'package:sales/models/response/prospek/master_id_response.dart';
-import 'package:sales/models/response/prospek/master_status_response.dart';
-import 'package:sales/models/response/prospek/show.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/action.dart';
+import 'package:staffku/models/request/overtime/get_list.dart';
+import 'package:staffku/models/request/overtime/update_approval_overtime_request.dart';
+import 'package:staffku/models/response/prospek/master_data_response.dart';
+import 'package:staffku/models/response/prospek/master_id_response.dart';
+import 'package:staffku/models/response/prospek/master_status_response.dart';
+import 'package:staffku/models/response/prospek/show.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../shared/utils/common_widget.dart';
@@ -32,10 +32,7 @@ class ProspekDetailController extends GetxController {
   var listSourceOfOrder = <MasterData>[].obs;
   var listStatusOrder = <MasterStatus>[].obs;
 
-  var arrayFive = <double>[
-    0.5,
-    1.0,
-  ].obs;
+  var arrayFive = <double>[0.5, 1.0].obs;
   String date = "";
   DateTime selectedDate = DateTime.now();
   final noRequestController = TextEditingController();
@@ -76,30 +73,12 @@ class ProspekDetailController extends GetxController {
     loadUsers();
     loadMaster();
 
-    listType.add(ActionStatus(
-      id: "2",
-      name: "Mobil",
-    ));
-    listType.add(ActionStatus(
-      id: "1",
-      name: "Motor",
-    ));
-    listAction.add(ActionStatus(
-      id: "",
-      name: "Accepted",
-    ));
-    listAction.add(ActionStatus(
-      id: "4",
-      name: "Cancel",
-    ));
-    listAction.add(ActionStatus(
-      id: "5",
-      name: "Reject",
-    ));
-    listAction.add(ActionStatus(
-      id: "6",
-      name: "TBC",
-    ));
+    listType.add(ActionStatus(id: "2", name: "Mobil"));
+    listType.add(ActionStatus(id: "1", name: "Motor"));
+    listAction.add(ActionStatus(id: "", name: "Accepted"));
+    listAction.add(ActionStatus(id: "4", name: "Cancel"));
+    listAction.add(ActionStatus(id: "5", name: "Reject"));
+    listAction.add(ActionStatus(id: "6", name: "TBC"));
   }
 
   @override
@@ -171,9 +150,7 @@ class ProspekDetailController extends GetxController {
     // }
   }
 
-  void approval({
-    action = "reject",
-  }) async {
+  void approval({action = "reject"}) async {
     int _statusId = 0;
     int _actionId = 0;
     int _typeId = 0;
@@ -215,12 +192,13 @@ class ProspekDetailController extends GetxController {
     final res = await apiRepository.updateApprovalOvertime(
       detail.value.id.toString(),
       UpdateApprovalOvertimeRequest(
-          action: _actionId,
-          noTrans: detail.value.noTrans,
-          status: _statusId,
-          kunci: token.value,
-          note: noteController.text,
-          type: _typeId),
+        action: _actionId,
+        noTrans: detail.value.noTrans,
+        status: _statusId,
+        kunci: token.value,
+        note: noteController.text,
+        type: _typeId,
+      ),
     );
 
     if (res?.error == false) {
@@ -237,9 +215,7 @@ class ProspekDetailController extends GetxController {
   void _dialogSuccess() {
     Get.defaultDialog(
       title: "Informasi",
-      content: CommonWidget.bodyText(
-        text: "Data berhasil disimpan",
-      ),
+      content: CommonWidget.bodyText(text: "Data berhasil disimpan"),
       textConfirm: 'OK',
       onConfirm: () {
         Get.back();
@@ -257,7 +233,9 @@ class ProspekDetailController extends GetxController {
 
   void getDetailProspek() async {
     final res = await apiRepository.showProspek(
-        argm.toString(), GetListRequest(id: '0', token: ''));
+      argm.toString(),
+      GetListRequest(id: '0', token: ''),
+    );
     final data = res?.data;
     if (data == null || data.isEmpty) {
       CommonWidget.errorSnackBar('Gagal memuat detail prospek');

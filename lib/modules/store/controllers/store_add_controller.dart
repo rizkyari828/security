@@ -6,20 +6,20 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
-import 'package:sales/models/request/kunjungan/non_schedule_request.dart';
-import 'package:sales/models/response/master_data_2_response.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/kunjungan/non_schedule_request.dart';
+import 'package:staffku/models/response/master_data_2_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/shared/constants/storage.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/shared/constants/storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StoreAddController extends BaseController {
   StoreAddController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   String date = "";
   DateTime selectedDate = DateTime.now();
@@ -104,8 +104,10 @@ class StoreAddController extends BaseController {
 
     if (isConnectedToInternet.value == true) {
       // Ambil dari API dan simpan ke storage
-      final resListAgenda = await apiRepository
-          .getMasterData2('aktifitas_kunjungan', userId: userId.value);
+      final resListAgenda = await apiRepository.getMasterData2(
+        'aktifitas_kunjungan',
+        userId: userId.value,
+      );
       if (resListAgenda?.data != null) {
         masterData.value = resListAgenda!.data!;
         listAgenda.assignAll(masterData);
@@ -114,8 +116,10 @@ class StoreAddController extends BaseController {
       }
 
       masterData.clear();
-      final resListStatus = await apiRepository
-          .getMasterData2('status_kunjungan', userId: userId.value);
+      final resListStatus = await apiRepository.getMasterData2(
+        'status_kunjungan',
+        userId: userId.value,
+      );
       if (resListStatus?.data != null) {
         masterData.value = resListStatus!.data!;
         listStatus.assignAll(masterData);
@@ -226,17 +230,21 @@ class StoreAddController extends BaseController {
         forwardAnimationCurve: Curves.easeOutBack,
       );
       print(
-          "Location permissions are permanently denied, we cannot request permissions.");
+        "Location permissions are permanently denied, we cannot request permissions.",
+      );
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     final position = await _geolocatorPlatform.getCurrentPosition();
     myLocation = LatLng(position.latitude, position.longitude);
 
     try {
-      final placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
       final place = placemarks.isNotEmpty ? placemarks.first : null;
       locationDetail.value = place == null
           ? ''
@@ -254,12 +262,18 @@ class StoreAddController extends BaseController {
     EasyLoading.dismiss();
   }
 
-  Future<void> onImageButtonPressed(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
+  Future<void> onImageButtonPressed(
+    ImageSource source, {
+    BuildContext? context,
+    bool isMultiImage = false,
+  }) async {
     // imageFileList.clear();
     if (isMultiImage) {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final List<XFile>? pickedFileList = await _picker.pickMultiImage(
             maxWidth: maxWidth,
@@ -275,8 +289,11 @@ class StoreAddController extends BaseController {
         }
       });
     } else {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
@@ -326,10 +343,7 @@ class StoreAddController extends BaseController {
       final photoBase64 = base64Encode(photoBytes);
 
       attachments.add(
-        PhotoAttachment(
-          img: photoBase64,
-          filename: file.path.split('/').last,
-        ),
+        PhotoAttachment(img: photoBase64, filename: file.path.split('/').last),
       );
     }
 
@@ -395,8 +409,9 @@ class StoreAddController extends BaseController {
         planExecution: wrapper.planExecution,
       );
 
-      final res =
-          await apiRepository.submitNonScheduleVisited(nonScheduleRequest);
+      final res = await apiRepository.submitNonScheduleVisited(
+        nonScheduleRequest,
+      );
       return res?.message == "sukses";
     } catch (e) {
       print("Error saat submit: $e");

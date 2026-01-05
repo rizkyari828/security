@@ -1,8 +1,8 @@
-import 'package:sales/modules/prospek_v2/controllers/prospek_controller.dart';
-import 'package:sales/routes/app_pages.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/utils/custom_pop_scope.dart';
-import 'package:sales/shared/widgets/approval.dart';
+import 'package:staffku/modules/prospek_v2/controllers/prospek_controller.dart';
+import 'package:staffku/routes/app_pages.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/utils/custom_pop_scope.dart';
+import 'package:staffku/shared/widgets/approval.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -25,28 +25,33 @@ class ProspekV2View extends GetView<ProspekV2Controller> {
 
   Widget _buildWidget(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme:
-              IconThemeData(color: ColorConstants.black //change your color here
-                  ),
-          centerTitle: false,
-          title: Text(
-            'List Prospek',
-            style: TextStyle(
-              color: ColorConstants.black,
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              fontFamily: 'Poppins',
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: ColorConstants.black, //change your color here
+        ),
+        centerTitle: false,
+        title: Text(
+          'List Prospek',
+          style: TextStyle(
+            color: ColorConstants.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontFamily: 'Poppins',
+          ),
+        ),
+        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
+        elevation: 0.0,
+        actions: [
+          Obx(
+            () => ApprovalFlow.addButtonApproval(
+              controller: controller,
+              onPressed: controller.goToAddPages,
             ),
           ),
-          backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
-          elevation: 0.0,
-          actions: [
-            Obx(() => ApprovalFlow.addButtonApproval(
-                controller: controller, onPressed: controller.goToAddPages))
-          ],
-        ),
-        body: Obx(() => _getItems(controller)));
+        ],
+      ),
+      body: Obx(() => _getItems(controller)),
+    );
   }
 
   SmartRefresher _getItems(ProspekV2Controller controller) {
@@ -65,20 +70,23 @@ class ProspekV2View extends GetView<ProspekV2Controller> {
               onTap: () {
                 if (controller.groupId.value == "1") {
                   controller.goToDetailPages(
-                      dataProspect: controller.listProspek[i]);
+                    dataProspect: controller.listProspek[i],
+                  );
                 }
               },
               child: CommonWidget.customStatusCard(
-                  firstParagraf: controller.listProspek[i].prospectName ?? '',
-                  secondParagraf: 'Nama Product',
-                  secondParagrafValue:
-                      controller.listProspek[i].productName ?? '',
-                  thirdParagraf: 'Status Prospek',
-                  thirdParagrafValue:
-                      controller.listProspek[i].statusProspectValue ?? '',
-                  status: controller.listProspek[i].sourceOrderValue ??
-                      'Belum ada Status',
-                  typeStatus: 'prospect'),
+                firstParagraf: controller.listProspek[i].prospectName ?? '',
+                secondParagraf: 'Nama Product',
+                secondParagrafValue:
+                    controller.listProspek[i].productName ?? '',
+                thirdParagraf: 'Status Prospek',
+                thirdParagrafValue:
+                    controller.listProspek[i].statusProspectValue ?? '',
+                status:
+                    controller.listProspek[i].sourceOrderValue ??
+                    'Belum ada Status',
+                typeStatus: 'prospect',
+              ),
             ),
           ],
         ),

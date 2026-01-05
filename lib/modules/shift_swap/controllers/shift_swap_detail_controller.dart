@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/shift_swap/detail_shift_swap_request.dart';
-import 'package:sales/models/request/shift_swap/update_approval_shift_swap_request.dart';
-import 'package:sales/models/response/shift_swap/show_shift_swap_response.dart';
-import 'package:sales/shared/utils/common_widget.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/shift_swap/detail_shift_swap_request.dart';
+import 'package:staffku/models/request/shift_swap/update_approval_shift_swap_request.dart';
+import 'package:staffku/models/response/shift_swap/show_shift_swap_response.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ShiftSwapDetailController extends GetxController {
@@ -39,8 +39,9 @@ class ShiftSwapDetailController extends GetxController {
   }
 
   void getDetailShiftSwap() async {
-    final res = await apiRepository
-        .showShiftSwap(ShowShiftSwapRequest(id: argm.toString()));
+    final res = await apiRepository.showShiftSwap(
+      ShowShiftSwapRequest(id: argm.toString()),
+    );
     final data = res?.data;
     if (data == null || data.isEmpty) {
       CommonWidget.errorSnackBar('Gagal memuat detail tukar shift');
@@ -48,21 +49,22 @@ class ShiftSwapDetailController extends GetxController {
     }
     detail.value = data.first;
     statusApproval.value = (detail.value.statusTukar ?? '').toLowerCase();
-    final idRoleDetail =
-        stringRoletoId((detail.value.levelApproval ?? '').toLowerCase());
+    final idRoleDetail = stringRoletoId(
+      (detail.value.levelApproval ?? '').toLowerCase(),
+    );
     approvalCondition.value = idRoleDetail == groupId.value;
   }
 
   String stringRoletoId(String role) {
     switch (role.toLowerCase()) {
-      case 'tad':
+      case 'staff':
         return '1';
-      case 'cabang':
+      case 'spv':
         return '2';
-      case 'area':
-        return '3';
-      case 'client':
-        return '4';
+      // case 'area':
+      //   return '3';
+      // case 'client':
+      //   return '4';
       default:
         return '1';
     }
@@ -95,4 +97,3 @@ class ShiftSwapDetailController extends GetxController {
     super.onClose();
   }
 }
-

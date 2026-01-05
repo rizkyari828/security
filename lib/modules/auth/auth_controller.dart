@@ -1,9 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:sales/api/api.dart';
-import 'package:sales/models/models.dart';
-import 'package:sales/routes/app_pages.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/api/api.dart';
+import 'package:staffku/models/models.dart';
+import 'package:staffku/routes/app_pages.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,17 +61,26 @@ class AuthController extends GetxController {
           prefs.setString(StorageConstants.token, firstUser?.token ?? '');
           prefs.setString(StorageConstants.name, firstUser?.nama ?? '');
           prefs.setString(
-              StorageConstants.userId, firstUser?.userId.toString() ?? "");
-          prefs.setString(StorageConstants.idPegawai,
-              firstUser?.idPegawai.toString() ?? "");
-          prefs.setString(StorageConstants.username,
-              firstUser?.username.toString() ?? "");
+            StorageConstants.userId,
+            firstUser?.userId.toString() ?? "",
+          );
           prefs.setString(
-              StorageConstants.profilePhoto, firstUser?.foto ?? "");
+            StorageConstants.idPegawai,
+            firstUser?.idPegawai.toString() ?? "",
+          );
           prefs.setString(
-              StorageConstants.groupId, firstUser?.stsUser.toString() ?? "");
+            StorageConstants.username,
+            firstUser?.username.toString() ?? "",
+          );
+          prefs.setString(StorageConstants.profilePhoto, firstUser?.foto ?? "");
           prefs.setString(
-              StorageConstants.tipe, firstUser?.tipe.toString() ?? "");
+            StorageConstants.groupId,
+            firstUser?.stsUser.toString() ?? "",
+          );
+          prefs.setString(
+            StorageConstants.tipe,
+            firstUser?.tipe.toString() ?? "",
+          );
           final menus = firstUser?.menus;
 
           if (menus != null) {

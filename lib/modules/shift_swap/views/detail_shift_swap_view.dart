@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/modules/shift_swap/controllers/shift_swap_detail_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/widgets/approval.dart';
+import 'package:staffku/modules/shift_swap/controllers/shift_swap_detail_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/widgets/approval.dart';
 
 class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
   const ShiftSwapDetailView({super.key});
@@ -27,7 +27,8 @@ class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
                     children: [
                       ApprovalFlow.statusApproval(
                         (controller.detail.value.statusTukar ?? '').toString(),
-                        (controller.detail.value.levelApproval ?? '').toString(),
+                        (controller.detail.value.levelApproval ?? '')
+                            .toString(),
                       ),
                       const SizedBox(height: 20.0),
                       CommonWidget.labelExpanded(
@@ -38,7 +39,8 @@ class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
                       CommonWidget.labelExpanded(
                         label: 'Tanggal Tukar',
                         value: DateFormat('yyyy-MM-dd', 'id_ID').format(
-                          controller.detail.value.tanggalTukar ?? DateTime.now(),
+                          controller.detail.value.tanggalTukar ??
+                              DateTime.now(),
                         ),
                       ),
                       const SizedBox(height: 10.0),
@@ -51,12 +53,14 @@ class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
                         label: 'Pengganti',
                         value: controller.detail.value.userPengganti ?? '-',
                       ),
-                      if ((controller.detail.value.alasan ?? '').isNotEmpty) ...[
+                      if ((controller.detail.value.alasan ?? '')
+                          .isNotEmpty) ...[
                         const SizedBox(height: 20.0),
                         CommonWidget.bodyText(text: 'Alasan'),
                         const SizedBox(height: 10.0),
                         CommonWidget.bodyText(
-                            text: controller.detail.value.alasan ?? ''),
+                          text: controller.detail.value.alasan ?? '',
+                        ),
                       ],
                       const SizedBox(height: 20.0),
                       Obx(() => ApprovalFlow.buttonApproval(controller)),
@@ -68,4 +72,3 @@ class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
     );
   }
 }
-

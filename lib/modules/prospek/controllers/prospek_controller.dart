@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/overtime/get_list.dart';
-import 'package:sales/models/response/prospek/list.dart';
-import 'package:sales/models/response/prospek/master_status_response.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/overtime/get_list.dart';
+import 'package:staffku/models/response/prospek/list.dart';
+import 'package:staffku/models/response/prospek/master_status_response.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,14 +20,19 @@ class ProspekController extends GetxController {
   RxString token = "".obs;
   RxString status = "".obs;
   DateTime? selectedDate;
-  RxString monthV =
-      DateFormat("MMMM yyyy", "id_ID").format(DateTime.now()).toString().obs;
-  RxString monthSubmit =
-      DateFormat("MM", "id_ID").format(DateTime.now()).toString().obs;
+  RxString monthV = DateFormat(
+    "MMMM yyyy",
+    "id_ID",
+  ).format(DateTime.now()).toString().obs;
+  RxString monthSubmit = DateFormat(
+    "MM",
+    "id_ID",
+  ).format(DateTime.now()).toString().obs;
   RxInt page = 1.obs;
   RxString type = "".obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
   RxString monthLabel = "".obs;
   var masterStatus = <MasterStatus>[].obs;
   var listStatusOrder = <MasterStatus>[].obs;
@@ -71,17 +76,19 @@ class ProspekController extends GetxController {
   }
 
   void getProspek(page) async {
-    String _month = DateFormat("MM", "id_ID")
-        .format(selectedDate ?? DateTime.now())
-        .toString();
+    String _month = DateFormat(
+      "MM",
+      "id_ID",
+    ).format(selectedDate ?? DateTime.now()).toString();
 
     if (selectedDate != null) {
       _month = _month;
     } else {
       if (argm['month'].toString() == '') {
-        _month = DateFormat("MM", "id_ID")
-            .format(selectedDate ?? DateTime.now())
-            .toString();
+        _month = DateFormat(
+          "MM",
+          "id_ID",
+        ).format(selectedDate ?? DateTime.now()).toString();
       } else {
         _month = argm['month'].toString();
       }
@@ -93,17 +100,21 @@ class ProspekController extends GetxController {
     var dateString = _month + ', ' + formattedDateS;
     DateFormat format = new DateFormat("MM, yyyy");
     var formattedDate = format.parse(dateString);
-    monthLabel.value =
-        DateFormat("MMMM yyyy", "id_ID").format(formattedDate).toString();
+    monthLabel.value = DateFormat(
+      "MMMM yyyy",
+      "id_ID",
+    ).format(formattedDate).toString();
 
     final res = await apiRepository.listProspek(
-        GetListRequest(
-            id: userId.value,
-            token: token.value,
-            month: _month,
-            status: status.value,
-            type: type.value),
-        page: page);
+      GetListRequest(
+        id: userId.value,
+        token: token.value,
+        month: _month,
+        status: status.value,
+        type: type.value,
+      ),
+      page: page,
+    );
     listProspek.addAll(res?.data ?? []);
   }
 

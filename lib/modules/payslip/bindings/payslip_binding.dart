@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:sales/modules/payslip/controllers/payslip_controller.dart';
+import 'package:staffku/modules/payslip/controllers/payslip_controller.dart';
 
 class PayslipBinding extends Bindings {
   @override
@@ -9,4 +9,3 @@ class PayslipBinding extends Bindings {
     );
   }
 }
-

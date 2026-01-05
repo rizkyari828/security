@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:sales/modules/claim/controllers/claim_list_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/widgets/approval.dart';
-import 'package:sales/shared/widgets/custom_card.dart';
+import 'package:staffku/modules/claim/controllers/claim_list_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/widgets/approval.dart';
+import 'package:staffku/shared/widgets/custom_card.dart';
 
 class ClaimView extends GetView<ClaimListController> {
   const ClaimView({super.key});
@@ -54,9 +54,8 @@ class ClaimView extends GetView<ClaimListController> {
         itemBuilder: (context, i) {
           final item = controller.listClaim[i];
           return InkWell(
-            onTap: () => controller.goToDetailPages(
-              id: item.idClaim?.toString() ?? '',
-            ),
+            onTap: () =>
+                controller.goToDetailPages(id: item.idClaim?.toString() ?? ''),
             child: CustomExpandedCardView(
               name: item.user ?? '',
               firstParagraf:
@@ -72,4 +71,3 @@ class ClaimView extends GetView<ClaimListController> {
     );
   }
 }
-

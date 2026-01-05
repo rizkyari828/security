@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/network_checker.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/network_checker.dart';
 
 class CustomAppBarWithNetwork extends StatelessWidget
     implements PreferredSizeWidget {
@@ -19,26 +19,23 @@ class CustomAppBarWithNetwork extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        title: Text(
-          title,
-          style: TextStyle(
-            color: ColorConstants.black,
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-            fontFamily: 'Poppins',
-          ),
+      iconTheme: IconThemeData(color: Colors.black),
+      backgroundColor: Colors.white,
+      elevation: 0.0,
+      title: Text(
+        title,
+        style: TextStyle(
+          color: ColorConstants.black,
+          fontWeight: FontWeight.w600,
+          fontSize: 20,
+          fontFamily: 'Poppins',
         ),
-        actions: [
-          NetworkChecker.networkMeter(networkStatus),
-          addButton != null
-              ? addButton!
-              : SizedBox(
-                  width: 20,
-                )
-        ]);
+      ),
+      actions: [
+        NetworkChecker.networkMeter(networkStatus),
+        addButton != null ? addButton! : SizedBox(width: 20),
+      ],
+    );
   }
 
   @override

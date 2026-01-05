@@ -3,26 +3,26 @@ import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
-import 'package:sales/models/request/kuisioner/kuisioner_request.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/kuisioner/kuisioner_request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/models/request/pagination_request.dart';
-import 'package:sales/models/response/kuisioner_response.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/routes/app_pages.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/utils/size_config.dart';
-import 'package:sales/shared/widgets/button.dart';
+import 'package:staffku/models/request/pagination_request.dart';
+import 'package:staffku/models/response/kuisioner_response.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/routes/app_pages.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/size_config.dart';
+import 'package:staffku/shared/widgets/button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class KusionerController extends BaseController {
   KusionerController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   var imageFileList = <XFile>[].obs;
 
@@ -62,8 +62,9 @@ class KusionerController extends BaseController {
   // Tambahkan map untuk essayControllers
   final Map<String, TextEditingController> essayControllers = {};
 
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   final argm = Get.arguments;
 
@@ -110,8 +111,11 @@ class KusionerController extends BaseController {
     String? idSoal, // tambahkan ini
   }) async {
     if (isMultiImage) {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final List<XFile>? pickedFileList = await _picker.pickMultiImage(
             maxWidth: maxWidth,
@@ -127,8 +131,11 @@ class KusionerController extends BaseController {
         }
       });
     } else {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
@@ -227,14 +234,17 @@ class KusionerController extends BaseController {
         );
       } else {
         Future.delayed(Duration(milliseconds: 100), () {
-          Get.offAllNamed(Routes.KUISIONER, arguments: {
-            'id_kuisioner': idKuisioner.value,
-            'id_group': idGroupKuisioner.value,
-            'total_question': allProgress.value,
-            'current_progress': currentProgress.value,
-            'page': page.value + 1,
-            'limit': 2
-          });
+          Get.offAllNamed(
+            Routes.KUISIONER,
+            arguments: {
+              'id_kuisioner': idKuisioner.value,
+              'id_group': idGroupKuisioner.value,
+              'total_question': allProgress.value,
+              'current_progress': currentProgress.value,
+              'page': page.value + 1,
+              'limit': 2,
+            },
+          );
         });
       }
     } else {
@@ -291,8 +301,10 @@ class KusionerController extends BaseController {
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
     startDate = selectedDate;
-    startDateController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    startDateController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   selectDateEnd(BuildContext context) async {
@@ -304,14 +316,20 @@ class KusionerController extends BaseController {
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
     endDate = selectedDate;
-    endDateController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    endDateController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   void getKuisioner(page) async {
     final res = await apiRepository.listKuisioner(
-        data: ListKuisionerRequest(
-            id: idGroupKuisioner.value, limit: 2, page: page));
+      data: ListKuisionerRequest(
+        id: idGroupKuisioner.value,
+        limit: 2,
+        page: page,
+      ),
+    );
     listKuisioner.addAll(res?.data ?? []);
   }
 
@@ -342,6 +360,9 @@ class JawabanKuisioner {
   final String idSoal;
   final String idKategori;
   String jawaban;
-  JawabanKuisioner(
-      {required this.idSoal, required this.idKategori, this.jawaban = ""});
+  JawabanKuisioner({
+    required this.idSoal,
+    required this.idKategori,
+    this.jawaban = "",
+  });
 }

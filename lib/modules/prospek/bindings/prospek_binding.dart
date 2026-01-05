@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:sales/modules/prospek/controllers/prospek_add_controller.dart';
-import 'package:sales/modules/prospek/controllers/prospek_detail_controller.dart';
+import 'package:staffku/modules/prospek/controllers/prospek_add_controller.dart';
+import 'package:staffku/modules/prospek/controllers/prospek_detail_controller.dart';
 
 import '../controllers/prospek_controller.dart';
 

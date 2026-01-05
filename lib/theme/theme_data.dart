@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/shared/shared.dart';
 
 class ThemeConfig {
   static ThemeData createTheme({
@@ -25,11 +25,7 @@ class ThemeConfig {
       canvasColor: background,
       cardColor: background,
       dividerColor: divider,
-      dividerTheme: DividerThemeData(
-        color: divider,
-        space: 1,
-        thickness: 1,
-      ),
+      dividerTheme: DividerThemeData(color: divider, space: 1, thickness: 1),
       // cardTheme: CardTheme(
       //   color: cardBackground,
       //   margin: EdgeInsets.zero,
@@ -46,9 +42,7 @@ class ThemeConfig {
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: cardBackground,
-        iconTheme: IconThemeData(
-          color: secondaryText,
-        ),
+        iconTheme: IconThemeData(color: secondaryText),
         toolbarTextStyle: TextTheme(
           bodyLarge: baseTextTheme.bodyLarge!.copyWith(
             color: secondaryText,
@@ -62,10 +56,7 @@ class ThemeConfig {
           ),
         ).titleLarge,
       ),
-      iconTheme: IconThemeData(
-        color: secondaryText,
-        size: 16.0,
-      ),
+      iconTheme: IconThemeData(color: secondaryText, size: 16.0),
       buttonTheme: ButtonThemeData(
         textTheme: ButtonTextTheme.primary,
         colorScheme: ColorScheme(
@@ -129,8 +120,9 @@ class ThemeConfig {
         ),
       ),
       checkboxTheme: CheckboxThemeData(
-        fillColor:
-            WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        fillColor: WidgetStateProperty.resolveWith<Color?>((
+          Set<WidgetState> states,
+        ) {
           if (states.contains(WidgetState.disabled)) {
             return null;
           }
@@ -141,8 +133,9 @@ class ThemeConfig {
         }),
       ),
       radioTheme: RadioThemeData(
-        fillColor:
-            WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        fillColor: WidgetStateProperty.resolveWith<Color?>((
+          Set<WidgetState> states,
+        ) {
           if (states.contains(WidgetState.disabled)) {
             return null;
           }
@@ -153,8 +146,9 @@ class ThemeConfig {
         }),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor:
-            WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        thumbColor: WidgetStateProperty.resolveWith<Color?>((
+          Set<WidgetState> states,
+        ) {
           if (states.contains(WidgetState.disabled)) {
             return null;
           }
@@ -163,8 +157,9 @@ class ThemeConfig {
           }
           return null;
         }),
-        trackColor:
-            WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        trackColor: WidgetStateProperty.resolveWith<Color?>((
+          Set<WidgetState> states,
+        ) {
           if (states.contains(WidgetState.disabled)) {
             return null;
           }
@@ -182,30 +177,30 @@ class ThemeConfig {
   }
 
   static ThemeData get lightTheme => createTheme(
-        brightness: Brightness.light,
-        background: ColorConstants.lightScaffoldBackgroundColor,
-        cardBackground: ColorConstants.secondaryAppColor,
-        primaryText: Colors.black,
-        secondaryText: Colors.white,
-        accentColor: ColorConstants.secondaryAppColor,
-        divider: ColorConstants.secondaryAppColor,
-        buttonBackground: Colors.black38,
-        buttonText: ColorConstants.secondaryAppColor,
-        disabled: ColorConstants.secondaryAppColor,
-        error: Colors.red,
-      );
+    brightness: Brightness.light,
+    background: ColorConstants.lightScaffoldBackgroundColor,
+    cardBackground: ColorConstants.secondaryAppColor,
+    primaryText: Colors.black,
+    secondaryText: Colors.white,
+    accentColor: ColorConstants.secondaryAppColor,
+    divider: ColorConstants.secondaryAppColor,
+    buttonBackground: Colors.black38,
+    buttonText: ColorConstants.secondaryAppColor,
+    disabled: ColorConstants.secondaryAppColor,
+    error: Colors.red,
+  );
 
   static ThemeData get darkTheme => createTheme(
-        brightness: Brightness.dark,
-        background: ColorConstants.darkScaffoldBackgroundColor,
-        cardBackground: ColorConstants.secondaryDarkAppColor,
-        primaryText: Colors.white,
-        secondaryText: Colors.black,
-        accentColor: ColorConstants.secondaryDarkAppColor,
-        divider: Colors.black45,
-        buttonBackground: Colors.white,
-        buttonText: ColorConstants.secondaryDarkAppColor,
-        disabled: ColorConstants.secondaryDarkAppColor,
-        error: Colors.red,
-      );
+    brightness: Brightness.dark,
+    background: ColorConstants.darkScaffoldBackgroundColor,
+    cardBackground: ColorConstants.secondaryDarkAppColor,
+    primaryText: Colors.white,
+    secondaryText: Colors.black,
+    accentColor: ColorConstants.secondaryDarkAppColor,
+    divider: Colors.black45,
+    buttonBackground: Colors.white,
+    buttonText: ColorConstants.secondaryDarkAppColor,
+    disabled: ColorConstants.secondaryDarkAppColor,
+    error: Colors.red,
+  );
 }

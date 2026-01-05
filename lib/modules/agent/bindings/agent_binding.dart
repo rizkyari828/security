@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:sales/modules/agent/controllers/agent_controller.dart';
-import 'package:sales/modules/agent/controllers/agent_detail_controller.dart';
-import 'package:sales/modules/agent/controllers/agent_list_controller.dart';
+import 'package:staffku/modules/agent/controllers/agent_controller.dart';
+import 'package:staffku/modules/agent/controllers/agent_detail_controller.dart';
+import 'package:staffku/modules/agent/controllers/agent_list_controller.dart';
 
 class AgentBinding extends Bindings {
   @override

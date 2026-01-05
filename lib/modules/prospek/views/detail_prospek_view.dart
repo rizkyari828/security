@@ -1,7 +1,7 @@
-import 'package:sales/modules/prospek/controllers/prospek_detail_controller.dart';
-import 'package:sales/shared/shared.dart';
-import 'package:sales/shared/widgets/approval.dart';
-import 'package:sales/shared/widgets/button.dart';
+import 'package:staffku/modules/prospek/controllers/prospek_detail_controller.dart';
+import 'package:staffku/shared/shared.dart';
+import 'package:staffku/shared/widgets/approval.dart';
+import 'package:staffku/shared/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -95,55 +95,51 @@ class ProspekDetailView extends GetView<ProspekDetailController> {
                             },
                           )
                         : controller.actionStatus.value == 'Reject'
-                            ? CustomDropDownSearch(
+                        ? CustomDropDownSearch(
+                            enabled: controller.enabled.value,
+                            selectedItem: controller.reason.value,
+                            listItem: controller.listReasonReject.map((item) {
+                              return item.nama.toString();
+                            }).toList(),
+                            labelText: "Action",
+                            onChanged: (value) async {
+                              controller.reason.value = value;
+                            },
+                          )
+                        : controller.actionStatus.value == 'Accepted'
+                        ? Column(
+                            children: [
+                              CustomDropDownSearch(
                                 enabled: controller.enabled.value,
                                 selectedItem: controller.reason.value,
-                                listItem:
-                                    controller.listReasonReject.map((item) {
+                                listItem: controller.listActivity.map((item) {
                                   return item.nama.toString();
                                 }).toList(),
                                 labelText: "Action",
                                 onChanged: (value) async {
                                   controller.reason.value = value;
                                 },
-                              )
-                            : controller.actionStatus.value == 'Accepted'
-                                ? Column(
-                                    children: [
-                                      CustomDropDownSearch(
-                                        enabled: controller.enabled.value,
-                                        selectedItem: controller.reason.value,
-                                        listItem:
-                                            controller.listActivity.map((item) {
-                                          return item.nama.toString();
-                                        }).toList(),
-                                        labelText: "Action",
-                                        onChanged: (value) async {
-                                          controller.reason.value = value;
-                                        },
-                                      ),
-                                      SizedBox(height: 20.0),
-                                      controller.status.value == 'Order'
-                                          ? CustomDropDownSearch(
-                                              selectedItem: controller
-                                                  .typeController.text,
-                                              listItem: controller.listType
-                                                  .map((item) {
-                                                return item.name.toString();
-                                              }).toList(),
-                                              labelText: "Type",
-                                              onChanged: (value) async {
-                                                controller.typeController.text =
-                                                    value;
-                                              },
-                                            )
-                                          : Container(),
-                                      controller.status.value == 'Order'
-                                          ? SizedBox(height: 20.0)
-                                          : Container(),
-                                    ],
-                                  )
-                                : Container(),
+                              ),
+                              SizedBox(height: 20.0),
+                              controller.status.value == 'Order'
+                                  ? CustomDropDownSearch(
+                                      selectedItem:
+                                          controller.typeController.text,
+                                      listItem: controller.listType.map((item) {
+                                        return item.name.toString();
+                                      }).toList(),
+                                      labelText: "Type",
+                                      onChanged: (value) async {
+                                        controller.typeController.text = value;
+                                      },
+                                    )
+                                  : Container(),
+                              controller.status.value == 'Order'
+                                  ? SizedBox(height: 20.0)
+                                  : Container(),
+                            ],
+                          )
+                        : Container(),
                   ],
                 ),
                 // controller.status.value == 'Order'
@@ -224,21 +220,16 @@ class ProspekDetailView extends GetView<ProspekDetailController> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        step(
-          status == '1' ? true : false,
-          'Prospek',
-          Icons.handshake_rounded,
-        ),
+        step(status == '1' ? true : false, 'Prospek', Icons.handshake_rounded),
         divLine(),
-        step(
-          status == '2' ? true : false,
-          'Order',
-          Icons.playlist_add_circle,
-        ),
+        step(status == '2' ? true : false, 'Order', Icons.playlist_add_circle),
         divLine(),
         Divider(color: Colors.black),
-        step(status == '3' ? true : false, 'Booking',
-            Icons.playlist_add_check_circle)
+        step(
+          status == '3' ? true : false,
+          'Booking',
+          Icons.playlist_add_check_circle,
+        ),
       ],
     );
   }
@@ -246,16 +237,16 @@ class ProspekDetailView extends GetView<ProspekDetailController> {
   Widget divLine() {
     final sw = SizeConfig().screenWidth;
     return Padding(
-        padding: EdgeInsets.only(left: sw * .01, right: sw * .01),
-        child: Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(2),
-              ),
-              color: Colors.grey),
-          width: sw * .09,
-          height: sw * .02,
-        ));
+      padding: EdgeInsets.only(left: sw * .01, right: sw * .01),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(2)),
+          color: Colors.grey,
+        ),
+        width: sw * .09,
+        height: sw * .02,
+      ),
+    );
   }
 
   Widget step(bool active, String status, IconData icon) {
@@ -289,15 +280,8 @@ class ProspekDetailView extends GetView<ProspekDetailController> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: ColorConstants.white,
-              size: active ? 35 : 33,
-            ),
-            CommonWidget.captionText(
-              text: status,
-              color: ColorConstants.white,
-            ),
+            Icon(icon, color: ColorConstants.white, size: active ? 35 : 33),
+            CommonWidget.captionText(text: status, color: ColorConstants.white),
           ],
         ),
       ),

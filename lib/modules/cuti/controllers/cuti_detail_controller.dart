@@ -1,11 +1,11 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/cuti_sales/detail_request_cuti.dart';
-import 'package:sales/models/request/cuti_sales/update_approval_request.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/cuti_sales/detail_request_cuti.dart';
+import 'package:staffku/models/request/cuti_sales/update_approval_request.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/models/response/cuti_sales/show_cuti_sales.dart';
-import 'package:sales/shared/utils/common_widget.dart';
+import 'package:staffku/models/response/cuti_sales/show_cuti_sales.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CutiDetailController extends GetxController {
@@ -60,8 +60,9 @@ class CutiDetailController extends GetxController {
   }
 
   void getDetailCuti() async {
-    final res = await apiRepository
-        .showCutiSales(ShowCutiSalesRequest(id: argm.toString()));
+    final res = await apiRepository.showCutiSales(
+      ShowCutiSalesRequest(id: argm.toString()),
+    );
     final data = res?.data;
     if (data == null || data.isEmpty) {
       CommonWidget.errorSnackBar('Gagal memuat detail cuti');
@@ -69,41 +70,41 @@ class CutiDetailController extends GetxController {
     }
     detail.value = data.first;
     statusApproval.value = detail.value.statusCuti.toString().toLowerCase();
-    String idRoleDetail =
-        stringRoletoId(detail.value.levelApproval.toString().toLowerCase());
+    String idRoleDetail = stringRoletoId(
+      detail.value.levelApproval.toString().toLowerCase(),
+    );
     approvalCondition.value = idRoleDetail == groupId.value;
   }
 
   String stringRoletoId(String role) {
     switch (role.toLowerCase()) {
-      case 'tad':
+      case 'staff':
         return '1';
-      case 'cabang':
+      case 'spv':
         return '2';
-      case 'area':
-        return '3';
-      case 'client':
-        return '4';
+      // case 'area':
+      //   return '3';
+      // case 'client':
+      //   return '4';
       default:
         return '1';
     }
   }
 
-  void approval({
-    action = "reject",
-  }) async {
+  void approval({action = "reject"}) async {
     String id_action = '0';
     if (action == 'reject') {
       id_action = '0';
     } else {
       id_action = '1';
     }
-    final res = await apiRepository
-        .updateApprovalCutiSales(UpdateApprovalCutiSalesRequest(
-      id: detail.value.idCuti.toString(),
-      action: id_action,
-      noteApproval: noteApprovalController.text,
-    ));
+    final res = await apiRepository.updateApprovalCutiSales(
+      UpdateApprovalCutiSalesRequest(
+        id: detail.value.idCuti.toString(),
+        action: id_action,
+        noteApproval: noteApprovalController.text,
+      ),
+    );
     if (res?.error == false) {
       getDetailCuti();
       loadUsers();

@@ -1,4 +1,4 @@
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
 
 class NonScheduleSubmitRequest {
   final String? latitude;
@@ -28,17 +28,17 @@ class NonScheduleSubmitRequest {
   });
 
   Map<String, dynamic> toJson({String? date}) => {
-        'lat': latitude,
-        'long': longitude,
-        'id_user': idUser,
-        'foto': photos?.map((e) => e.toJson()).toList(),
-        'nama_kunjungan': name,
-        'alamat_kunjungan': alamat,
-        'status1': agenda,
-        'status2': status,
-        'catatan': visitNote,
-        'rencana': planExecution,
-      };
+    'lat': latitude,
+    'long': longitude,
+    'id_user': idUser,
+    'foto': photos?.map((e) => e.toJson()).toList(),
+    'nama_kunjungan': name,
+    'alamat_kunjungan': alamat,
+    'status1': agenda,
+    'status2': status,
+    'catatan': visitNote,
+    'rencana': planExecution,
+  };
 
   factory NonScheduleSubmitRequest.fromJson(Map<String, dynamic> json) =>
       NonScheduleSubmitRequest(

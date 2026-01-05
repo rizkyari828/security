@@ -1,5 +1,5 @@
-import 'package:sales/modules/notification/controllers/notification_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
+import 'package:staffku/modules/notification/controllers/notification_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -9,24 +9,25 @@ class NotificationView extends GetView<NotificationController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme:
-              IconThemeData(color: ColorConstants.black //change your color here
-                  ),
-          centerTitle: false,
-          title: Text(
-            'Notifikasi',
-            style: TextStyle(
-              color: ColorConstants.black,
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              fontFamily: 'Poppins',
-            ),
-          ),
-          backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
-          elevation: 0.0,
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: ColorConstants.black, //change your color here
         ),
-        body: Obx(() => _getItems(controller)));
+        centerTitle: false,
+        title: Text(
+          'Notifikasi',
+          style: TextStyle(
+            color: ColorConstants.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontFamily: 'Poppins',
+          ),
+        ),
+        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
+        elevation: 0.0,
+      ),
+      body: Obx(() => _getItems(controller)),
+    );
   }
 
   SmartRefresher _getItems(NotificationController controller) {
@@ -42,7 +43,8 @@ class NotificationView extends GetView<NotificationController> {
         itemBuilder: (context, i) => InkWell(
           onTap: () {
             controller.goToDetailCutiPages(
-                id: controller.listCuti[i].id.toString());
+              id: controller.listCuti[i].id.toString(),
+            );
           },
           child: Container(
             margin: const EdgeInsets.only(left: 15.0, right: 15.0, top: 10.0),
@@ -50,8 +52,7 @@ class NotificationView extends GetView<NotificationController> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10.0),
-              border: Border.all(
-                            width: 2.0, color: ColorConstants.borderColor),
+              border: Border.all(width: 2.0, color: ColorConstants.borderColor),
               // boxShadow: [
               //   BoxShadow(
               //     color: CommonWidget.setOpacity(Colors.black, 0.3),
@@ -67,7 +68,8 @@ class NotificationView extends GetView<NotificationController> {
             child: ListTile(
               title: Text(controller.listCuti[i].noTrans ?? ''),
               subtitle: Text(
-                  '${DateFormat("EEEE, d MMMM yyyy", "id_ID").format(controller.listCuti[i].dateBoking ?? DateTime.now())}'),
+                '${DateFormat("EEEE, d MMMM yyyy", "id_ID").format(controller.listCuti[i].dateBoking ?? DateTime.now())}',
+              ),
             ),
           ),
         ),

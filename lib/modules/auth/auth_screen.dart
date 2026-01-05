@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sales/modules/auth/auth.dart';
-import 'package:sales/routes/routes.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/modules/auth/auth.dart';
+import 'package:staffku/routes/routes.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:get/get.dart';
 
 import '../../shared/utils/custom_pop_scope.dart';
@@ -11,11 +11,7 @@ class AuthScreen extends GetView<AuthController> {
   Widget build(BuildContext context) {
     return CustomPopScope(
       onWillPop: () async => false,
-      child: Scaffold(
-        body: Center(
-          child: _buildItems(context),
-        ),
-      ),
+      child: Scaffold(body: Center(child: _buildItems(context))),
     );
   }
 

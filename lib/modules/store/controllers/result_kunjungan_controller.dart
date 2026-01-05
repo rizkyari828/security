@@ -1,7 +1,7 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/user_id_request.dart';
-import 'package:sales/models/response/store/list_store.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/user_id_request.dart';
+import 'package:staffku/models/response/store/list_store.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,13 +17,12 @@ class ResultKunjunganController extends GetxController {
   RxString token = "".obs;
 
   RxInt page = 1.obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   void goToKunjunganPages() {
-    Get.toNamed(
-      Routes.RESULT_KUNJUNGAN,
-    );
+    Get.toNamed(Routes.RESULT_KUNJUNGAN);
   }
 
   void onLoading() async {
@@ -62,7 +61,9 @@ class ResultKunjunganController extends GetxController {
 
   void getStore(page) async {
     final res = await apiRepository.listStore(
-        page: page, data: UserIdRequest(id: userId.value));
+      page: page,
+      data: UserIdRequest(id: userId.value),
+    );
     listStore.addAll(res?.data ?? []);
   }
 
@@ -75,8 +76,10 @@ class ResultKunjunganController extends GetxController {
   }
 
   void goToDetailPages({String id = "", String storeName = ''}) {
-    Get.toNamed(Routes.DETAIL_STORE,
-        arguments: {'id': id, 'storeName': storeName});
+    Get.toNamed(
+      Routes.DETAIL_STORE,
+      arguments: {'id': id, 'storeName': storeName},
+    );
   }
 
   void goToAddPages() {

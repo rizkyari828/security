@@ -2,100 +2,100 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'dart:typed_data';
-import 'package:sales/models/models.dart';
-import 'package:sales/models/request/agent/submit_agent.dart';
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
-import 'package:sales/models/request/attendance/submit_attendance.dart';
-import 'package:sales/models/request/attendance/validate_attenance.dart';
-import 'package:sales/models/request/claim/detail_claim_request.dart';
-import 'package:sales/models/request/claim/submit_claim_request.dart';
-import 'package:sales/models/request/claim/update_approval_claim_request.dart';
-import 'package:sales/models/request/cuti/submit_cuti_request.dart';
-import 'package:sales/models/request/cuti/update_approval_request.dart';
-import 'package:sales/models/request/cuti_sales/detail_request_cuti.dart';
-import 'package:sales/models/request/cuti_sales/submit_izin_request.dart';
-import 'package:sales/models/request/cuti_sales/update_approval_request.dart';
-import 'package:sales/models/request/dashboard_request.dart';
-import 'package:sales/models/request/detail_request.dart';
-import 'package:sales/models/request/detail_request_leave.dart';
-import 'package:sales/models/request/id_request.dart';
-import 'package:sales/models/request/input_request.dart';
-import 'package:sales/models/request/izin/submit_izin_request.dart';
-import 'package:sales/models/request/izin/update_approval_request.dart';
-import 'package:sales/models/request/kuisioner/kuisioner_input_data_request.dart';
-import 'package:sales/models/request/kuisioner/kuisioner_request.dart';
-import 'package:sales/models/request/kunjungan/non_schedule_request.dart';
-import 'package:sales/models/request/leads/submit_lead.dart';
-import 'package:sales/models/request/leads/submit_status_lead.dart';
-import 'package:sales/models/request/lembur/detail_request_lembur.dart';
-import 'package:sales/models/request/lembur/submit_izin_request.dart';
-import 'package:sales/models/request/lembur/update_approval_request.dart';
-import 'package:sales/models/request/logout_request.dart';
-import 'package:sales/models/request/overtime/get_list.dart';
-import 'package:sales/models/request/overtime/set_done_overtime_request.dart';
-import 'package:sales/models/request/overtime/submit_overtime_client_request.dart';
-import 'package:sales/models/request/overtime/submit_request_overtime.dart';
-import 'package:sales/models/request/overtime/update_approval_overtime_request.dart';
-import 'package:sales/models/request/pagination_request.dart';
-import 'package:sales/models/request/payslip/download_payslip_request.dart';
-import 'package:sales/models/request/prospek_v2/detail_request_cuti.dart';
-import 'package:sales/models/request/prospek_v2/submit_request_prospek_v2.dart';
-import 'package:sales/models/request/rate/submit_rate_request.dart';
-import 'package:sales/models/request/reliver/approve_reliver_request.dart';
-import 'package:sales/models/request/reliver/create_reliver_request.dart';
-import 'package:sales/models/request/store/detail_request_leave.dart';
-import 'package:sales/models/request/store/update_qty_request.dart';
-import 'package:sales/models/request/submit_mood_request.dart';
-import 'package:sales/models/request/shift_swap/detail_shift_swap_request.dart';
-import 'package:sales/models/request/shift_swap/submit_shift_swap_request.dart';
-import 'package:sales/models/request/shift_swap/update_approval_shift_swap_request.dart';
-import 'package:sales/models/request/update_fcm_profile_request.dart';
-import 'package:sales/models/request/update_photo_profile_request.dart';
-import 'package:sales/models/request/user_id_request.dart';
-import 'package:sales/models/response/Lead/list_lead_respone.dart';
-import 'package:sales/models/response/agent/list_agent_response.dart';
-import 'package:sales/models/response/attendance/attendance_submit.dart';
-import 'package:sales/models/response/attendance/attendance_validate.dart';
-import 'package:sales/models/response/benefit/benefit_dashboard_response.dart';
-import 'package:sales/models/response/branch_response.dart';
-import 'package:sales/models/response/benefit/show_benefit.dart';
-import 'package:sales/models/response/benefit/type_cuti.dart';
-import 'package:sales/models/response/cuti_sales/list_cuti_sales.dart';
-import 'package:sales/models/response/cuti_sales/show_cuti_sales.dart';
-import 'package:sales/models/response/dashboard/dashboard_kunjungan_response.dart';
-import 'package:sales/models/response/izin/list_izin.dart';
-import 'package:sales/models/response/izin/show_izin.dart';
-import 'package:sales/models/response/izin/type_izin.dart';
-import 'package:sales/models/response/kuisioner/input_data_kuisioner_respons.dart';
-import 'package:sales/models/response/kuisioner_response.dart';
-import 'package:sales/models/response/lembur/list_lembur.dart';
-import 'package:sales/models/response/lembur/show_lembur.dart';
-import 'package:sales/models/response/master_data_2_response.dart';
-import 'package:sales/models/response/name_tad_list_response.dart';
-import 'package:sales/models/response/claim/list_claim_response.dart';
-import 'package:sales/models/response/claim/show_claim_response.dart';
-import 'package:sales/models/response/payslip/payslip_download_result.dart';
-import 'package:sales/models/response/payslip/payslip_list_response.dart';
-import 'package:sales/models/response/prospek/list.dart';
-import 'package:sales/models/response/prospek/master_data_response.dart';
-import 'package:sales/models/response/prospek/master_id_response.dart';
-import 'package:sales/models/response/shift_swap/list_shift_swap_response.dart';
-import 'package:sales/models/response/shift_swap/show_shift_swap_response.dart';
-import 'package:sales/models/response/prospek/master_status_response.dart';
-import 'package:sales/models/response/prospek/show.dart';
-import 'package:sales/models/response/prospek_v2/detail_prospek_v2_response.dart';
-import 'package:sales/models/response/prospek_v2/list_prospek_v2_response.dart';
-import 'package:sales/models/response/rate/show_rate_review_response.dart';
-import 'package:sales/models/response/recap_history.dart';
-import 'package:sales/models/response/reliver/list_reliver_response.dart';
-import 'package:sales/models/response/reliver/show_reliver_response.dart';
-import 'package:sales/models/response/store/detail_store_response.dart';
-import 'package:sales/models/response/store/list_items.dart';
-import 'package:sales/models/response/store/list_store.dart';
-import 'package:sales/models/response/update_profile_response.dart';
-import 'package:sales/models/response/user/logout_response.dart';
-import 'package:sales/models/response/user/user_schedule.dart';
-import 'package:sales/models/response/user/users_response.dart';
+import 'package:staffku/models/models.dart';
+import 'package:staffku/models/request/agent/submit_agent.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/attendance/submit_attendance.dart';
+import 'package:staffku/models/request/attendance/validate_attenance.dart';
+import 'package:staffku/models/request/claim/detail_claim_request.dart';
+import 'package:staffku/models/request/claim/submit_claim_request.dart';
+import 'package:staffku/models/request/claim/update_approval_claim_request.dart';
+import 'package:staffku/models/request/cuti/submit_cuti_request.dart';
+import 'package:staffku/models/request/cuti/update_approval_request.dart';
+import 'package:staffku/models/request/cuti_sales/detail_request_cuti.dart';
+import 'package:staffku/models/request/cuti_sales/submit_izin_request.dart';
+import 'package:staffku/models/request/cuti_sales/update_approval_request.dart';
+import 'package:staffku/models/request/dashboard_request.dart';
+import 'package:staffku/models/request/detail_request.dart';
+import 'package:staffku/models/request/detail_request_leave.dart';
+import 'package:staffku/models/request/id_request.dart';
+import 'package:staffku/models/request/input_request.dart';
+import 'package:staffku/models/request/izin/submit_izin_request.dart';
+import 'package:staffku/models/request/izin/update_approval_request.dart';
+import 'package:staffku/models/request/kuisioner/kuisioner_input_data_request.dart';
+import 'package:staffku/models/request/kuisioner/kuisioner_request.dart';
+import 'package:staffku/models/request/kunjungan/non_schedule_request.dart';
+import 'package:staffku/models/request/leads/submit_lead.dart';
+import 'package:staffku/models/request/leads/submit_status_lead.dart';
+import 'package:staffku/models/request/lembur/detail_request_lembur.dart';
+import 'package:staffku/models/request/lembur/submit_izin_request.dart';
+import 'package:staffku/models/request/lembur/update_approval_request.dart';
+import 'package:staffku/models/request/logout_request.dart';
+import 'package:staffku/models/request/overtime/get_list.dart';
+import 'package:staffku/models/request/overtime/set_done_overtime_request.dart';
+import 'package:staffku/models/request/overtime/submit_overtime_client_request.dart';
+import 'package:staffku/models/request/overtime/submit_request_overtime.dart';
+import 'package:staffku/models/request/overtime/update_approval_overtime_request.dart';
+import 'package:staffku/models/request/pagination_request.dart';
+import 'package:staffku/models/request/payslip/download_payslip_request.dart';
+import 'package:staffku/models/request/prospek_v2/detail_request_cuti.dart';
+import 'package:staffku/models/request/prospek_v2/submit_request_prospek_v2.dart';
+import 'package:staffku/models/request/rate/submit_rate_request.dart';
+import 'package:staffku/models/request/reliver/approve_reliver_request.dart';
+import 'package:staffku/models/request/reliver/create_reliver_request.dart';
+import 'package:staffku/models/request/store/detail_request_leave.dart';
+import 'package:staffku/models/request/store/update_qty_request.dart';
+import 'package:staffku/models/request/submit_mood_request.dart';
+import 'package:staffku/models/request/shift_swap/detail_shift_swap_request.dart';
+import 'package:staffku/models/request/shift_swap/submit_shift_swap_request.dart';
+import 'package:staffku/models/request/shift_swap/update_approval_shift_swap_request.dart';
+import 'package:staffku/models/request/update_fcm_profile_request.dart';
+import 'package:staffku/models/request/update_photo_profile_request.dart';
+import 'package:staffku/models/request/user_id_request.dart';
+import 'package:staffku/models/response/Lead/list_lead_respone.dart';
+import 'package:staffku/models/response/agent/list_agent_response.dart';
+import 'package:staffku/models/response/attendance/attendance_submit.dart';
+import 'package:staffku/models/response/attendance/attendance_validate.dart';
+import 'package:staffku/models/response/benefit/benefit_dashboard_response.dart';
+import 'package:staffku/models/response/branch_response.dart';
+import 'package:staffku/models/response/benefit/show_benefit.dart';
+import 'package:staffku/models/response/benefit/type_cuti.dart';
+import 'package:staffku/models/response/cuti_sales/list_cuti_sales.dart';
+import 'package:staffku/models/response/cuti_sales/show_cuti_sales.dart';
+import 'package:staffku/models/response/dashboard/dashboard_kunjungan_response.dart';
+import 'package:staffku/models/response/izin/list_izin.dart';
+import 'package:staffku/models/response/izin/show_izin.dart';
+import 'package:staffku/models/response/izin/type_izin.dart';
+import 'package:staffku/models/response/kuisioner/input_data_kuisioner_respons.dart';
+import 'package:staffku/models/response/kuisioner_response.dart';
+import 'package:staffku/models/response/lembur/list_lembur.dart';
+import 'package:staffku/models/response/lembur/show_lembur.dart';
+import 'package:staffku/models/response/master_data_2_response.dart';
+import 'package:staffku/models/response/name_tad_list_response.dart';
+import 'package:staffku/models/response/claim/list_claim_response.dart';
+import 'package:staffku/models/response/claim/show_claim_response.dart';
+import 'package:staffku/models/response/payslip/payslip_download_result.dart';
+import 'package:staffku/models/response/payslip/payslip_list_response.dart';
+import 'package:staffku/models/response/prospek/list.dart';
+import 'package:staffku/models/response/prospek/master_data_response.dart';
+import 'package:staffku/models/response/prospek/master_id_response.dart';
+import 'package:staffku/models/response/shift_swap/list_shift_swap_response.dart';
+import 'package:staffku/models/response/shift_swap/show_shift_swap_response.dart';
+import 'package:staffku/models/response/prospek/master_status_response.dart';
+import 'package:staffku/models/response/prospek/show.dart';
+import 'package:staffku/models/response/prospek_v2/detail_prospek_v2_response.dart';
+import 'package:staffku/models/response/prospek_v2/list_prospek_v2_response.dart';
+import 'package:staffku/models/response/rate/show_rate_review_response.dart';
+import 'package:staffku/models/response/recap_history.dart';
+import 'package:staffku/models/response/reliver/list_reliver_response.dart';
+import 'package:staffku/models/response/reliver/show_reliver_response.dart';
+import 'package:staffku/models/response/store/detail_store_response.dart';
+import 'package:staffku/models/response/store/list_items.dart';
+import 'package:staffku/models/response/store/list_store.dart';
+import 'package:staffku/models/response/update_profile_response.dart';
+import 'package:staffku/models/response/user/logout_response.dart';
+import 'package:staffku/models/response/user/user_schedule.dart';
+import 'package:staffku/models/response/user/users_response.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'api.dart';
@@ -1580,8 +1580,9 @@ class ApiRepository {
         if (body is Map<String, dynamic>) {
           parsed = PayslipListResponse.fromJson(body);
         } else if (body is Map) {
-          parsed =
-              PayslipListResponse.fromJson(Map<String, dynamic>.from(body));
+          parsed = PayslipListResponse.fromJson(
+            Map<String, dynamic>.from(body),
+          );
         } else if (body is String) {
           parsed = payslipListResponseFromJson(body);
         }
@@ -1626,8 +1627,10 @@ class ApiRepository {
         return null;
       }
 
-      final filename = _filenameFromContentDisposition(
-              _headerValue(fileRes.headers, 'content-disposition')) ??
+      final filename =
+          _filenameFromContentDisposition(
+            _headerValue(fileRes.headers, 'content-disposition'),
+          ) ??
           Uri.tryParse(path)?.pathSegments.last;
       return PayslipDownloadResult(
         bytes: bytes,
@@ -1673,7 +1676,8 @@ class ApiRepository {
   String? _filenameFromContentDisposition(String? contentDisposition) {
     if (contentDisposition == null) return null;
     final value = contentDisposition;
-    final match = RegExp(
+    final match =
+        RegExp(
           r"filename\\*=UTF-8''([^;]+)",
           caseSensitive: false,
         ).firstMatch(value) ??

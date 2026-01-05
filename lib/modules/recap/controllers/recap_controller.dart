@@ -1,9 +1,9 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/id_request.dart';
-import 'package:sales/models/response/recap_history.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/id_request.dart';
+import 'package:staffku/models/response/recap_history.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecapController extends GetxController
@@ -14,10 +14,14 @@ class RecapController extends GetxController
   // List<DataHistory> _historyData = [];
   var historyData = <DataHistory>[].obs;
   DateTime? selectedDate;
-  RxString month =
-      DateFormat("MMMM yyyy", "id_ID").format(DateTime.now()).toString().obs;
-  RxString monthSubmit =
-      DateFormat("MM", "id_ID").format(DateTime.now()).toString().obs;
+  RxString month = DateFormat(
+    "MMMM yyyy",
+    "id_ID",
+  ).format(DateTime.now()).toString().obs;
+  RxString monthSubmit = DateFormat(
+    "MM",
+    "id_ID",
+  ).format(DateTime.now()).toString().obs;
   // RxList<DataHistory> historyData = (List<DataHistory>.of([])).obs;
   // get historyData => this._historyData;
   // List<TableRow> priceTableRows = [];
@@ -52,19 +56,22 @@ class RecapController extends GetxController
   Future<void> getData() async {
     change(null, status: RxStatus.loading());
     historyData.clear();
-    monthSubmit.value = DateFormat("MM", "id_ID")
-        .format(selectedDate ?? DateTime.now())
-        .toString();
+    monthSubmit.value = DateFormat(
+      "MM",
+      "id_ID",
+    ).format(selectedDate ?? DateTime.now()).toString();
 
     if (token.value.isEmpty || idUser.value.isEmpty) {
       CommonWidget.errorSnackBar(
-          'Sesi login tidak valid. Silakan login ulang.');
+        'Sesi login tidak valid. Silakan login ulang.',
+      );
       change(null, status: RxStatus.error('Sesi login tidak valid'));
       return;
     }
 
-    final res = await apiRepository.getRecapHistory(IdRequest(
-        id: idUser.value, token: token.value, month: monthSubmit.value));
+    final res = await apiRepository.getRecapHistory(
+      IdRequest(id: idUser.value, token: token.value, month: monthSubmit.value),
+    );
 
     if (res == null) {
       CommonWidget.errorSnackBar('Gagal memuat rekap. Silakan coba lagi.');

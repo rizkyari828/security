@@ -2,12 +2,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:sales/models/response/user/users_response.dart';
-import 'package:sales/modules/home/home.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/utils/network_checker.dart';
-import 'package:sales/shared/utils/size_config.dart';
+import 'package:staffku/models/response/user/users_response.dart';
+import 'package:staffku/modules/home/home.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/network_checker.dart';
+import 'package:staffku/shared/utils/size_config.dart';
 import 'package:get/get.dart';
 
 class MainTab extends GetView<HomeController> {
@@ -15,7 +15,7 @@ class MainTab extends GetView<HomeController> {
   Widget build(BuildContext context) {
     double scaleWidth = MediaQuery.of(context).size.width / 360;
     controller.context = context;
-    controller.showMoodDialogOncePerDay(context);
+    // controller.showMoodDialogOncePerDay(context);
     return Obx(
       () => Scaffold(
         floatingActionButton: controller.isConnectedToInternetWidget.value
@@ -625,11 +625,16 @@ class MainTab extends GetView<HomeController> {
 
       final shiftLabelRaw = controller.attendanceShiftLabel;
       final hasShiftTime = shiftLabelRaw != '--:-- - --:--';
-      final shiftLabel = !hasSchedule
-          ? 'Belum ada jadwal'
-          : hasShiftTime
+      final inOfficeArea = controller.attendanceInOfficeArea.value;
+      final distanceText = controller.attendanceDistanceToOffice.value.trim();
+      final areaLabel = inOfficeArea
+          ? 'Di area absensi'
+          : 'Di luar area absensi';
+      final shiftLabel = hasShiftTime
           ? shiftLabelRaw
-          : 'Shift belum tersedia';
+          : (distanceText.isNotEmpty
+                ? '$areaLabel ($distanceText)'
+                : areaLabel);
 
       final checkInColor = hasSchedule ? Colors.green : Colors.grey;
       final checkOutColor = hasSchedule
@@ -700,9 +705,10 @@ class MainTab extends GetView<HomeController> {
                         )
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Expanded(
                                   child: Column(
@@ -730,14 +736,26 @@ class MainTab extends GetView<HomeController> {
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                _pill(
-                                  text: shiftLabel,
-                                  color: hasSchedule
-                                      ? ColorConstants.mainColor
-                                      : Colors.grey,
-                                  icon: hasSchedule
-                                      ? Icons.schedule_rounded
-                                      : Icons.event_busy_rounded,
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: sw * 0.46,
+                                  ),
+                                  child: _pill(
+                                    text: shiftLabel,
+                                    color: hasShiftTime
+                                        ? ColorConstants.mainColor
+                                        : (inOfficeArea
+                                              ? Colors.green
+                                              : Colors.grey),
+                                    icon: hasShiftTime
+                                        ? Icons.schedule_rounded
+                                        : Icons.location_on_rounded,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                _refreshButton(
+                                  isLoading: isLoading,
+                                  onPressed: controller.getAttendanceInfo,
                                 ),
                               ],
                             ),
@@ -837,7 +855,7 @@ class MainTab extends GetView<HomeController> {
                                   ),
                                   elevation: 0,
                                 ),
-                                onPressed: controller.goToAbsensiPages,
+                                onPressed: controller.goToKehadiranTab,
                                 icon: Icon(ctaIcon, size: 18),
                                 label: Text(
                                   ctaText.toUpperCase(),
@@ -906,6 +924,47 @@ class MainTab extends GetView<HomeController> {
       height: 56,
       margin: const EdgeInsets.symmetric(horizontal: 6),
       color: ColorConstants.borderColor,
+    );
+  }
+
+  Widget _refreshButton({
+    required bool isLoading,
+    required VoidCallback onPressed,
+  }) {
+    final enabled = !isLoading;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: enabled ? onPressed : null,
+        child: Container(
+          width: 34,
+          height: 34,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: CommonWidget.setOpacity(ColorConstants.mainColor, 0.08),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              width: 1,
+              color: CommonWidget.setOpacity(ColorConstants.mainColor, 0.18),
+            ),
+          ),
+          child: isLoading
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: ColorConstants.mainColor,
+                  ),
+                )
+              : Icon(
+                  Icons.refresh_rounded,
+                  size: 18,
+                  color: ColorConstants.mainColor,
+                ),
+        ),
+      ),
     );
   }
 

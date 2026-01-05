@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
 
 SubmitLeadRequest SubmitLeadRequestFromJson(String str) =>
     SubmitLeadRequest.fromJson(json.decode(str));
@@ -13,25 +13,26 @@ String SubmitLeadRequestToJson(SubmitLeadRequest data) =>
     json.encode(data.toJson());
 
 class SubmitLeadRequest {
-  SubmitLeadRequest(
-      {this.idUser,
-      this.date,
-      this.leadSource,
-      this.optionLeadSource,
-      this.email,
-      this.name,
-      this.noHp,
-      this.latitude,
-      this.longitude,
-      this.leadCategory,
-      this.minatProduct,
-      this.leadStatus,
-      this.note,
-      this.photos,
-      this.alamat,
-      this.gender,
-      this.age,
-      this.statusPekerjaan});
+  SubmitLeadRequest({
+    this.idUser,
+    this.date,
+    this.leadSource,
+    this.optionLeadSource,
+    this.email,
+    this.name,
+    this.noHp,
+    this.latitude,
+    this.longitude,
+    this.leadCategory,
+    this.minatProduct,
+    this.leadStatus,
+    this.note,
+    this.photos,
+    this.alamat,
+    this.gender,
+    this.age,
+    this.statusPekerjaan,
+  });
 
   String? idUser;
   String? date;
@@ -75,23 +76,23 @@ class SubmitLeadRequest {
       );
 
   Map<String, dynamic> toJson() => {
-        'user_id': idUser,
-        'date': date,
-        'sumber_leads': leadSource,
-        'sumber_leads2': optionLeadSource,
-        'email': email,
-        'nama': name,
-        'telphone': noHp,
-        'lat': latitude,
-        'long': longitude,
-        'kategori_leads': leadCategory,
-        'product_minat': minatProduct,
-        'status_leads': leadStatus,
-        'catatan': note,
-        'alamat': alamat,
-        'jenis_kelamin': gender,
-        'umur': age,
-        'status_pekerjaan': statusPekerjaan,
-        'foto': photos?.map((e) => e.toJson()).toList(),
-      };
+    'user_id': idUser,
+    'date': date,
+    'sumber_leads': leadSource,
+    'sumber_leads2': optionLeadSource,
+    'email': email,
+    'nama': name,
+    'telphone': noHp,
+    'lat': latitude,
+    'long': longitude,
+    'kategori_leads': leadCategory,
+    'product_minat': minatProduct,
+    'status_leads': leadStatus,
+    'catatan': note,
+    'alamat': alamat,
+    'jenis_kelamin': gender,
+    'umur': age,
+    'status_pekerjaan': statusPekerjaan,
+    'foto': photos?.map((e) => e.toJson()).toList(),
+  };
 }

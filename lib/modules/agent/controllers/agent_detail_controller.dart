@@ -1,6 +1,6 @@
-import 'package:sales/api/api_repository.dart';
+import 'package:staffku/api/api_repository.dart';
 import 'package:get/get.dart';
-import 'package:sales/models/response/agent/list_agent_response.dart';
+import 'package:staffku/models/response/agent/list_agent_response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AgentDetailController extends GetxController {

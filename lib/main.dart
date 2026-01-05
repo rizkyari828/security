@@ -2,8 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:sales/api/http_overrides.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/api/http_overrides.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'app_binding.dart';
@@ -32,7 +32,7 @@ void main() async {
   await DenpendencyInjection.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_messageHandler);
-  
+
   // await Firebase.initializeApp(
   //   options: const FirebaseOptions(
   //     apiKey: 'AIzaSyAHAsf51D0A407EklG1bs-5wA7EbyfNFg0',
@@ -60,22 +60,22 @@ void main() async {
     /// default FCM channel to enable heads up notifications.
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
 
     /// Update the iOS foreground notification presentation options to allow
     /// heads up notifications.
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+          alert: true,
+          badge: true,
+          sound: true,
+        );
   }
   GetStorage.init();
   await initializeDateFormatting('id_ID', "").then((_) => runApp(const App()));
   configLoading();
-  
 }
 
 class App extends StatefulWidget {
@@ -104,7 +104,7 @@ class _AppState extends State<App> {
       getPages: AppPages.routes,
       initialBinding: AppBinding(),
       smartManagement: SmartManagement.keepFactory,
-      title: 'SALES',
+      title: 'Staffku',
       theme: ThemeConfig.lightTheme,
       locale: TranslationService.locale,
       fallbackLocale: TranslationService.fallbackLocale,

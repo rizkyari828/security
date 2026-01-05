@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/claim/detail_claim_request.dart';
-import 'package:sales/models/request/claim/update_approval_claim_request.dart';
-import 'package:sales/models/response/claim/show_claim_response.dart';
-import 'package:sales/shared/utils/common_widget.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/claim/detail_claim_request.dart';
+import 'package:staffku/models/request/claim/update_approval_claim_request.dart';
+import 'package:staffku/models/response/claim/show_claim_response.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ClaimDetailController extends GetxController {
@@ -38,8 +38,9 @@ class ClaimDetailController extends GetxController {
   }
 
   void getDetailClaim() async {
-    final res =
-        await apiRepository.showClaim(ShowClaimRequest(id: argm.toString()));
+    final res = await apiRepository.showClaim(
+      ShowClaimRequest(id: argm.toString()),
+    );
     final data = res?.data;
     if (data == null || data.isEmpty) {
       CommonWidget.errorSnackBar('Gagal memuat detail claim');
@@ -47,21 +48,22 @@ class ClaimDetailController extends GetxController {
     }
     detail.value = data.first;
     statusApproval.value = (detail.value.statusClaim ?? '').toLowerCase();
-    final idRoleDetail =
-        stringRoletoId((detail.value.levelApproval ?? '').toLowerCase());
+    final idRoleDetail = stringRoletoId(
+      (detail.value.levelApproval ?? '').toLowerCase(),
+    );
     approvalCondition.value = idRoleDetail == groupId.value;
   }
 
   String stringRoletoId(String role) {
     switch (role.toLowerCase()) {
-      case 'tad':
+      case 'staff':
         return '1';
-      case 'cabang':
+      case 'spv':
         return '2';
-      case 'area':
-        return '3';
-      case 'client':
-        return '4';
+      // case 'area':
+      //   return '3';
+      // case 'client':
+      //   return '4';
       default:
         return '1';
     }
@@ -94,4 +96,3 @@ class ClaimDetailController extends GetxController {
     super.onClose();
   }
 }
-

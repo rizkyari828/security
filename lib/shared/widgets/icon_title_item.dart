@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sales/shared/constants/constants.dart';
+import 'package:staffku/shared/constants/constants.dart';
 import 'package:flutter_svg/svg.dart';
 
 class IconTitleItem extends StatelessWidget {
@@ -32,18 +32,27 @@ class IconTitleItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin:
-          EdgeInsets.fromLTRB(marginLeft, marginTop, marginRight, marginBottom),
+      margin: EdgeInsets.fromLTRB(
+        marginLeft,
+        marginTop,
+        marginRight,
+        marginBottom,
+      ),
       child: Material(
         borderRadius: BorderRadius.circular(11),
         color: backgroundColor,
         child: InkWell(
           onTap: onTap,
-          customBorder:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
+          customBorder: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(11),
+          ),
           child: Padding(
             padding: EdgeInsets.fromLTRB(
-                paddingLeft, paddingTop, paddingRight, padingBottom),
+              paddingLeft,
+              paddingTop,
+              paddingRight,
+              padingBottom,
+            ),
             child: Row(
               children: [
                 SvgPicture.asset(
@@ -55,19 +64,17 @@ class IconTitleItem extends StatelessWidget {
                     BlendMode.srcIn,
                   ),
                 ),
-                SizedBox(
-                  width: drawablePadding,
-                ),
+                SizedBox(width: drawablePadding),
                 Expanded(
-                    child: Text(
-                  title,
-                  style:
-                      TextStyle(color: ColorConstants.darkGray, fontSize: 16),
-                )),
-                Icon(
-                  Icons.chevron_right,
-                  color: ColorConstants.darkGray,
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: ColorConstants.darkGray,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
+                Icon(Icons.chevron_right, color: ColorConstants.darkGray),
               ],
             ),
           ),

@@ -1,23 +1,26 @@
-import 'package:sales/modules/store/controllers/store_list_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/utils/size_config.dart';
+import 'package:staffku/modules/store/controllers/store_list_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:sales/shared/widgets/approval.dart';
-import 'package:sales/shared/widgets/custom_appbar.dart';
+import 'package:staffku/shared/widgets/approval.dart';
+import 'package:staffku/shared/widgets/custom_appbar.dart';
 
 class StoreView extends GetView<StoreListController> {
   @override
   Widget build(BuildContext context) {
     double scaleWidth = MediaQuery.of(context).size.width / 360;
-    return Obx(() => Scaffold(
+    return Obx(
+      () => Scaffold(
         appBar: CustomAppBarWithNetwork(
           title: 'Patroli',
           networkStatus: controller.qualityNetwork,
           addButton: ApprovalFlow.addButtonApproval(
-              controller: controller, onPressed: controller.goToAddPages),
+            controller: controller,
+            onPressed: controller.goToAddPages,
+          ),
         ),
         floatingActionButton: controller.isConnectedToInternetWidget.value
             ? Padding(
@@ -25,7 +28,9 @@ class StoreView extends GetView<StoreListController> {
                 child: controller.internetConnection(),
               )
             : SizedBox(),
-        body: _getItems(controller)));
+        body: _getItems(controller),
+      ),
+    );
   }
 
   SmartRefresher _getItems(StoreListController controller) {
@@ -46,26 +51,32 @@ class StoreView extends GetView<StoreListController> {
                       Row(
                         children: [
                           Expanded(
-                            child: Obx(() => pendingTask(
-                                  '${controller.dailyProgressCount.value}',
-                                  'Patroli hari ini',
-                                )),
+                            child: Obx(
+                              () => pendingTask(
+                                '${controller.dailyProgressCount.value}',
+                                'Patroli hari ini',
+                              ),
+                            ),
                           ),
                           Expanded(
-                            child: Obx(() => pendingTask(
-                                  '${controller.montlyProgressCount.value}',
-                                  'Patroli bulan ini',
-                                )),
+                            child: Obx(
+                              () => pendingTask(
+                                '${controller.montlyProgressCount.value}',
+                                'Patroli bulan ini',
+                              ),
+                            ),
                           ),
                           SizedBox(width: 20),
                         ],
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
-                            left: 20.0, right: 20, bottom: 10, top: 10),
-                        child: Divider(
-                          color: ColorConstants.borderColor,
+                          left: 20.0,
+                          right: 20,
+                          bottom: 10,
+                          top: 10,
                         ),
+                        child: Divider(color: ColorConstants.borderColor),
                       ),
                     ],
                   )
@@ -73,21 +84,22 @@ class StoreView extends GetView<StoreListController> {
             InkWell(
               onTap: () {
                 controller.goToDetailPages(
-                    id: controller.listStore[i].tokoId.toString(),
-                    type: controller.listStore[i].typList.toString(),
-                    storeName: controller.listStore[i].namaToko ?? '',
-                    statusKunjungan:
-                        controller.listStore[i].statusKunjungan ?? '');
+                  id: controller.listStore[i].tokoId.toString(),
+                  type: controller.listStore[i].typList.toString(),
+                  storeName: controller.listStore[i].namaToko ?? '',
+                  statusKunjungan:
+                      controller.listStore[i].statusKunjungan ?? '',
+                );
               },
               child: customStockExpandedCard(
-                  name: controller.listStore[i].namaToko ?? '',
-                  photo: controller.listStore[i].pathToko ?? '',
-                  type: controller.listStore[i].typList == '1'
-                      ? 'Patroli Terjadwal'
-                      : 'Patroli Tidak Terjadwal',
-                  address: controller.listStore[i].alamatToko ?? '',
-                  statusKunjungan:
-                      controller.listStore[i].statusKunjungan ?? ''),
+                name: controller.listStore[i].namaToko ?? '',
+                photo: controller.listStore[i].pathToko ?? '',
+                type: controller.listStore[i].typList == '1'
+                    ? 'Patroli Terjadwal'
+                    : 'Patroli Tidak Terjadwal',
+                address: controller.listStore[i].alamatToko ?? '',
+                statusKunjungan: controller.listStore[i].statusKunjungan ?? '',
+              ),
             ),
           ],
         ),
@@ -140,7 +152,9 @@ class StoreView extends GetView<StoreListController> {
                 children: [
                   CommonWidget.minHeadText(text: value, color: Colors.black),
                   CommonWidget.subtitleText(
-                      text: ' $title', color: Colors.black),
+                    text: ' $title',
+                    color: Colors.black,
+                  ),
                 ],
               ),
             ],
@@ -187,8 +201,9 @@ class StoreView extends GetView<StoreListController> {
                         photo == ''
                             ? Container(
                                 decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
                                   color: Colors.red,
                                 ),
                                 child: Padding(
@@ -203,10 +218,10 @@ class StoreView extends GetView<StoreListController> {
                             : Container(
                                 height: 70,
                                 width: 70,
-                                 decoration: BoxDecoration(
-                                   borderRadius: BorderRadius.circular(10),
-                                   color: ColorConstants.secondaryAppColor,
-                                 ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: ColorConstants.secondaryAppColor,
+                                ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.network(
@@ -214,45 +229,44 @@ class StoreView extends GetView<StoreListController> {
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Center(
-                                        child: Icon(Icons.store_rounded,
-                                            color: Colors.white, size: 65),
+                                        child: Icon(
+                                          Icons.store_rounded,
+                                          color: Colors.white,
+                                          size: 65,
+                                        ),
                                       );
                                     },
                                   ),
                                 ),
                               ),
-                        SizedBox(
-                          width: 20,
-                        ),
+                        SizedBox(width: 20),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
                               child: CommonWidget.subtitleText(
-                                  text: name, fontWeight: FontWeight.bold),
+                                text: name,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             // CommonWidget.subtitleText(text: type),
-                            SizedBox(
-                              height: 5,
-                            ),
+                            SizedBox(height: 5),
                             Container(
                               width: SizeConfig().screenWidth * .50,
                               child: CommonWidget.subtitleText(
-                                  text: 'Alamat : ' + address,
-                                  // fontWeight: FontWeight.bold,
-                                  color: ColorConstants.mainColor),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            CommonWidget.subtitleText(
-                                text: type,
+                                text: 'Alamat : ' + address,
                                 // fontWeight: FontWeight.bold,
-                                color: ColorConstants.mainColor),
-                            SizedBox(
-                              height: 5,
+                                color: ColorConstants.mainColor,
+                              ),
                             ),
+                            SizedBox(height: 5),
+                            CommonWidget.subtitleText(
+                              text: type,
+                              // fontWeight: FontWeight.bold,
+                              color: ColorConstants.mainColor,
+                            ),
+                            SizedBox(height: 5),
                           ],
                         ),
                       ],

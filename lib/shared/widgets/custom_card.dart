@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/shared/shared.dart';
 
 class CustomCardView extends StatelessWidget {
   final String code;
@@ -59,12 +59,12 @@ class CustomCardView extends StatelessWidget {
                   code == ''
                       ? SizedBox(height: 0)
                       : CommonWidget.subtitleText(
-                          text: code, fontWeight: FontWeight.bold),
+                          text: code,
+                          fontWeight: FontWeight.bold,
+                        ),
                   date == ''
                       ? SizedBox(height: 0)
-                      : CommonWidget.minSubtitleText(
-                          text: date,
-                        ),
+                      : CommonWidget.minSubtitleText(text: date),
                   tipe == ''
                       ? SizedBox(height: 0)
                       : CommonWidget.minSubtitleText(text: tipe),
@@ -77,61 +77,65 @@ class CustomCardView extends StatelessWidget {
             updateDelete
                 ? Expanded(
                     child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
                             icon: Icon(
                               Icons.create,
                               color: Colors.orange,
                               size: 30,
                             ),
-                            onPressed: onPressedEdit),
-                        IconButton(
+                            onPressed: onPressedEdit,
+                          ),
+                          IconButton(
                             icon: Icon(
                               Icons.restore_from_trash_rounded,
                               color: Colors.red,
                               size: 30,
                             ),
-                            onPressed: onPressedDelete),
-                      ],
+                            onPressed: onPressedDelete,
+                          ),
+                        ],
+                      ),
                     ),
-                  ))
+                  )
                 : Expanded(
                     child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              (approval == "approved")
-                                  ? Icons.check_circle_outlined
-                                  : (approval == "pengajuan" ||
-                                          approval == "proses")
-                                      ? Icons.access_time_outlined
-                                      : Icons.close,
-                              color: (approval == "approved")
-                                  ? Colors.green
-                                  : (approval == "pengajuan" ||
-                                          approval == "proses")
-                                      ? Colors.orange
-                                      : Colors.red,
-                              size: 30,
-                            ),
-                            CommonWidget.captionText(
-                              text: approval,
-                              color: (approval == "approved")
-                                  ? Colors.green
-                                  : (approval == "pengajuan" ||
-                                          approval == "proses")
-                                      ? Colors.orange
-                                      : Colors.red,
-                            ),
-                          ],
-                        )),
-                  )
+                      alignment: Alignment.centerRight,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            (approval == "approved")
+                                ? Icons.check_circle_outlined
+                                : (approval == "pengajuan" ||
+                                      approval == "proses")
+                                ? Icons.access_time_outlined
+                                : Icons.close,
+                            color: (approval == "approved")
+                                ? Colors.green
+                                : (approval == "pengajuan" ||
+                                      approval == "proses")
+                                ? Colors.orange
+                                : Colors.red,
+                            size: 30,
+                          ),
+                          CommonWidget.captionText(
+                            text: approval,
+                            color: (approval == "approved")
+                                ? Colors.green
+                                : (approval == "pengajuan" ||
+                                      approval == "proses")
+                                ? Colors.orange
+                                : Colors.red,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),
@@ -457,41 +461,41 @@ class CustomExpandedCardView extends StatelessWidget {
     );
   }
 
-//   Widget bottomApproval(String approval, String levelApproval) {
-//     final sw = SizeConfig().screenWidth;
-//     return Column(
-//       children: [
-//         Spacer(),
-//         Container(
-//           width: sw * .85,
-//           decoration: BoxDecoration(
-//             color:
-//                 statusKunjungan == '1' ? Colors.green[100] : Colors.yellow[100],
-//             borderRadius: BorderRadius.circular(10),
-//           ),
-//           padding: const EdgeInsets.all(5),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               Icon(
-//                 statusKunjungan == '1'
-//                     ? Icons.check_circle
-//                     : Icons.warning_amber_rounded,
-//                 color: statusKunjungan == '1' ? Colors.green : Colors.orange,
-//               ),
-//               const SizedBox(width: 10),
-//               CommonWidget.captionText(
-//                 text: statusKunjungan == '1'
-//                     ? 'Sudah dikunjungi'
-//                     : 'Belum dikunjungi',
-//                 color: ColorConstants.mainColor,
-//               ),
-//             ],
-//           ),
-//         ),
-//       ],
-//     );
-//   }
+  //   Widget bottomApproval(String approval, String levelApproval) {
+  //     final sw = SizeConfig().screenWidth;
+  //     return Column(
+  //       children: [
+  //         Spacer(),
+  //         Container(
+  //           width: sw * .85,
+  //           decoration: BoxDecoration(
+  //             color:
+  //                 statusKunjungan == '1' ? Colors.green[100] : Colors.yellow[100],
+  //             borderRadius: BorderRadius.circular(10),
+  //           ),
+  //           padding: const EdgeInsets.all(5),
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Icon(
+  //                 statusKunjungan == '1'
+  //                     ? Icons.check_circle
+  //                     : Icons.warning_amber_rounded,
+  //                 color: statusKunjungan == '1' ? Colors.green : Colors.orange,
+  //               ),
+  //               const SizedBox(width: 10),
+  //               CommonWidget.captionText(
+  //                 text: statusKunjungan == '1'
+  //                     ? 'Sudah dikunjungi'
+  //                     : 'Belum dikunjungi',
+  //                 color: ColorConstants.mainColor,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     );
+  //   }
 }
 
 class _ApprovalTone {
@@ -505,7 +509,8 @@ class _ApprovalTone {
     final approval = normalizedApproval.trim();
     final isApproved =
         approval == 'approved' || approval == 'approve' || approval == 'ok';
-    final isPending = approval == 'pengajuan' ||
+    final isPending =
+        approval == 'pengajuan' ||
         approval == 'proses' ||
         approval == 'process' ||
         approval == 'waiting' ||
@@ -581,16 +586,15 @@ class CustomExpandedImageCardView extends StatelessWidget {
             height: sw * .3,
             child: ClipRRect(
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10)),
+                topLeft: Radius.circular(10),
+                bottomLeft: Radius.circular(10),
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.black,
                   image: new DecorationImage(
                     fit: BoxFit.cover,
-                    image: new NetworkImage(
-                      image,
-                    ),
+                    image: new NetworkImage(image),
                   ),
                 ),
               ),
@@ -605,21 +609,26 @@ class CustomExpandedImageCardView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CommonWidget.subtitleText(
-                      text: title, fontWeight: FontWeight.bold),
+                    text: title,
+                    fontWeight: FontWeight.bold,
+                  ),
                   CommonWidget.labelRowIcon(
-                      icon: Icons.access_alarms_rounded,
-                      widget: CommonWidget.subtitleText(text: time)),
+                    icon: Icons.access_alarms_rounded,
+                    widget: CommonWidget.subtitleText(text: time),
+                  ),
                   CommonWidget.labelRowIcon(
-                      icon: Icons.place_rounded,
-                      widget: CommonWidget.subtitleText(text: description)),
+                    icon: Icons.place_rounded,
+                    widget: CommonWidget.subtitleText(text: description),
+                  ),
                   Expanded(
                     child: Align(
                       alignment: Alignment.bottomLeft,
                       child: CommonWidget.labelExpanded(
-                          label: location,
-                          value: date,
-                          fontWeight2: FontWeight.normal,
-                          fontSize: 12.0),
+                        label: location,
+                        value: date,
+                        fontWeight2: FontWeight.normal,
+                        fontSize: 12.0,
+                      ),
                     ),
                   ),
                 ],
@@ -697,26 +706,24 @@ class CustomStockExpandedCardView extends StatelessWidget {
                                     color: Colors.green,
                                     size: 20,
                                   ),
-                            SizedBox(
-                              width: 5,
-                            ),
+                            SizedBox(width: 5),
                             CommonWidget.minHeadText(
-                                text: name,
-                                // fontWeight: FontWeight.bold,
-                                color: ColorConstants.mainColor),
+                              text: name,
+                              // fontWeight: FontWeight.bold,
+                              color: ColorConstants.mainColor,
+                            ),
                           ],
                         ),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   CommonWidget.subtitleText(text: type),
                   Row(
                     children: [
                       CommonWidget.subtitleText(text: 'Rp. '),
                       CommonWidget.minHeadText(
-                          text: price,
-                          // fontWeight: FontWeight.bold,
-                          color: ColorConstants.mainColor),
+                        text: price,
+                        // fontWeight: FontWeight.bold,
+                        color: ColorConstants.mainColor,
+                      ),
                     ],
                   ),
                 ],
@@ -732,18 +739,25 @@ class CustomStockExpandedCardView extends StatelessWidget {
                   ),
                   onPressed: onPressedRemove,
                 ),
-                Obx(() => Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CommonWidget.subtitleText(text: 'Stok'),
-                        CommonWidget.bigText(
-                            text: stock, color: ColorConstants.mainColor),
-                      ],
-                    )),
+                Obx(
+                  () => Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CommonWidget.subtitleText(text: 'Stok'),
+                      CommonWidget.bigText(
+                        text: stock,
+                        color: ColorConstants.mainColor,
+                      ),
+                    ],
+                  ),
+                ),
                 IconButton(
-                  icon: Icon(Icons.add_circle_rounded,
-                      color: Colors.green, size: 20),
+                  icon: Icon(
+                    Icons.add_circle_rounded,
+                    color: Colors.green,
+                    size: 20,
+                  ),
                   onPressed: onPressedAdd,
                 ),
               ],

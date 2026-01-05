@@ -1,7 +1,7 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/user_id_request.dart';
-import 'package:sales/models/response/cuti_sales/list_cuti_sales.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/user_id_request.dart';
+import 'package:staffku/models/response/cuti_sales/list_cuti_sales.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,8 +17,9 @@ class CutiListController extends GetxController {
   RxString token = "".obs;
 
   RxInt page = 1.obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   void onLoading() async {
     page.value = page.value + 1;
@@ -57,8 +58,8 @@ class CutiListController extends GetxController {
 
   void getCutiSales(page) async {
     final res = await apiRepository.listCuti(
-        data: UserIdRequest(
-            id: userId.value, page: page.toString(), limit: '10'));
+      data: UserIdRequest(id: userId.value, page: page.toString(), limit: '10'),
+    );
     listCuti.addAll(res?.data ?? []);
   }
 

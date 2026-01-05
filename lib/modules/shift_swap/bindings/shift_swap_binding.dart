@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:sales/modules/shift_swap/controllers/shift_swap_controller.dart';
-import 'package:sales/modules/shift_swap/controllers/shift_swap_detail_controller.dart';
-import 'package:sales/modules/shift_swap/controllers/shift_swap_list_controller.dart';
+import 'package:staffku/modules/shift_swap/controllers/shift_swap_controller.dart';
+import 'package:staffku/modules/shift_swap/controllers/shift_swap_detail_controller.dart';
+import 'package:staffku/modules/shift_swap/controllers/shift_swap_list_controller.dart';
 
 class ShiftSwapBinding extends Bindings {
   @override
@@ -19,4 +19,3 @@ class ShiftSwapBinding extends Bindings {
     );
   }
 }
-

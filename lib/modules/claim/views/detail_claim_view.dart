@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/modules/claim/controllers/claim_detail_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/utils/common_widget.dart';
-import 'package:sales/shared/widgets/approval.dart';
+import 'package:staffku/modules/claim/controllers/claim_detail_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
+import 'package:staffku/shared/widgets/approval.dart';
 
 class ClaimDetailView extends GetView<ClaimDetailController> {
   const ClaimDetailView({super.key});
@@ -27,7 +27,8 @@ class ClaimDetailView extends GetView<ClaimDetailController> {
                     children: [
                       ApprovalFlow.statusApproval(
                         (controller.detail.value.statusClaim ?? '').toString(),
-                        (controller.detail.value.levelApproval ?? '').toString(),
+                        (controller.detail.value.levelApproval ?? '')
+                            .toString(),
                       ),
                       const SizedBox(height: 20.0),
                       CommonWidget.labelExpanded(
@@ -38,7 +39,8 @@ class ClaimDetailView extends GetView<ClaimDetailController> {
                       CommonWidget.labelExpanded(
                         label: 'Tanggal Claim',
                         value: DateFormat('yyyy-MM-dd', 'id_ID').format(
-                          controller.detail.value.tanggalClaim ?? DateTime.now(),
+                          controller.detail.value.tanggalClaim ??
+                              DateTime.now(),
                         ),
                       ),
                       const SizedBox(height: 10.0),
@@ -62,4 +64,3 @@ class ClaimDetailView extends GetView<ClaimDetailController> {
     );
   }
 }
-

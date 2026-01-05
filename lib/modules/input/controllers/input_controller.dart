@@ -1,6 +1,6 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/input_request.dart';
-import 'package:sales/models/response/izin/type_izin.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/input_request.dart';
+import 'package:staffku/models/response/izin/type_izin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -119,8 +119,10 @@ class InputController extends GetxController {
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
     startDate = selectedDate;
-    startDateController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    startDateController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   selectDateEnd(BuildContext context) async {
@@ -132,8 +134,10 @@ class InputController extends GetxController {
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
     endDate = selectedDate;
-    endDateController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    endDateController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   void getType() async {

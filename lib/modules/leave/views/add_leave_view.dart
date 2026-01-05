@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
-import 'package:sales/modules/leave/controllers/leave_controller.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/utils.dart';
-import 'package:sales/shared/widgets/button.dart';
-import 'package:sales/shared/widgets/input_field.dart';
+import 'package:staffku/modules/leave/controllers/leave_controller.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/utils.dart';
+import 'package:staffku/shared/widgets/button.dart';
+import 'package:staffku/shared/widgets/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

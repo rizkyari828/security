@@ -4,23 +4,23 @@ import 'dart:io';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
-import 'package:sales/models/request/leads/submit_lead.dart';
-import 'package:sales/models/response/izin/type_izin.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/leads/submit_lead.dart';
+import 'package:staffku/models/response/izin/type_izin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/models/response/master_data_2_response.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/shared/constants/storage.dart';
+import 'package:staffku/models/response/master_data_2_response.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/shared/constants/storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LeadsController extends BaseController {
   LeadsController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
   var imageFileList = <XFile>[].obs;
 
   set _imageFile(XFile? value) {
@@ -104,11 +104,17 @@ class LeadsController extends BaseController {
     }
   }
 
-  Future<void> onImageButtonPressed(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
+  Future<void> onImageButtonPressed(
+    ImageSource source, {
+    BuildContext? context,
+    bool isMultiImage = false,
+  }) async {
     if (isMultiImage) {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final List<XFile>? pickedFileList = await _picker.pickMultiImage(
             maxWidth: maxWidth,
@@ -124,8 +130,11 @@ class LeadsController extends BaseController {
         }
       });
     } else {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
@@ -170,33 +179,31 @@ class LeadsController extends BaseController {
       final photoBase64 = base64Encode(photoBytes);
 
       attachments.add(
-        PhotoAttachment(
-          img: photoBase64,
-          filename: file.path.split('/').last,
-        ),
+        PhotoAttachment(img: photoBase64, filename: file.path.split('/').last),
       );
     }
 
     final res = await apiRepository.submitLead(
       SubmitLeadRequest(
-          idUser: idUser.value,
-          date: DateFormat("yyyy-MM-dd", "id_ID").format(dateNow).toString(),
-          latitude: myLocation.latitude.toString(),
-          longitude: myLocation.longitude.toString(),
-          email: emailController.text,
-          name: nameController.text,
-          noHp: noHpController.text,
-          leadSource: leadSourceId.value,
-          optionLeadSource: optionalTextValue.value,
-          leadCategory: leadCategoryId.value,
-          minatProduct: minatProductController.text,
-          leadStatus: statusLeadId.value,
-          note: noteController.text,
-          photos: attachments,
-          alamat: alamatController.text,
-          gender: idGender.value,
-          age: ageController.text,
-          statusPekerjaan: statusPekerjaanId.toString()),
+        idUser: idUser.value,
+        date: DateFormat("yyyy-MM-dd", "id_ID").format(dateNow).toString(),
+        latitude: myLocation.latitude.toString(),
+        longitude: myLocation.longitude.toString(),
+        email: emailController.text,
+        name: nameController.text,
+        noHp: noHpController.text,
+        leadSource: leadSourceId.value,
+        optionLeadSource: optionalTextValue.value,
+        leadCategory: leadCategoryId.value,
+        minatProduct: minatProductController.text,
+        leadStatus: statusLeadId.value,
+        note: noteController.text,
+        photos: attachments,
+        alamat: alamatController.text,
+        gender: idGender.value,
+        age: ageController.text,
+        statusPekerjaan: statusPekerjaanId.toString(),
+      ),
     );
     if (res?.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
@@ -271,17 +278,21 @@ class LeadsController extends BaseController {
         forwardAnimationCurve: Curves.easeOutBack,
       );
       print(
-          "Location permissions are permanently denied, we cannot request permissions.");
+        "Location permissions are permanently denied, we cannot request permissions.",
+      );
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     final position = await _geolocatorPlatform.getCurrentPosition();
     myLocation = LatLng(position.latitude, position.longitude);
 
     try {
-      final placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
       final place = placemarks.isNotEmpty ? placemarks.first : null;
       locationDetail.value = place == null
           ? ''
@@ -327,8 +338,9 @@ class LeadsController extends BaseController {
     }
 
     masterData.clear();
-    final resListLeadCategory =
-        await apiRepository.getMasterData2('Kategori Lead');
+    final resListLeadCategory = await apiRepository.getMasterData2(
+      'Kategori Lead',
+    );
     final leadCategoryData = resListLeadCategory?.data;
     if (leadCategoryData == null || leadCategoryData.isEmpty) {
       EasyLoading.showError('Gagal memuat master data');
@@ -373,8 +385,9 @@ class LeadsController extends BaseController {
     //     .add(MasterData2(id: 10, nama: 'Pensiunan', flag: 'status_pekerjaan'));
     // listStatusPekerjaan
     masterData.clear();
-    final resListStatusPekerjaan =
-        await apiRepository.getMasterData2('Status Kerja Leads');
+    final resListStatusPekerjaan = await apiRepository.getMasterData2(
+      'Status Kerja Leads',
+    );
     final statusPekerjaanData = resListStatusPekerjaan?.data;
     if (statusPekerjaanData != null) {
       masterData.value = statusPekerjaanData;

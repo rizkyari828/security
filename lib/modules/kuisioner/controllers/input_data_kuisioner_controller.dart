@@ -1,18 +1,18 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/kuisioner/kuisioner_input_data_request.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/kuisioner/kuisioner_input_data_request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/models/response/kuisioner/input_data_kuisioner_respons.dart';
-import 'package:sales/models/response/kuisioner_response.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/models/response/kuisioner/input_data_kuisioner_respons.dart';
+import 'package:staffku/models/response/kuisioner_response.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InputDataKuisionerController extends BaseController {
   InputDataKuisionerController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   final startDateController = TextEditingController();
   final endDateController = TextEditingController();
@@ -53,14 +53,17 @@ class InputDataKuisionerController extends BaseController {
       dataSummaryKuisioner.idGroup = res?.data?.first.idGroup;
       dataSummaryKuisioner.jumlahSoal = res?.data?.first.jumlahSoal;
 
-      Get.toNamed(Routes.KUISIONER, arguments: {
-        'id_kuisioner': dataSummaryKuisioner.idTrans,
-        'id_group': dataSummaryKuisioner.idGroup,
-        'total_question': dataSummaryKuisioner.jumlahSoal,
-        'current_progress': 0,
-        'page': 1,
-        'limit': 2
-      });
+      Get.toNamed(
+        Routes.KUISIONER,
+        arguments: {
+          'id_kuisioner': dataSummaryKuisioner.idTrans,
+          'id_group': dataSummaryKuisioner.idGroup,
+          'total_question': dataSummaryKuisioner.jumlahSoal,
+          'current_progress': 0,
+          'page': 1,
+          'limit': 2,
+        },
+      );
     } else {
       EasyLoading.showError('Gagal disimpan');
       EasyLoading.dismiss();
@@ -97,8 +100,10 @@ class InputDataKuisionerController extends BaseController {
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
     startDate = selectedDate;
-    startDateController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    startDateController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   selectDateEnd(BuildContext context) async {
@@ -110,8 +115,10 @@ class InputDataKuisionerController extends BaseController {
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
     endDate = selectedDate;
-    endDateController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    endDateController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   @override

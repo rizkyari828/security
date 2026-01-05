@@ -1,7 +1,7 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/user_id_request.dart';
-import 'package:sales/models/response/agent/list_agent_response.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/user_id_request.dart';
+import 'package:staffku/models/response/agent/list_agent_response.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,8 +17,9 @@ class AgentListController extends GetxController {
   RxString token = "".obs;
 
   RxInt page = 1.obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   void onLoading() async {
     page.value = page.value + 1;
@@ -56,8 +57,9 @@ class AgentListController extends GetxController {
   }
 
   void getAgent(page) async {
-    final res =
-        await apiRepository.listAgent(data: UserIdRequest(id: userId.value));
+    final res = await apiRepository.listAgent(
+      data: UserIdRequest(id: userId.value),
+    );
     list.addAll(res?.data ?? []);
   }
 

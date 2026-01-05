@@ -1,18 +1,18 @@
 import 'package:get_storage/get_storage.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/dashboard_request.dart';
-import 'package:sales/models/request/user_id_request.dart';
-import 'package:sales/models/response/dashboard/dashboard_kunjungan_response.dart';
-import 'package:sales/models/response/store/list_store.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/dashboard_request.dart';
+import 'package:staffku/models/request/user_id_request.dart';
+import 'package:staffku/models/response/dashboard/dashboard_kunjungan_response.dart';
+import 'package:staffku/models/response/store/list_store.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StoreListController extends BaseController {
   StoreListController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   var listStore = <DataStore>[].obs;
   RxString groupName = "".obs;
@@ -23,15 +23,14 @@ class StoreListController extends BaseController {
   RxInt montlyProgressCount = 0.obs;
 
   RxInt page = 1.obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   var detailDashboard = DashbooardKunjunganData().obs;
 
   void goToKunjunganPages() {
-    Get.toNamed(
-      Routes.RESULT_KUNJUNGAN,
-    );
+    Get.toNamed(Routes.RESULT_KUNJUNGAN);
   }
 
   void onLoading() async {
@@ -75,7 +74,9 @@ class StoreListController extends BaseController {
   void getStore(page) async {
     try {
       final res = await apiRepository.listStore(
-          page: page, data: UserIdRequest(id: userId.value));
+        page: page,
+        data: UserIdRequest(id: userId.value),
+      );
 
       if (res != null && res.data != null) {
         // Ubah objek DataStore ke JSON sebelum simpan
@@ -96,9 +97,11 @@ class StoreListController extends BaseController {
     final cachedData = storage.read('cached_items_page_$page');
 
     if (cachedData != null) {
-      listStore.addAll(List<DataStore>.from(
-        (cachedData as List).map((e) => DataStore.fromJson(e)),
-      ));
+      listStore.addAll(
+        List<DataStore>.from(
+          (cachedData as List).map((e) => DataStore.fromJson(e)),
+        ),
+      );
     }
   }
 
@@ -117,25 +120,30 @@ class StoreListController extends BaseController {
 
   void clearCachedPages({String prefix = 'cached_store_page_'}) {
     final keys = storage.getKeys();
-    final pageKeys =
-        keys.where((k) => k is String && k.startsWith(prefix)).toList();
+    final pageKeys = keys
+        .where((k) => k is String && k.startsWith(prefix))
+        .toList();
 
     for (final key in pageKeys) {
       storage.remove(key);
     }
   }
 
-  void goToDetailPages(
-      {String id = "",
-      String type = '',
-      String storeName = '',
-      String statusKunjungan = ''}) {
-    Get.toNamed(Routes.DETAIL_STORE, arguments: {
-      'id': id,
-      'type': type,
-      'storeName': storeName,
-      'status_kunjungan': statusKunjungan
-    });
+  void goToDetailPages({
+    String id = "",
+    String type = '',
+    String storeName = '',
+    String statusKunjungan = '',
+  }) {
+    Get.toNamed(
+      Routes.DETAIL_STORE,
+      arguments: {
+        'id': id,
+        'type': type,
+        'storeName': storeName,
+        'status_kunjungan': statusKunjungan,
+      },
+    );
   }
 
   void goToAddPages() async {
@@ -149,14 +157,16 @@ class StoreListController extends BaseController {
 
   void getDataDashboard() async {
     final monthly = await apiRepository.getDashboardKunjungan(
-        DashboardRequest(id: userId.value, type: 'bulan'));
+      DashboardRequest(id: userId.value, type: 'bulan'),
+    );
     final monthlyData = monthly?.data;
     if (monthlyData != null && monthlyData.isNotEmpty) {
       montlyProgressCount.value = monthlyData.first.count ?? 0;
     }
 
     final daily = await apiRepository.getDashboardKunjungan(
-        DashboardRequest(id: userId.value, type: 'hari'));
+      DashboardRequest(id: userId.value, type: 'hari'),
+    );
     final dailyData = daily?.data;
     if (dailyData != null && dailyData.isNotEmpty) {
       dailyProgressCount.value = dailyData.first.count ?? 0;

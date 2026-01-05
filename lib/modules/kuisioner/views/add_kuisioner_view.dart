@@ -2,16 +2,16 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sales/modules/kuisioner/controllers/kuisioner_controller.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/custom_pop_scope.dart';
-import 'package:sales/shared/utils/utils.dart';
-import 'package:sales/shared/widgets/button.dart';
-import 'package:sales/shared/widgets/custom_appbar.dart';
-import 'package:sales/shared/widgets/input_field.dart';
+import 'package:staffku/modules/kuisioner/controllers/kuisioner_controller.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/custom_pop_scope.dart';
+import 'package:staffku/shared/utils/utils.dart';
+import 'package:staffku/shared/widgets/button.dart';
+import 'package:staffku/shared/widgets/custom_appbar.dart';
+import 'package:staffku/shared/widgets/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/routes/app_pages.dart';
+import 'package:staffku/routes/app_pages.dart';
 
 class AddKuisionerView extends GetView<KusionerController> {
   const AddKuisionerView({Key? key}) : super(key: key);
@@ -41,8 +41,9 @@ class AddKuisionerView extends GetView<KusionerController> {
           Padding(
             padding: EdgeInsets.only(left: sw * .06, right: 20, bottom: 20),
             child: CustomButton(
-              buttonText:
-                  controller.percentage.value >= 1.0 ? 'SIMPAN' : 'SELANJUTNYA',
+              buttonText: controller.percentage.value >= 1.0
+                  ? 'SIMPAN'
+                  : 'SELANJUTNYA',
               width: MediaQuery.of(context).size.width,
               onPressed: () {
                 if (controller.percentage.value >= 1.0) {
@@ -92,8 +93,10 @@ class AddKuisionerView extends GetView<KusionerController> {
                           controller.listKuisioner[i].idKategori ?? 0,
                           controller.listKuisioner[i].isUpload ?? 0,
                           controller,
-                          initialValue: controller.answers[controller
-                                      .listKuisioner[i].idSoal
+                          initialValue:
+                              controller.answers[controller
+                                      .listKuisioner[i]
+                                      .idSoal
                                       ?.toString() ??
                                   ""] ??
                               "",
@@ -123,7 +126,10 @@ class AddKuisionerView extends GetView<KusionerController> {
 }
 
 Widget uploadFile(
-    BuildContext context, KusionerController controller, String idSoal) {
+  BuildContext context,
+  KusionerController controller,
+  String idSoal,
+) {
   final sw = SizeConfig().screenWidth;
   final imageFiles = controller.imageFileMap[idSoal] ?? [];
 
@@ -190,7 +196,9 @@ Widget uploadFile(
                       Icon(Icons.camera_alt, color: Colors.grey, size: 30),
                       SizedBox(width: 10.0),
                       CommonWidget.bodyText(
-                          text: "Ambil Photos", color: Colors.grey),
+                        text: "Ambil Photos",
+                        color: Colors.grey,
+                      ),
                     ],
                   ),
                 ),
@@ -201,9 +209,16 @@ Widget uploadFile(
   );
 }
 
-Widget soalEssay(BuildContext context, int no, String question, int idSoal,
-    int idKategori, int isUpload, KusionerController controller,
-    {String initialValue = ""}) {
+Widget soalEssay(
+  BuildContext context,
+  int no,
+  String question,
+  int idSoal,
+  int idKategori,
+  int isUpload,
+  KusionerController controller, {
+  String initialValue = "",
+}) {
   final idSoalStr = idSoal.toString();
   if (!controller.essayControllers.containsKey(idSoalStr)) {
     controller.essayControllers[idSoalStr] = TextEditingController(
@@ -227,17 +242,13 @@ Widget soalEssay(BuildContext context, int no, String question, int idSoal,
           TextAreaField(
             controller: textController,
             onChanged: (val) {
-              controller.setAnswer(
-                idSoalStr,
-                idKategori.toString(),
-                val,
-              );
+              controller.setAnswer(idSoalStr, idKategori.toString(), val);
             },
           ),
           SizedBox(height: 20.0),
           if (isUpload == 1) ...[
-            uploadFile(context, controller, idSoal.toString())
-          ]
+            uploadFile(context, controller, idSoal.toString()),
+          ],
         ],
       ),
     ),
@@ -296,11 +307,12 @@ class SingleChoice extends GetView<KusionerController> {
                       children: options
                           .where((option) => option.trim().isNotEmpty)
                           .map((option) {
-                        return RadioListTile<String>(
-                          title: CommonWidget.bodyText(text: option),
-                          value: option,
-                        );
-                      }).toList(),
+                            return RadioListTile<String>(
+                              title: CommonWidget.bodyText(text: option),
+                              value: option,
+                            );
+                          })
+                          .toList(),
                     ),
                   );
                 }),
@@ -312,8 +324,8 @@ class SingleChoice extends GetView<KusionerController> {
                 ),
             ],
             if (isUpload == 1) ...[
-              uploadFile(context, controller, idSoal.toString())
-            ]
+              uploadFile(context, controller, idSoal.toString()),
+            ],
           ],
         ),
       ),

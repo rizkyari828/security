@@ -1,8 +1,8 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/constants/common.dart';
-import 'package:sales/shared/utils/common_widget.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/constants/common.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
 
 class InputField extends StatelessWidget {
   final TextEditingController controller;
@@ -28,10 +28,7 @@ class InputField extends StatelessWidget {
     this.fontSize = CommonConstants.bodyText,
     this.password = false,
     this.validator,
-    this.prefixIcon = const Icon(
-      Icons.person,
-      color: ColorConstants.black,
-    ),
+    this.prefixIcon = const Icon(Icons.person, color: ColorConstants.black),
     this.suffixIcon = const Icon(
       Icons.error_outline,
       size: 30,
@@ -66,13 +63,19 @@ class InputField extends StatelessWidget {
               : null,
           suffixIcon: _suffixIcon(),
           focusedBorder: new OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: new BorderSide(
-                  color: isError ?? false ? Colors.red : color, width: 1.0)),
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: new BorderSide(
+              color: isError ?? false ? Colors.red : color,
+              width: 1.0,
+            ),
+          ),
           enabledBorder: new OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: new BorderSide(
-                  color: isError ?? false ? Colors.red : color, width: 1.0)),
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: new BorderSide(
+              color: isError ?? false ? Colors.red : color,
+              width: 1.0,
+            ),
+          ),
           hintText: this.placeholder,
           hintStyle: TextStyle(
             fontSize: fontSize,
@@ -107,12 +110,8 @@ class InputField extends StatelessWidget {
         color: ColorConstants.black,
         onPressed: isPassword ?? false ? onVisibilityPressed : null,
         icon: textObscured ?? false
-            ? Icon(
-                Icons.visibility_off,
-              )
-            : Icon(
-                Icons.visibility,
-              ),
+            ? Icon(Icons.visibility_off)
+            : Icon(Icons.visibility),
       );
     }
     return isError ?? false ? suffixIcon : null;
@@ -183,23 +182,26 @@ class InputInputField extends StatelessWidget {
             },
             decoration: InputDecoration(
               labelStyle: TextStyle(
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  letterSpacing: 0.5,
-                  color: const Color.fromARGB(255, 20, 22, 24),
-                  fontFamily: 'Poppins'),
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+                letterSpacing: 0.5,
+                color: const Color.fromARGB(255, 20, 22, 24),
+                fontFamily: 'Poppins',
+              ),
               prefixStyle: TextStyle(
-                  color: ColorConstants.black,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  letterSpacing: 0.5,
-                  fontFamily: 'Poppins'),
+                color: ColorConstants.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+                letterSpacing: 0.5,
+                fontFamily: 'Poppins',
+              ),
               suffixStyle: TextStyle(
-                  color: ColorConstants.black,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  letterSpacing: 0.5,
-                  fontFamily: 'Poppins'),
+                color: ColorConstants.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+                letterSpacing: 0.5,
+                fontFamily: 'Poppins',
+              ),
               labelText: labelText,
               hintText: placeholder,
               filled: true,
@@ -208,16 +210,12 @@ class InputInputField extends StatelessWidget {
                   : ColorConstants.backgroundTextField,
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: ColorConstants.mainColor,
-                ),
+                borderSide: BorderSide(color: ColorConstants.mainColor),
               ),
               suffixIcon: _suffixIcon(),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: Colors.grey[200] ?? Colors.grey,
-                ),
+                borderSide: BorderSide(color: Colors.grey[200] ?? Colors.grey),
               ),
             ),
           ),
@@ -252,22 +250,21 @@ class TextAreaField extends StatelessWidget {
   final bool isRequired;
   final bool showError;
 
-  TextAreaField(
-      {required this.controller,
-      this.isDisabled = false,
-      this.onChanged,
-      this.isRequired = false,
-      this.showError = false,
-      s});
+  TextAreaField({
+    required this.controller,
+    this.isDisabled = false,
+    this.onChanged,
+    this.isRequired = false,
+    this.showError = false,
+    s,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 0.1,
       color: isDisabled ? Colors.grey[200] : ColorConstants.backgroundTextField,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       child: Padding(
         padding: EdgeInsets.all(8.0),
         child: Column(
@@ -277,22 +274,24 @@ class TextAreaField extends StatelessWidget {
               readOnly: isDisabled,
               enableInteractiveSelection: isDisabled,
               style: TextStyle(
-                  color: ColorConstants.black,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  letterSpacing: 0.5,
-                  fontFamily: 'Poppins'),
+                color: ColorConstants.black,
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+                letterSpacing: 0.5,
+                fontFamily: 'Poppins',
+              ),
               controller: controller,
               maxLines: 8,
               onChanged: onChanged,
               decoration: InputDecoration.collapsed(
                 hintText: "Masukkan text disini",
                 hintStyle: TextStyle(
-                    color: ColorConstants.black,
-                    fontWeight: FontWeight.normal,
-                    fontSize: 14,
-                    letterSpacing: 0.5,
-                    fontFamily: 'Poppins'),
+                  color: ColorConstants.black,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14,
+                  letterSpacing: 0.5,
+                  fontFamily: 'Poppins',
+                ),
                 filled: true,
                 fillColor: isDisabled
                     ? Colors.grey[200]
@@ -345,43 +344,40 @@ class CustomDropDownSearch extends StatelessWidget {
         decoratorProps: DropDownDecoratorProps(
           decoration: InputDecoration(
             labelStyle: TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: 14,
-                letterSpacing: 0.5,
-                color: ColorConstants.black,
-                fontFamily: 'Poppins'),
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+              letterSpacing: 0.5,
+              color: ColorConstants.black,
+              fontFamily: 'Poppins',
+            ),
             prefixStyle: TextStyle(
-                color: ColorConstants.black,
-                fontWeight: FontWeight.normal,
-                fontSize: 14,
-                letterSpacing: 0.5,
-                fontFamily: 'Poppins'),
+              color: ColorConstants.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+              letterSpacing: 0.5,
+              fontFamily: 'Poppins',
+            ),
             suffixStyle: TextStyle(
-                color: ColorConstants.black,
-                fontWeight: FontWeight.normal,
-                fontSize: 14,
-                letterSpacing: 0.5,
-                fontFamily: 'Poppins'),
+              color: ColorConstants.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+              letterSpacing: 0.5,
+              fontFamily: 'Poppins',
+            ),
             labelText: labelText,
             filled: true,
             fillColor: enabled ? Colors.white : Colors.grey[200],
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(
-                color: ColorConstants.mainColor,
-              ),
+              borderSide: BorderSide(color: ColorConstants.mainColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(
-                color: ColorConstants.mainColor,
-              ),
+              borderSide: BorderSide(color: ColorConstants.mainColor),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(
-                color: ColorConstants.mainColor,
-              ),
+              borderSide: BorderSide(color: ColorConstants.mainColor),
             ),
           ),
         ),

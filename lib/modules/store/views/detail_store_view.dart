@@ -1,13 +1,13 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sales/modules/store/controllers/store_detail_controller.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/modules/store/controllers/store_detail_controller.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sales/shared/widgets/button.dart';
-import 'package:sales/shared/widgets/custom_appbar.dart';
-import 'package:sales/shared/widgets/image_picker.dart';
+import 'package:staffku/shared/widgets/button.dart';
+import 'package:staffku/shared/widgets/custom_appbar.dart';
+import 'package:staffku/shared/widgets/image_picker.dart';
 
 class StoreDetailView extends GetView<StoreDetailController> {
   final data = Get.arguments;
@@ -15,7 +15,8 @@ class StoreDetailView extends GetView<StoreDetailController> {
   @override
   Widget build(BuildContext context) {
     double scaleWidth = MediaQuery.of(context).size.width / 360;
-    return Obx(() => Scaffold(
+    return Obx(
+      () => Scaffold(
         appBar: CustomAppBarWithNetwork(
           title: 'Detail Patroli',
           networkStatus: controller.qualityNetwork,
@@ -34,10 +35,12 @@ class StoreDetailView extends GetView<StoreDetailController> {
                 ),
               )
             : controller.typeStore == '1'
-                ? controller.statusKunjungan == '0'
-                    ? _buildViewSchedule(context)
-                    : _buildViewScheduleSubmit(context)
-                : _buildViewNon(context)));
+            ? controller.statusKunjungan == '0'
+                  ? _buildViewSchedule(context)
+                  : _buildViewScheduleSubmit(context)
+            : _buildViewNon(context),
+      ),
+    );
   }
 
   Widget _buildViewSchedule(BuildContext context) {
@@ -56,124 +59,129 @@ class StoreDetailView extends GetView<StoreDetailController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       InkWell(
-                          onTap: () => controller.showMaps(),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            height: sw * .12,
-                            width: sw * .5,
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                        onTap: () => controller.showMaps(),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          height: sw * .12,
+                          width: sw * .5,
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  color: Colors.transparent,
+                                  child: Image(
+                                    image: AssetImage('assets/icons/gm.png'),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                        width: 40,
-                                        height: 40,
-                                        color: Colors.transparent,
-                                        child: Image(
-                                            image: AssetImage(
-                                                'assets/icons/gm.png'))),
-                                    SizedBox(
-                                      width: 10,
+                                    CommonWidget.subtitleText(
+                                      text: 'Klik',
+                                      color: ColorConstants.white,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        CommonWidget.subtitleText(
-                                            text: 'Klik',
-                                            color: ColorConstants.white,
-                                            fontWeight: FontWeight.w500),
-                                        CommonWidget.captionText(
-                                            text: 'Untuk membuka Maps',
-                                            color: Colors.white70),
-                                      ],
+                                    CommonWidget.captionText(
+                                      text: 'Untuk membuka Maps',
+                                      color: Colors.white70,
                                     ),
-                                  ]),
+                                  ],
+                                ),
+                              ],
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                       SizedBox(height: 20),
                     ],
                   )
                 : Column(
                     children: [
                       Container(
-                          width: sw,
-                          height: sw * .8,
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: GoogleMap(
-                                  initialCameraPosition: CameraPosition(
-                                      target: controller.myLocation,
-                                      zoom: 18.0),
-                                  mapType: MapType.terrain,
-                                  myLocationEnabled: true,
-                                  myLocationButtonEnabled: true,
-                                  markers: Set<Marker>.of(controller.markers),
-                                  circles: controller.circles,
+                        width: sw,
+                        height: sw * .8,
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: GoogleMap(
+                                initialCameraPosition: CameraPosition(
+                                  target: controller.myLocation,
+                                  zoom: 18.0,
                                 ),
+                                mapType: MapType.terrain,
+                                myLocationEnabled: true,
+                                myLocationButtonEnabled: true,
+                                markers: Set<Marker>.of(controller.markers),
+                                circles: controller.circles,
                               ),
-                              Positioned(
-                                top: sw * .02,
-                                left: sw * .02,
-                                child: InkWell(
-                                  onTap: () => controller.hideMaps(),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      border: Border.all(
-                                          width: 2.0,
-                                          color: ColorConstants.borderColor),
+                            ),
+                            Positioned(
+                              top: sw * .02,
+                              left: sw * .02,
+                              child: InkWell(
+                                onTap: () => controller.hideMaps(),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    border: Border.all(
+                                      width: 2.0,
+                                      color: ColorConstants.borderColor,
                                     ),
-                                    height: sw * .1,
-                                    width: sw * .1,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.close,
-                                            color: Colors.redAccent, size: 30),
-                                      ],
-                                    ),
+                                  ),
+                                  height: sw * .1,
+                                  width: sw * .1,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.close,
+                                        color: Colors.redAccent,
+                                        size: 30,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
-                          )),
+                            ),
+                          ],
+                        ),
+                      ),
                       SizedBox(height: 30.0),
                     ],
                   ),
             CommonWidget.labelIconExpanded(
-                color: Colors.green,
-                text: controller.storeName.value,
-                fontWeight2: FontWeight.w500,
-                icon: Icon(
-                  Icons.store,
-                  size: 30,
-                  color: Colors.green,
-                )),
+              color: Colors.green,
+              text: controller.storeName.value,
+              fontWeight2: FontWeight.w500,
+              icon: Icon(Icons.store, size: 30, color: Colors.green),
+            ),
             CommonWidget.labelIconExpanded(
-                text: controller.locationDetail.value,
-                icon: Icon(
-                  Icons.location_pin,
-                  size: 30,
-                  color: Colors.orangeAccent,
-                ),
-                isSubtitle: false),
+              text: controller.locationDetail.value,
+              icon: Icon(
+                Icons.location_pin,
+                size: 30,
+                color: Colors.orangeAccent,
+              ),
+              isSubtitle: false,
+            ),
             SizedBox(height: 20.0),
             CommonWidget.minSubtitleText(
-                text: "Silahkan upload bukti Foto patroli anda"),
+              text: "Silahkan upload bukti Foto patroli anda",
+            ),
             SizedBox(height: 10.0),
             Padding(
               padding: EdgeInsets.all(8.0),
@@ -182,8 +190,10 @@ class StoreDetailView extends GetView<StoreDetailController> {
             controller.imageFileList.length < 3
                 ? InkWell(
                     onTap: () {
-                      controller.onImageButtonPressed(ImageSource.camera,
-                          context: context);
+                      controller.onImageButtonPressed(
+                        ImageSource.camera,
+                        context: context,
+                      );
                     },
                     child: DottedBorder(
                       options: RectDottedBorderOptions(
@@ -204,7 +214,9 @@ class StoreDetailView extends GetView<StoreDetailController> {
                             ),
                             SizedBox(width: 10.0),
                             CommonWidget.bodyText(
-                                text: "Ambil Photos", color: Colors.grey),
+                              text: "Ambil Photos",
+                              color: Colors.grey,
+                            ),
                           ],
                         ),
                       ),
@@ -213,7 +225,9 @@ class StoreDetailView extends GetView<StoreDetailController> {
                 : Container(),
             SizedBox(height: 10.0),
             CommonWidget.captionText(
-                text: "Maksimal melampirkan 3 Foto", color: Colors.red),
+              text: "Maksimal melampirkan 3 Foto",
+              color: Colors.red,
+            ),
             SizedBox(height: 90), // beri jarak agar button tidak tertutup
           ],
         ),
@@ -285,10 +299,10 @@ class StoreDetailView extends GetView<StoreDetailController> {
                     : Container(
                         height: 70,
                         width: 70,
-                         decoration: BoxDecoration(
-                           borderRadius: BorderRadius.circular(10),
-                           color: ColorConstants.secondaryAppColor,
-                         ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: ColorConstants.secondaryAppColor,
+                        ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Image.network(
@@ -296,36 +310,35 @@ class StoreDetailView extends GetView<StoreDetailController> {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Center(
-                                child: Icon(Icons.store_rounded,
-                                    color: Colors.white, size: 65),
+                                child: Icon(
+                                  Icons.store_rounded,
+                                  color: Colors.white,
+                                  size: 65,
+                                ),
                               );
                             },
                           ),
                         ),
                       ),
-                SizedBox(
-                  width: 20,
-                ),
+                SizedBox(width: 20),
                 CommonWidget.minHeadText(
-                    text: controller.detail.value.namaToko ?? ''),
+                  text: controller.detail.value.namaToko ?? '',
+                ),
               ],
             ),
-            SizedBox(
-              height: 20,
-            ),
-            Divider(
-              color: ColorConstants.borderColor,
-            ),
+            SizedBox(height: 20),
+            Divider(color: ColorConstants.borderColor),
             SizedBox(height: 20.0),
             CommonWidget.twoLabelIconExpanded(
-                text: controller.detail.value.alamatToko,
-                text2: controller.locationStore.value,
-                icon: Icon(
-                  Icons.location_pin,
-                  size: 30,
-                  color: Colors.orangeAccent,
-                ),
-                isSubtitle: false),
+              text: controller.detail.value.alamatToko,
+              text2: controller.locationStore.value,
+              icon: Icon(
+                Icons.location_pin,
+                size: 30,
+                color: Colors.orangeAccent,
+              ),
+              isSubtitle: false,
+            ),
             SizedBox(height: 20.0),
             Padding(
               padding: EdgeInsets.all(8.0),
@@ -383,10 +396,10 @@ class StoreDetailView extends GetView<StoreDetailController> {
                     : Container(
                         height: 70,
                         width: 70,
-                         decoration: BoxDecoration(
-                           borderRadius: BorderRadius.circular(10),
-                           color: ColorConstants.secondaryAppColor,
-                         ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: ColorConstants.secondaryAppColor,
+                        ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Image.network(
@@ -394,49 +407,50 @@ class StoreDetailView extends GetView<StoreDetailController> {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Center(
-                                child: Icon(Icons.store_rounded,
-                                    color: Colors.white, size: 65),
+                                child: Icon(
+                                  Icons.store_rounded,
+                                  color: Colors.white,
+                                  size: 65,
+                                ),
                               );
                             },
                           ),
                         ),
                       ),
-                SizedBox(
-                  width: 20,
-                ),
+                SizedBox(width: 20),
                 Container(
                   width: SizeConfig().screenWidth * .60,
                   child: CommonWidget.minHeadText(
-                      text: controller.detail.value.namaToko ?? ''),
+                    text: controller.detail.value.namaToko ?? '',
+                  ),
                 ),
               ],
             ),
-            SizedBox(
-              height: 20,
-            ),
-            Divider(
-              color: ColorConstants.borderColor,
-            ),
+            SizedBox(height: 20),
+            Divider(color: ColorConstants.borderColor),
             SizedBox(height: 20.0),
             CommonWidget.twoLabelIconExpanded(
-                text: controller.detail.value.alamatToko,
-                text2: controller.locationStore.value,
-                icon: Icon(
-                  Icons.location_pin,
-                  size: 30,
-                  color: Colors.orangeAccent,
-                ),
-                isSubtitle: false),
+              text: controller.detail.value.alamatToko,
+              text2: controller.locationStore.value,
+              icon: Icon(
+                Icons.location_pin,
+                size: 30,
+                color: Colors.orangeAccent,
+              ),
+              isSubtitle: false,
+            ),
             SizedBox(height: 20.0),
             CommonWidget.subtitleText(text: "Catatan"),
             SizedBox(height: 10.0),
             CommonWidget.subtitleText(
-                text: controller.detail.value.catatan ?? ''),
+              text: controller.detail.value.catatan ?? '',
+            ),
             SizedBox(height: 10.0),
             CommonWidget.subtitleText(text: "Rencana"),
             SizedBox(height: 10.0),
             CommonWidget.subtitleText(
-                text: controller.detail.value.rencana ?? ''),
+              text: controller.detail.value.rencana ?? '',
+            ),
             SizedBox(height: 20.0),
             Padding(
               padding: EdgeInsets.all(8.0),
@@ -455,18 +469,17 @@ class StoreDetailView extends GetView<StoreDetailController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         icon,
-        SizedBox(
-          width: 10,
-        ),
+        SizedBox(width: 10),
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CommonWidget.captionText(text: text),
             CommonWidget.subtitleText(
-                text: value,
-                color: ColorConstants.mainColor,
-                fontWeight: FontWeight.w500),
+              text: value,
+              color: ColorConstants.mainColor,
+              fontWeight: FontWeight.w500,
+            ),
           ],
         ),
       ],

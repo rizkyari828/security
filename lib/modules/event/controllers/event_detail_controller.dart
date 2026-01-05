@@ -1,10 +1,10 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/detail_request.dart';
-import 'package:sales/models/response/reliver/show_reliver_response.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/detail_request.dart';
+import 'package:staffku/models/response/reliver/show_reliver_response.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/shared/utils/common_widget.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReliverDetailController extends GetxController {
@@ -53,8 +53,9 @@ class ReliverDetailController extends GetxController {
   }
 
   void getDetail() async {
-    final res =
-        await apiRepository.showReliver(ShowEventRequest(id: argm.toString()));
+    final res = await apiRepository.showReliver(
+      ShowEventRequest(id: argm.toString()),
+    );
     final data = res?.data;
     if (data == null || data.isEmpty) {
       CommonWidget.errorSnackBar('Gagal memuat detail event');
@@ -63,9 +64,7 @@ class ReliverDetailController extends GetxController {
     detail.value = data.first;
   }
 
-  void approval({
-    action = "reject",
-  }) async {
+  void approval({action = "reject"}) async {
     // final res = await apiRepository.updateApprovalReliver(
     //     detail.value.id.toString(),
     //     ApproveReliverRequest(
@@ -91,7 +90,9 @@ class ReliverDetailController extends GetxController {
       lastDate: DateTime(2028),
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
-    dateStartWorkController.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    dateStartWorkController.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 }

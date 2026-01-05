@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sales/modules/home/home.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/modules/home/home.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:get/get.dart';
 
 import '../../shared/utils/custom_pop_scope.dart';
@@ -48,16 +48,13 @@ class HomeScreen extends GetView<HomeController> {
           MainTabs.me == controller.currentTab.value
               ? Icon(Icons.person_rounded)
               : Icon(Icons.person_outline_rounded),
-        )
+        ),
       ],
       type: BottomNavigationBarType.fixed,
       unselectedItemColor: Colors.grey,
       selectedItemColor: ColorConstants.mainColor,
       currentIndex: controller.getCurrentIndex(controller.currentTab.value),
-      selectedLabelStyle: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-      ),
+      selectedLabelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
       onTap: (index) => controller.switchTab(index),
     );
   }

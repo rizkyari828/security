@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sales/shared/shared.dart';
-import 'package:sales/shared/widgets/button.dart';
+import 'package:staffku/shared/shared.dart';
+import 'package:staffku/shared/widgets/button.dart';
 import 'package:get/get.dart';
 
 import 'auth_controller.dart';
@@ -23,19 +23,25 @@ class LoginScreen extends GetView<AuthController> {
               children: [
                 Align(
                   alignment: Alignment.center,
-                  child: Container(
-                    child: Image.asset(
-                      'assets/images/logo_biru.png',
-                      height: MediaQuery.of(context).size.height * .13,
-                      width: MediaQuery.of(context).size.width * .80,
-                      fit: BoxFit.fill,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * .13,
+                        maxWidth: MediaQuery.of(context).size.width * .80,
+                      ),
+                      child: Image.asset(
+                        'assets/images/logo_biru.png',
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),
 
                 Container(
                   margin: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height * .13),
+                    top: MediaQuery.of(context).size.height * .13,
+                  ),
                   alignment: Alignment.center,
                   padding: EdgeInsets.symmetric(horizontal: 35.0),
                   child: _buildForms(context),
@@ -61,23 +67,24 @@ class LoginScreen extends GetView<AuthController> {
         InkWell(
           child: Text(
             "02619277700",
-            style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.normal,
+            ),
           ),
           onTap: () {},
         ),
-        Text(
-          "  |  ",
-          style: TextStyle(color: Colors.white),
-        ),
+        Text("  |  ", style: TextStyle(color: Colors.white)),
         InkWell(
           child: Text(
             "Contact Support",
-            style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.normal,
+            ),
           ),
           onTap: () {},
-        )
+        ),
       ],
     ),
   );
@@ -95,7 +102,9 @@ class LoginScreen extends GetView<AuthController> {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 5.0, left: 10),
                 child: CommonWidget.bigText(
-                    text: 'Login', color: ColorConstants.black),
+                  text: 'Login',
+                  color: ColorConstants.black,
+                ),
               ),
             ),
             Align(
@@ -103,8 +112,9 @@ class LoginScreen extends GetView<AuthController> {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 15.0, left: 10),
                 child: CommonWidget.subtitleMultilineText(
-                    text: 'Masukkan username dan password untuk melanjutkan',
-                    color: ColorConstants.black),
+                  text: 'Masukkan username dan password untuk melanjutkan',
+                  color: ColorConstants.black,
+                ),
               ),
             ),
             InputField(
@@ -128,32 +138,34 @@ class LoginScreen extends GetView<AuthController> {
               },
             ),
             CommonWidget.rowHeight(),
-            Obx(() => InputField(
-                  textObscured: controller.isObscured.value,
-                  isPassword: true,
-                  onVisibilityPressed: () {
-                    controller.toggleVisibility();
-                  },
-                  prefixIcon: Icon(
-                    Icons.vpn_key_rounded,
-                    size: 30,
-                    color: ColorConstants.black,
-                  ),
-                  controller: controller.loginPasswordController,
-                  keyboardType: TextInputType.emailAddress,
-                  placeholder: 'Password',
-                  password: true,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Password is required.';
-                    }
-                    if (value.length < 4) {
-                      return 'Password should be more then 6 characters';
-                    }
+            Obx(
+              () => InputField(
+                textObscured: controller.isObscured.value,
+                isPassword: true,
+                onVisibilityPressed: () {
+                  controller.toggleVisibility();
+                },
+                prefixIcon: Icon(
+                  Icons.vpn_key_rounded,
+                  size: 30,
+                  color: ColorConstants.black,
+                ),
+                controller: controller.loginPasswordController,
+                keyboardType: TextInputType.emailAddress,
+                placeholder: 'Password',
+                password: true,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Password is required.';
+                  }
+                  if (value.length < 4) {
+                    return 'Password should be more then 6 characters';
+                  }
 
-                    return null;
-                  },
-                )),
+                  return null;
+                },
+              ),
+            ),
             //  CommonWidget.captionText(
             //           text: "Password is required"),
             // CommonWidget.rowHeight(),

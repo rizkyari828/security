@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class CommonWidget {
-  static AppBar appBar(
-      {String title = "",
-      bool backIcon = true,
-      bool centerTextAlign = false,
-      void Function()? callback,
-      bool actionIcon = false,
-      VoidCallback? onPressedActionIcon}) {
+  static AppBar appBar({
+    String title = "",
+    bool backIcon = true,
+    bool centerTextAlign = false,
+    void Function()? callback,
+    bool actionIcon = false,
+    VoidCallback? onPressedActionIcon,
+  }) {
     return AppBar(
-      iconTheme:
-          IconThemeData(color: ColorConstants.black //change your color here
-              ),
+      iconTheme: IconThemeData(
+        color: ColorConstants.black, //change your color here
+      ),
       // toolbarHeight: 50,
       automaticallyImplyLeading: backIcon,
       centerTitle: centerTextAlign,
@@ -50,33 +51,37 @@ class CommonWidget {
     return SizedBox(width: width);
   }
 
-  static Text bigText(
-      {String text = "",
-      Color color = ColorConstants.black,
-      TextAlign align = TextAlign.start}) {
+  static Text bigText({
+    String text = "",
+    Color color = ColorConstants.black,
+    TextAlign align = TextAlign.start,
+  }) {
     return Text(
       text,
       textAlign: align,
       style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 33,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: FontWeight.w600,
+        fontSize: 33,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
-  static Text headText(
-      {String text = "",
-      Color color = ColorConstants.black,
-      TextAlign align = TextAlign.start}) {
+  static Text headText({
+    String text = "",
+    Color color = ColorConstants.black,
+    TextAlign align = TextAlign.start,
+  }) {
     return Text(
       text,
       textAlign: align,
       style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 23,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: FontWeight.w600,
+        fontSize: 23,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
@@ -91,71 +96,79 @@ class CommonWidget {
       maxLines: 2,
       textAlign: align,
       style: TextStyle(
-          color: color,
-          fontWeight: fontWeight,
-          fontSize: 18,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: fontWeight,
+        fontSize: 18,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
-  static Text subtitleText(
-      {String text = "",
-      Color color = ColorConstants.black,
-      FontWeight fontWeight = FontWeight.normal,
-      textAlign = TextAlign.start}) {
+  static Text subtitleText({
+    String text = "",
+    Color color = ColorConstants.black,
+    FontWeight fontWeight = FontWeight.normal,
+    textAlign = TextAlign.start,
+  }) {
     return Text(
       text,
       textAlign: textAlign,
       style: TextStyle(
-          color: color,
-          fontWeight: fontWeight,
-          fontSize: 13,
-          letterSpacing: 0.15,
-          fontFamily: 'Poppins',
-          overflow: TextOverflow.ellipsis),
+        color: color,
+        fontWeight: fontWeight,
+        fontSize: 13,
+        letterSpacing: 0.15,
+        fontFamily: 'Poppins',
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 
-  static Text subtitleMultilineText(
-      {String text = "",
-      Color color = ColorConstants.black,
-      FontWeight fontWeight = FontWeight.normal,
-      textAlign = TextAlign.start}) {
+  static Text subtitleMultilineText({
+    String text = "",
+    Color color = ColorConstants.black,
+    FontWeight fontWeight = FontWeight.normal,
+    textAlign = TextAlign.start,
+  }) {
     return Text(
       maxLines: 2,
       text,
       textAlign: textAlign,
       style: TextStyle(
-          color: color,
-          fontWeight: fontWeight,
-          fontSize: 13,
-          letterSpacing: 0.15,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: fontWeight,
+        fontSize: 13,
+        letterSpacing: 0.15,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
-  static Text subtitlePlusText(
-      {String text = "",
-      Color color = ColorConstants.black,
-      FontWeight fontWeight = FontWeight.normal,
-      textAlign = TextAlign.start}) {
+  static Text subtitlePlusText({
+    String text = "",
+    Color color = ColorConstants.black,
+    FontWeight fontWeight = FontWeight.normal,
+    textAlign = TextAlign.start,
+  }) {
     return Text(
       text,
       textAlign: textAlign,
       style: TextStyle(
-          color: color,
-          fontWeight: fontWeight,
-          fontSize: 15,
-          letterSpacing: 0.15,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: fontWeight,
+        fontSize: 15,
+        letterSpacing: 0.15,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
-  static Text minSubtitleText(
-      {String text = "",
-      Color color = ColorConstants.black,
-      FontWeight fontWeight = FontWeight.normal,
-      textAlign = TextAlign.start}) {
+  static Text minSubtitleText({
+    String text = "",
+    Color color = ColorConstants.black,
+    FontWeight fontWeight = FontWeight.normal,
+    textAlign = TextAlign.start,
+  }) {
     return Text(
       text,
       textAlign: textAlign,
@@ -173,154 +186,164 @@ class CommonWidget {
     return Text(
       text,
       style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.normal,
-          fontSize: 14,
-          letterSpacing: 0.5,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: FontWeight.normal,
+        fontSize: 14,
+        letterSpacing: 0.5,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
-  static Text captionText(
-      {String text = "", Color color = ColorConstants.black}) {
+  static Text captionText({
+    String text = "",
+    Color color = ColorConstants.black,
+  }) {
     return Text(
       text,
       style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.normal,
-          fontSize: 10,
-          letterSpacing: 0.4,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: FontWeight.normal,
+        fontSize: 10,
+        letterSpacing: 0.4,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
-  static Text bodyMultilineText(
-      {String text = "", Color color = ColorConstants.black}) {
+  static Text bodyMultilineText({
+    String text = "",
+    Color color = ColorConstants.black,
+  }) {
     return Text(
       text,
       maxLines: 5,
       style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.normal,
-          fontSize: 14,
-          letterSpacing: 0.4,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: FontWeight.normal,
+        fontSize: 14,
+        letterSpacing: 0.4,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
-  static Text captionMultilineText(
-      {String text = "",
-      Color color = ColorConstants.black,
-      TextAlign textAlign = TextAlign.start}) {
+  static Text captionMultilineText({
+    String text = "",
+    Color color = ColorConstants.black,
+    TextAlign textAlign = TextAlign.start,
+  }) {
     return Text(
       text,
       maxLines: 2,
       textAlign: textAlign,
       style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.normal,
-          fontSize: 10,
-          letterSpacing: 0.4,
-          fontFamily: 'Poppins'),
+        color: color,
+        fontWeight: FontWeight.normal,
+        fontSize: 10,
+        letterSpacing: 0.4,
+        fontFamily: 'Poppins',
+      ),
     );
   }
 
-  static Row labelExpanded(
-      {String label = "",
-      value = "",
-      Color color = ColorConstants.black,
-      fontWeight2 = FontWeight.w600,
-      fontSize = 14.0}) {
+  static Row labelExpanded({
+    String label = "",
+    value = "",
+    Color color = ColorConstants.black,
+    fontWeight2 = FontWeight.w600,
+    fontSize = 14.0,
+  }) {
     return Row(
       children: <Widget>[
         Expanded(
           child: Text(
             label,
             style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.normal,
-                fontSize: fontSize,
-                letterSpacing: 0.5,
-                fontFamily: 'Poppins'),
+              color: color,
+              fontWeight: FontWeight.normal,
+              fontSize: fontSize,
+              letterSpacing: 0.5,
+              fontFamily: 'Poppins',
+            ),
           ),
         ),
         Expanded(
-          child: Text(value,
-              style: TextStyle(
-                  color: color,
-                  fontWeight: fontWeight2,
-                  fontSize: fontSize,
-                  letterSpacing: 0.5,
-                  fontFamily: 'Poppins')),
+          child: Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontWeight: fontWeight2,
+              fontSize: fontSize,
+              letterSpacing: 0.5,
+              fontFamily: 'Poppins',
+            ),
+          ),
         ),
       ],
     );
   }
 
-  static Row labelIconExpanded(
-      {Icon icon = const Icon(
-        Icons.person,
-        size: 30,
-        color: Colors.orangeAccent,
-      ),
-      text = "",
-      Color color = ColorConstants.black,
-      fontWeight2 = FontWeight.w600,
-      fontSize = 14.0,
-      isSubtitle = true}) {
+  static Row labelIconExpanded({
+    Icon icon = const Icon(Icons.person, size: 30, color: Colors.orangeAccent),
+    text = "",
+    Color color = ColorConstants.black,
+    fontWeight2 = FontWeight.w600,
+    fontSize = 14.0,
+    isSubtitle = true,
+  }) {
     return Row(
       children: <Widget>[
         icon,
-        SizedBox(
-          width: 10,
-        ),
+        SizedBox(width: 10),
         Expanded(
-            child: isSubtitle
-                ? minHeadText(text: text, color: color, fontWeight: fontWeight2)
-                : captionText(text: text, color: color)),
+          child: isSubtitle
+              ? minHeadText(text: text, color: color, fontWeight: fontWeight2)
+              : captionText(text: text, color: color),
+        ),
       ],
     );
   }
 
-  static Row twoLabelIconExpanded(
-      {Icon icon = const Icon(
-        Icons.person,
-        size: 30,
-        color: Colors.orangeAccent,
-      ),
-      text = "",
-      text2 = "",
-      Color color = ColorConstants.black,
-      fontWeight2 = FontWeight.w600,
-      fontSize = 14.0,
-      isSubtitle = true}) {
+  static Row twoLabelIconExpanded({
+    Icon icon = const Icon(Icons.person, size: 30, color: Colors.orangeAccent),
+    text = "",
+    text2 = "",
+    Color color = ColorConstants.black,
+    fontWeight2 = FontWeight.w600,
+    fontSize = 14.0,
+    isSubtitle = true,
+  }) {
     return Row(
       children: <Widget>[
         icon,
-        SizedBox(
-          width: 10,
-        ),
+        SizedBox(width: 10),
         Expanded(
-            child: isSubtitle
-                ? Column(
-                    children: [
-                      subtitleText(
-                          text: text, color: color, fontWeight: fontWeight2),
-                      subtitleText(
-                          text: text2, color: color, fontWeight: fontWeight2),
-                    ],
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      subtitleText(text: text, color: color),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      subtitleText(text: text2, color: color),
-                    ],
-                  )),
+          child: isSubtitle
+              ? Column(
+                  children: [
+                    subtitleText(
+                      text: text,
+                      color: color,
+                      fontWeight: fontWeight2,
+                    ),
+                    subtitleText(
+                      text: text2,
+                      color: color,
+                      fontWeight: fontWeight2,
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    subtitleText(text: text, color: color),
+                    SizedBox(height: 5),
+                    subtitleText(text: text2, color: color),
+                  ],
+                ),
+        ),
       ],
     );
   }
@@ -328,28 +351,23 @@ class CommonWidget {
   static Row labelRowIcon({icon, widget}) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: ColorConstants.mainColor,
-          size: 13,
-        ),
+        Icon(icon, color: ColorConstants.mainColor, size: 13),
         SizedBox(width: 5.0),
         widget,
       ],
     );
   }
 
-  static Row widgetExpanded(
-      {Widget? left, Widget? right, Color color = ColorConstants.black}) {
+  static Row widgetExpanded({
+    Widget? left,
+    Widget? right,
+    Color color = ColorConstants.black,
+  }) {
     return Row(
       children: <Widget>[
-        Expanded(
-          child: left ?? Container(),
-        ),
+        Expanded(child: left ?? Container()),
         SizedBox(width: 20),
-        Expanded(
-          child: right ?? Container(),
-        ),
+        Expanded(child: right ?? Container()),
       ],
     );
   }
@@ -404,10 +422,7 @@ class CommonWidget {
         //   ),
         // ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: child,
-      ),
+      child: Padding(padding: const EdgeInsets.all(20.0), child: child),
     );
   }
 
@@ -416,7 +431,11 @@ class CommonWidget {
   }
 
   static Widget progressLiniar(
-      int current, int total, double percentage, context) {
+    int current,
+    int total,
+    double percentage,
+    context,
+  ) {
     return Column(
       children: [
         LinearPercentIndicator(
@@ -426,22 +445,22 @@ class CommonWidget {
           animationDuration: 2000,
           percent: percentage,
           center: CommonWidget.minSubtitleText(
-              text: '${current} / ${total}', color: ColorConstants.white),
+            text: '${current} / ${total}',
+            color: ColorConstants.white,
+          ),
           barRadius: Radius.circular(10),
           progressColor: percentage < 0.25
               ? Colors.red
               : percentage < 0.5
-                  ? Colors.orange
-                  : percentage < 0.75
-                      ? Colors.amber
-                      : percentage < 1.0
-                          ? ColorConstants.secondaryAppColor
-                          : Colors.green,
+              ? Colors.orange
+              : percentage < 0.75
+              ? Colors.amber
+              : percentage < 1.0
+              ? ColorConstants.secondaryAppColor
+              : Colors.green,
         ),
         SizedBox(height: 20.0),
-        Divider(
-          color: ColorConstants.borderColor,
-        ),
+        Divider(color: ColorConstants.borderColor),
         SizedBox(height: 20.0),
       ],
     );
@@ -450,15 +469,15 @@ class CommonWidget {
   static String getRoleLabel(String role) {
     switch (role.toLowerCase()) {
       case '1':
-        return 'TAD';
+        return 'Staff';
       case '2':
-        return 'Cabang';
-      case '3':
-        return 'Area';
-      case '4':
-        return 'Client';
+        return 'SPV';
+      // case '3':
+      //   return 'Area';
+      // case '4':
+      //   return 'Client';
       default:
-        return 'TAD';
+        return 'Staff';
     }
   }
 
@@ -516,26 +535,24 @@ class CommonWidget {
                   children: [
                     Container(
                       child: CommonWidget.subtitleText(
-                          text: firstParagraf, fontWeight: FontWeight.bold),
+                        text: firstParagraf,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    SizedBox(
-                      height: 5,
-                    ),
+                    SizedBox(height: 5),
                     Container(
                       width: SizeConfig().screenWidth * .50,
                       child: CommonWidget.subtitleText(
-                          text: secondParagraf + " : " + secondParagrafValue,
-                          color: ColorConstants.mainColor),
+                        text: secondParagraf + " : " + secondParagrafValue,
+                        color: ColorConstants.mainColor,
+                      ),
                     ),
-                    SizedBox(
-                      height: 5,
-                    ),
+                    SizedBox(height: 5),
                     CommonWidget.subtitleText(
-                        text: thirdParagraf + " : " + thirdParagrafValue,
-                        color: ColorConstants.mainColor),
-                    SizedBox(
-                      height: 5,
+                      text: thirdParagraf + " : " + thirdParagrafValue,
+                      color: ColorConstants.mainColor,
                     ),
+                    SizedBox(height: 5),
                     Spacer(),
                     Container(
                       width: sw * .85,

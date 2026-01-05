@@ -2,24 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CLIENT_ID</key>
-	<string>301855838376-o4vo90n4aksrfnt0amr2lq8v2bhplb2s.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.301855838376-o4vo90n4aksrfnt0amr2lq8v2bhplb2s</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>301855838376-29aakpakh4uuub3j5npl1lb3hler2kr3.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAHuDwEPx-IdSHygoF4t_aU-Tv6uWc75xI</string>
+	<string>AIzaSyDJlXXVipp4y_bI0CKFmqmBBVQ3VJKjrAs</string>
 	<key>GCM_SENDER_ID</key>
-	<string>301855838376</string>
+	<string>810027223836</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.tamrevi</string>
+	<string>com.tama.staffku</string>
 	<key>PROJECT_ID</key>
-	<string>com-tam-revi</string>
+	<string>staffku</string>
 	<key>STORAGE_BUCKET</key>
-	<string>com-tam-revi.appspot.com</string>
+	<string>staffku.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:301855838376:ios:707451cd2680d0c3a6329d</string>
+	<string>1:810027223836:ios:b40871549853e33dd748d9</string>
 </dict>
 </plist>

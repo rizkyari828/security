@@ -1,9 +1,9 @@
-import 'package:sales/modules/prospek_v2/controllers/prospek_add_controller.dart';
-import 'package:sales/routes/app_pages.dart';
-import 'package:sales/shared/shared.dart';
-import 'package:sales/shared/utils/custom_pop_scope.dart';
-import 'package:sales/shared/widgets/approval.dart';
-import 'package:sales/shared/widgets/button.dart';
+import 'package:staffku/modules/prospek_v2/controllers/prospek_add_controller.dart';
+import 'package:staffku/routes/app_pages.dart';
+import 'package:staffku/shared/shared.dart';
+import 'package:staffku/shared/utils/custom_pop_scope.dart';
+import 'package:staffku/shared/widgets/approval.dart';
+import 'package:staffku/shared/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,11 +22,12 @@ class ProspekV2AddView extends GetView<ProspekV2AddController> {
   Widget _buildWidget(BuildContext context) {
     final sw = SizeConfig().screenWidth;
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: CommonWidget.appBar(
-            title: controller.isEdit.value ? 'Edit Prospek' : 'Tambah Prospek'),
-        body: SingleChildScrollView(
-            child: Padding(
+      backgroundColor: Colors.white,
+      appBar: CommonWidget.appBar(
+        title: controller.isEdit.value ? 'Edit Prospek' : 'Tambah Prospek',
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,18 +36,21 @@ class ProspekV2AddView extends GetView<ProspekV2AddController> {
               SizedBox(height: 20.0),
               if (controller.isEdit.value) ...[
                 ApprovalFlow.statusApprovalProspectV2(
-                    controller.detail.value.sourceOrderValue ??
-                        'Belum ada Status'),
+                  controller.detail.value.sourceOrderValue ??
+                      'Belum ada Status',
+                ),
                 SizedBox(height: 20.0),
                 controller.detail.value.idLead != 0
                     ? CommonWidget.labelExpanded(
                         label: 'ID Leads',
-                        value: controller.detail.value.idLead.toString())
+                        value: controller.detail.value.idLead.toString(),
+                      )
                     : Container(),
                 SizedBox(height: 10.0),
                 CommonWidget.labelExpanded(
-                    label: 'Nama Prospek',
-                    value: controller.prospectNameController.text),
+                  label: 'Nama Prospek',
+                  value: controller.prospectNameController.text,
+                ),
                 SizedBox(height: 20.0),
               ],
               Column(
@@ -243,34 +247,36 @@ class ProspekV2AddView extends GetView<ProspekV2AddController> {
               ),
             ],
           ),
-        )),
-        floatingActionButton: controller.disabled.value
-            ? Container()
-            : Padding(
-                padding: EdgeInsets.only(left: sw * .08),
-                child: CustomButton(
-                  buttonText: 'SIMPAN',
-                  width: MediaQuery.of(context).size.width,
-                  onPressed: () {
-                    controller.submitProspek();
-                  },
-                ),
-              ));
+        ),
+      ),
+      floatingActionButton: controller.disabled.value
+          ? Container()
+          : Padding(
+              padding: EdgeInsets.only(left: sw * .08),
+              child: CustomButton(
+                buttonText: 'SIMPAN',
+                width: MediaQuery.of(context).size.width,
+                onPressed: () {
+                  controller.submitProspek();
+                },
+              ),
+            ),
+    );
   }
 
   Widget divLine() {
     final sw = SizeConfig().screenWidth;
     return Padding(
-        padding: EdgeInsets.only(left: sw * .01, right: sw * .01),
-        child: Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(2),
-              ),
-              color: Colors.grey),
-          width: sw * .09,
-          height: sw * .02,
-        ));
+      padding: EdgeInsets.only(left: sw * .01, right: sw * .01),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(2)),
+          color: Colors.grey,
+        ),
+        width: sw * .09,
+        height: sw * .02,
+      ),
+    );
   }
 
   Widget stepsIcon(String status) {
@@ -292,8 +298,11 @@ class ProspekV2AddView extends GetView<ProspekV2AddController> {
         ),
         divLine(),
         Divider(color: Colors.black),
-        step(status.toLowerCase() == 'order' ? true : false, 'Order',
-            Icons.assignment_turned_in)
+        step(
+          status.toLowerCase() == 'order' ? true : false,
+          'Order',
+          Icons.assignment_turned_in,
+        ),
       ],
     );
   }
@@ -314,15 +323,8 @@ class ProspekV2AddView extends GetView<ProspekV2AddController> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: ColorConstants.white,
-              size: active ? 35 : 33,
-            ),
-            CommonWidget.captionText(
-              text: status,
-              color: ColorConstants.white,
-            ),
+            Icon(icon, color: ColorConstants.white, size: active ? 35 : 33),
+            CommonWidget.captionText(text: status, color: ColorConstants.white),
           ],
         ),
       ),

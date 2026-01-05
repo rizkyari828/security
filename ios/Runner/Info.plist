@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>SALES</string>
+	<string>Staffku</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>SALES</string>
+	<string>Staffku</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -25,18 +25,18 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>"SALES" need access the camera to change your profile photo</string>
+	<string>"Staffku" need access the camera to change your profile photo</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>"SALES" need access the device' location to use attendance feature.</string>
+	<string>"Staffku" need access the device' location to use attendance feature.</string>
 	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
 	<dict>
 		<key>YourPurposeKey</key>
-		<string>"SALES" need access the device's precise location to use attendance feature.</string>
+		<string>"Staffku" need access the device's precise location to use attendance feature.</string>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>"SALES" need access the device's location to use attendance feature.</string>
+	<string>"Staffku" need access the device's location to use attendance feature.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>"SALES" need access the gallery to change your profile photo.</string>
+	<string>"Staffku" need access the gallery to change your profile photo.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -66,8 +66,8 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<!-- <key>NSLocationAlwaysUsageDescription</key>
-	<string>"SALES" needs access to location when in the background.</string> -->
+	<string>"Staffku" needs access to location when in the background.</string> -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>"SALES" requires access to location when open.</string>
+	<string>"Staffku" requires access to location when open.</string>
 </dict>
 </plist>

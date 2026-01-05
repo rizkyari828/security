@@ -1,7 +1,7 @@
-import 'package:sales/modules/leave/controllers/leave_list_controller.dart';
-import 'package:sales/shared/constants/constants.dart';
-import 'package:sales/shared/widgets/approval.dart';
-import 'package:sales/shared/widgets/custom_card.dart';
+import 'package:staffku/modules/leave/controllers/leave_list_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/widgets/approval.dart';
+import 'package:staffku/shared/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';

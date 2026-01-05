@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:sales/modules/claim/controllers/claim_controller.dart';
-import 'package:sales/modules/claim/controllers/claim_detail_controller.dart';
-import 'package:sales/modules/claim/controllers/claim_list_controller.dart';
+import 'package:staffku/modules/claim/controllers/claim_controller.dart';
+import 'package:staffku/modules/claim/controllers/claim_detail_controller.dart';
+import 'package:staffku/modules/claim/controllers/claim_list_controller.dart';
 
 class ClaimBinding extends Bindings {
   @override
@@ -19,4 +19,3 @@ class ClaimBinding extends Bindings {
     );
   }
 }
-

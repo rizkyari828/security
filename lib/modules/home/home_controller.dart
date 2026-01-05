@@ -3,29 +3,29 @@ import 'dart:convert';
 
 import 'package:get_storage/get_storage.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:sales/models/request/dashboard_request.dart';
-import 'package:sales/models/request/id_request.dart';
-import 'package:sales/models/request/rate/submit_rate_request.dart';
-import 'package:sales/models/request/store/update_qty_request.dart';
-import 'package:sales/models/request/submit_mood_request.dart';
-import 'package:sales/models/request/update_fcm_profile_request.dart';
-import 'package:sales/models/request/update_photo_profile_request.dart';
-import 'package:sales/models/request/user_id_request.dart';
-import 'package:sales/models/response/benefit/benefit_dashboard_response.dart';
-import 'package:sales/models/response/dashboard/dashboard_response.dart';
-import 'package:sales/models/response/rate/show_rate_review_response.dart';
+import 'package:staffku/models/request/dashboard_request.dart';
+import 'package:staffku/models/request/attendance/validate_attenance.dart';
+import 'package:staffku/models/request/rate/submit_rate_request.dart';
+import 'package:staffku/models/request/store/update_qty_request.dart';
+import 'package:staffku/models/request/submit_mood_request.dart';
+import 'package:staffku/models/request/update_fcm_profile_request.dart';
+import 'package:staffku/models/request/update_photo_profile_request.dart';
+import 'package:staffku/models/request/user_id_request.dart';
+import 'package:staffku/models/response/benefit/benefit_dashboard_response.dart';
+import 'package:staffku/models/response/dashboard/dashboard_response.dart';
+import 'package:staffku/models/response/rate/show_rate_review_response.dart';
 import 'dart:io' as Io;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:sales/api/api.dart';
-import 'package:sales/models/response/store/list_store.dart';
-import 'package:sales/models/response/user/user_schedule.dart';
-import 'package:sales/models/response/user/users_response.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/modules/home/home.dart';
-import 'package:sales/routes/app_pages.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/api/api.dart';
+import 'package:staffku/models/response/store/list_store.dart';
+import 'package:staffku/models/response/user/user_schedule.dart';
+import 'package:staffku/models/response/user/users_response.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/modules/home/home.dart';
+import 'package:staffku/routes/app_pages.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -37,7 +37,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends BaseController {
   HomeController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
   late LatLng myLocation = LatLng(0, 0);
@@ -50,25 +50,41 @@ class HomeController extends BaseController {
   Set<Circle> circles = <Circle>{};
   final RxBool attendanceInfoLoading = false.obs;
   final Rxn<Schedule> attendanceSchedule = Rxn<Schedule>();
+  final RxBool attendanceInOfficeArea = false.obs;
+  final RxString attendanceDistanceToOffice = ''.obs;
 
   late MainTab mainTab;
   late DiscoverTab discoverTab;
   late MeTab meTab;
   DateTime? selectedDate;
-  RxString month =
-      DateFormat("MMMM yyyy", "id_ID").format(DateTime.now()).toString().obs;
+  RxString month = DateFormat(
+    "MMMM yyyy",
+    "id_ID",
+  ).format(DateTime.now()).toString().obs;
   RxString previousMonth = DateFormat("MMMM yyyy", "id_ID")
-      .format(DateTime(
-          DateTime.now().year, DateTime.now().month - 1, DateTime.now().day))
+      .format(
+        DateTime(
+          DateTime.now().year,
+          DateTime.now().month - 1,
+          DateTime.now().day,
+        ),
+      )
       .toString()
       .obs;
   String monthInt = DateFormat("MM", "id_ID").format(DateTime.now()).toString();
   String previousMonthInt = DateFormat("MM", "id_ID")
-      .format(DateTime(
-          DateTime.now().year, DateTime.now().month - 1, DateTime.now().day))
+      .format(
+        DateTime(
+          DateTime.now().year,
+          DateTime.now().month - 1,
+          DateTime.now().day,
+        ),
+      )
       .toString();
-  RxString dateNow =
-      DateFormat("dd MMMM yyyy", "id_ID").format(DateTime.now()).toString().obs;
+  RxString dateNow = DateFormat(
+    "dd MMMM yyyy",
+    "id_ID",
+  ).format(DateTime.now()).toString().obs;
 
   RxBool showRateDialog = false.obs;
   RxBool isConnectedToInternet = true.obs;
@@ -103,8 +119,9 @@ class HomeController extends BaseController {
   RxString groupId = "".obs;
 
   RxInt page = 1.obs;
-  RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   var detailDashboard = DashbooardData().obs;
 
@@ -112,13 +129,15 @@ class HomeController extends BaseController {
   RxInt montlyProgressCount = 0.obs;
 
   void goToKunjunganPages() {
-    Get.toNamed(
-      Routes.RESULT_KUNJUNGAN,
-    );
+    Get.toNamed(Routes.RESULT_KUNJUNGAN);
   }
 
   void goToAbsensiPages() {
     Get.toNamed(Routes.RECAP);
+  }
+
+  void goToKehadiranTab() {
+    switchTab(1);
   }
 
   void goToIzinPages() {
@@ -151,11 +170,13 @@ class HomeController extends BaseController {
   }
 
   @override
-  void onReady() {
+  void onReady() async {
     super.onReady();
     // if (isConnectedToInternetWidget.value == false) {
-    determinePosition();
-    getDataBenefit();
+    try {
+      await determinePosition();
+    } catch (_) {}
+    // getDataBenefit();
     getStore(page.value);
     getDataDashboard();
     getAttendanceInfo();
@@ -208,34 +229,32 @@ class HomeController extends BaseController {
   void callDialog() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => new RatingDialog(
-                initialRating: 1.0,
-                title: CommonWidget.minHeadText(
-                  text: 'Berikan Review Anda',
-                  align: TextAlign.center,
-                ),
-                message:
-                    CommonWidget.subtitleText(text: showRate.value.note ?? ''),
-                // your app's logo?
-                image: Container(
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    height: MediaQuery.of(context).size.height * .1,
-                    // width: MediaQuery.of(context).size.width * .1,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                submitButtonText: 'Submit',
-                commentHint: 'Masukkan komentar',
-                onCancelled: () => print('cancelled'),
-                onSubmitted: (response) {
-                  submitReview(
-                      rate: response.rating.round(), note: response.comment);
-                  print(
-                      'rating: ${response.rating}, comment: ${response.comment}');
-                },
-              ));
+        context: context,
+        builder: (BuildContext context) => new RatingDialog(
+          initialRating: 1.0,
+          title: CommonWidget.minHeadText(
+            text: 'Berikan Review Anda',
+            align: TextAlign.center,
+          ),
+          message: CommonWidget.subtitleText(text: showRate.value.note ?? ''),
+          // your app's logo?
+          image: Container(
+            child: Image.asset(
+              'assets/images/logo.png',
+              height: MediaQuery.of(context).size.height * .1,
+              // width: MediaQuery.of(context).size.width * .1,
+              fit: BoxFit.contain,
+            ),
+          ),
+          submitButtonText: 'Submit',
+          commentHint: 'Masukkan komentar',
+          onCancelled: () => print('cancelled'),
+          onSubmitted: (response) {
+            submitReview(rate: response.rating.round(), note: response.comment);
+            print('rating: ${response.rating}, comment: ${response.comment}');
+          },
+        ),
+      );
     });
   }
 
@@ -289,12 +308,18 @@ class HomeController extends BaseController {
     }
   }
 
-  Future<void> onImageButtonPressed(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
+  Future<void> onImageButtonPressed(
+    ImageSource source, {
+    BuildContext? context,
+    bool isMultiImage = false,
+  }) async {
     imageFileList.clear();
     if (isMultiImage) {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final List<XFile>? pickedFileList = await _picker.pickMultiImage(
             maxWidth: maxWidth,
@@ -310,8 +335,11 @@ class HomeController extends BaseController {
         }
       });
     } else {
-      await _displayPickImageDialog(context!,
-          (double? maxWidth, double? maxHeight, int? quality) async {
+      await _displayPickImageDialog(context!, (
+        double? maxWidth,
+        double? maxHeight,
+        int? quality,
+      ) async {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
@@ -457,17 +485,22 @@ class HomeController extends BaseController {
         forwardAnimationCurve: Curves.easeOutBack,
       );
       print(
-          "Location permissions are permanently denied, we cannot request permissions.");
+        "Location permissions are permanently denied, we cannot request permissions.",
+      );
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     final position = await _geolocatorPlatform.getCurrentPosition();
     myLocation = LatLng(position.latitude, position.longitude);
-    markers.add(Marker(
+    markers.add(
+      Marker(
         markerId: MarkerId('SomeId'),
         position: LatLng(position.latitude, position.longitude),
-        infoWindow: InfoWindow(title: 'My Location')));
+        infoWindow: InfoWindow(title: 'My Location'),
+      ),
+    );
 
     final prefs = Get.find<SharedPreferences>();
     if (prefs.getString('token') != null) {
@@ -479,8 +512,9 @@ class HomeController extends BaseController {
   }
 
   void submitToken(token) async {
-    final res = await apiRepository
-        .updateFcmProfile(UpdateFcmProfileRequest(fcmToken: token));
+    final res = await apiRepository.updateFcmProfile(
+      UpdateFcmProfileRequest(fcmToken: token),
+    );
     if (res == null) {
       print('Token update failed');
       return;
@@ -508,8 +542,9 @@ class HomeController extends BaseController {
   }
 
   void submitReview({int rate = 0, String note = ''}) async {
-    final res =
-        await apiRepository.submitRate(SubmitRate(rate: rate, note: note));
+    final res = await apiRepository.submitRate(
+      SubmitRate(rate: rate, note: note),
+    );
     if (res == null) {
       EasyLoading.showError('Gagal disimpan');
       return;
@@ -529,7 +564,8 @@ class HomeController extends BaseController {
     for (var itemBefore in imageFileList) {
       var mimeType = lookupMimeType(itemBefore.path);
       var bytesBefore = await Io.File(itemBefore.path).readAsBytes();
-      String img64 = 'data:' +
+      String img64 =
+          'data:' +
           mimeType.toString() +
           ';base64,' +
           base64Encode(bytesBefore);
@@ -537,7 +573,8 @@ class HomeController extends BaseController {
     }
 
     final res = await apiRepository.updatePhotoProfile(
-        UpdatePhotoProfileRequest(base64Photo: _afterBase64.first));
+      UpdatePhotoProfileRequest(base64Photo: _afterBase64.first),
+    );
     if (res == null) {
       EasyLoading.showError('Gagal disimpan');
       EasyLoading.dismiss();
@@ -548,7 +585,9 @@ class HomeController extends BaseController {
       EasyLoading.showSuccess('Berhasil disimpan');
       final prefs = Get.find<SharedPreferences>();
       prefs.setString(
-          StorageConstants.profilePhoto, res.data?.profilePhotoPath ?? "");
+        StorageConstants.profilePhoto,
+        res.data?.profilePhotoPath ?? "",
+      );
       profilePhoto.value = res.data?.profilePhotoPath ?? "";
       onRefresh();
       EasyLoading.dismiss();
@@ -591,13 +630,19 @@ class HomeController extends BaseController {
     isConnectedToInternetWidget.value = false;
   }
 
-  void goToLemburPages(String month, String type, String status,
-      {bool needBack = true}) {
+  void goToLemburPages(
+    String month,
+    String type,
+    String status, {
+    bool needBack = true,
+  }) {
     if (needBack) {
       Get.back();
     }
-    Get.toNamed(Routes.PROSPEK,
-        arguments: {'month': month, 'type': type, 'status': status});
+    Get.toNamed(
+      Routes.PROSPEK,
+      arguments: {'month': month, 'type': type, 'status': status},
+    );
   }
 
   void goToProspekV2() {
@@ -614,101 +659,109 @@ class HomeController extends BaseController {
 
   void goToProspekDialogPages() {
     Get.bottomSheet(
-        Container(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Column(
-                  children: [
-                    CommonWidget.rowHeight(),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: CommonWidget.minHeadText(text: 'Detail Prospek'),
+      Container(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                children: [
+                  CommonWidget.rowHeight(),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: CommonWidget.minHeadText(text: 'Detail Prospek'),
+                    ),
+                  ),
+                  CommonWidget.rowHeight(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () =>
+                            goToLemburPages(previousMonthInt, "old", ''),
+                        child: _monthMenu(
+                          monthText: 'Bulan Lalu'.toUpperCase(),
+                          day:
+                              '${benefitDashboard.value?.jumlahBulanLalu ?? '0'}',
+                          month: previousMonth.value,
+                        ),
                       ),
-                    ),
-                    CommonWidget.rowHeight(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () =>
-                              goToLemburPages(previousMonthInt, "old", ''),
-                          child: _monthMenu(
-                              monthText: 'Bulan Lalu'.toUpperCase(),
-                              day:
-                                  '${benefitDashboard.value?.jumlahBulanLalu ?? '0'}',
-                              month: previousMonth.value),
+                      InkWell(
+                        onTap: () => goToLemburPages(monthInt, "now", ''),
+                        child: _monthMenu(
+                          monthText: 'Bulan Ini'.toUpperCase(),
+                          day:
+                              '${benefitDashboard.value?.jumlahBulanIni ?? '0'}',
+                          month: month.value,
                         ),
-                        InkWell(
-                          onTap: () => goToLemburPages(monthInt, "now", ''),
-                          child: _monthMenu(
-                              monthText: 'Bulan Ini'.toUpperCase(),
-                              day:
-                                  '${benefitDashboard.value?.jumlahBulanIni ?? '0'}',
-                              month: month.value),
-                        ),
-                      ],
-                    ),
-                    CommonWidget.rowHeight(),
-                    _statusTaskBar(),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  CommonWidget.rowHeight(),
+                  _statusTaskBar(),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        elevation: 20.0,
-        enableDrag: false,
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
+      ),
+      elevation: 20.0,
+      enableDrag: false,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),
           topRight: Radius.circular(30.0),
-        )));
+        ),
+      ),
+    );
   }
 
   Widget _monthMenu({monthText, day, month}) {
     final sw = SizeConfig().screenWidth;
     return Container(
-        width: sw / 2.5,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(width: 2.0, color: ColorConstants.borderColor),
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: CommonWidget.setOpacity(Colors.black, 0.3),
-          //     blurRadius: 20.0,
-          //     spreadRadius: 4.0,
-          //     offset: Offset(
-          //       -10.0,
-          //       10.0,
-          //     ),
-          //   ),
-          // ],
-        ),
-        child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(children: [
-              CommonWidget.bodyText(text: monthText),
-              CommonWidget.rowHeight(),
-              Container(
-                decoration: new BoxDecoration(
-                  color: Colors.green,
-                  shape: BoxShape.circle,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: CommonWidget.headText(text: day, color: Colors.white),
-                ),
+      width: sw / 2.5,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(width: 2.0, color: ColorConstants.borderColor),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: CommonWidget.setOpacity(Colors.black, 0.3),
+        //     blurRadius: 20.0,
+        //     spreadRadius: 4.0,
+        //     offset: Offset(
+        //       -10.0,
+        //       10.0,
+        //     ),
+        //   ),
+        // ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          children: [
+            CommonWidget.bodyText(text: monthText),
+            CommonWidget.rowHeight(),
+            Container(
+              decoration: new BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle,
               ),
-              CommonWidget.rowHeight(height: 8.0),
-              CommonWidget.bodyText(text: month),
-              CommonWidget.rowHeight(),
-            ])));
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: CommonWidget.headText(text: day, color: Colors.white),
+              ),
+            ),
+            CommonWidget.rowHeight(height: 8.0),
+            CommonWidget.bodyText(text: month),
+            CommonWidget.rowHeight(),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _statusTaskBar() {
@@ -762,11 +815,13 @@ class HomeController extends BaseController {
                 title: Row(
                   children: [
                     CommonWidget.headText(
-                        text: "${benefitDashboard.value?.jumlahBoking ?? 0} ",
-                        color: ColorConstants.mainColor),
+                      text: "${benefitDashboard.value?.jumlahBoking ?? 0} ",
+                      color: ColorConstants.mainColor,
+                    ),
                     CommonWidget.subtitleText(
-                        text: "Dari bulan kemarin",
-                        color: ColorConstants.black),
+                      text: "Dari bulan kemarin",
+                      color: ColorConstants.black,
+                    ),
                   ],
                 ),
               ),
@@ -793,52 +848,55 @@ class HomeController extends BaseController {
     if (isConnectedToInternet.value) {
       if (box.read('barang') != null) {
         Get.defaultDialog(
-            title: "SIMPAN PRODUCT",
-            content: CommonWidget.subtitleText(
-                text: "Simpan data product yang belum/gagal tersimpan?",
-                textAlign: TextAlign.center),
-            textConfirm: 'OK',
-            textCancel: 'CANCLE',
-            onConfirm: () {
-              Get.back();
-              submitBarang();
-              // Get.toNamed(Routes.STORE);
-            },
-            onCancel: () {
-              Get.back();
-            });
+          title: "SIMPAN PRODUCT",
+          content: CommonWidget.subtitleText(
+            text: "Simpan data product yang belum/gagal tersimpan?",
+            textAlign: TextAlign.center,
+          ),
+          textConfirm: 'OK',
+          textCancel: 'CANCLE',
+          onConfirm: () {
+            Get.back();
+            submitBarang();
+            // Get.toNamed(Routes.STORE);
+          },
+          onCancel: () {
+            Get.back();
+          },
+        );
       } else {
         Get.defaultDialog(
-            title: "PRODUK KOSONG",
-            content: CommonWidget.subtitleText(
-                text:
-                    "Semua product sudah tersimpan, tidak ada data yang belum/gagal dikirim",
-                textAlign: TextAlign.center),
-            textConfirm: 'OK',
-            onConfirm: () {
-              Get.back();
-            });
-      }
-    } else {
-      Get.defaultDialog(
-          title: "INTERNET TERPUTUS",
+          title: "PRODUK KOSONG",
           content: CommonWidget.subtitleText(
-              text:
-                  "Koneksi anda masih belum terhubung, silahkan periksa kembali",
-              textAlign: TextAlign.center),
+            text:
+                "Semua product sudah tersimpan, tidak ada data yang belum/gagal dikirim",
+            textAlign: TextAlign.center,
+          ),
           textConfirm: 'OK',
           onConfirm: () {
             Get.back();
-          });
+          },
+        );
+      }
+    } else {
+      Get.defaultDialog(
+        title: "INTERNET TERPUTUS",
+        content: CommonWidget.subtitleText(
+          text: "Koneksi anda masih belum terhubung, silahkan periksa kembali",
+          textAlign: TextAlign.center,
+        ),
+        textConfirm: 'OK',
+        onConfirm: () {
+          Get.back();
+        },
+      );
     }
   }
 
   Future<void> submitBarang() async {
     print(box.read('barang'));
     QtyUpdateRequest qty = box.read('barang');
-    final res = await apiRepository.decreaseQtyItems(
-      qty,
-    );
+    final res = await apiRepository.decreaseQtyItems(qty);
 
     if (res == null) {
       EasyLoading.showError('Gagal disimpan');
@@ -878,27 +936,88 @@ class HomeController extends BaseController {
   Future<void> getAttendanceInfo() async {
     attendanceInfoLoading.value = true;
     try {
-      final res = await apiRepository.getUserSchedule();
-      attendanceSchedule.value = res?.data?.schedule;
+      final resSchedule = await apiRepository.getUserSchedule();
+      final scheduleFromApi = resSchedule?.data?.schedule;
+
+      final prefs = Get.find<SharedPreferences>();
+      final hasLiveLocation =
+          myLocation.latitude != 0.0 || myLocation.longitude != 0.0;
+      final latitude = hasLiveLocation
+          ? myLocation.latitude
+          : (prefs.getDouble(StorageConstants.initLatitude) ?? 0.0);
+      final longitude = hasLiveLocation
+          ? myLocation.longitude
+          : (prefs.getDouble(StorageConstants.initLongitude) ?? 0.0);
+
+      final resBeforeAbsen = await apiRepository.validateAttendance(
+        AttendanceValidateRequest(
+          latitude: latitude.toString(),
+          longitude: longitude.toString(),
+          id: userId.value.toString(),
+          token: token.value.toString(),
+        ),
+      );
+
+      final validateData = (resBeforeAbsen?.data?.isNotEmpty ?? false)
+          ? resBeforeAbsen!.data!.first
+          : null;
+
+      final schedule =
+          scheduleFromApi ?? attendanceSchedule.value ?? Schedule();
+
+      schedule.dataUserAttandance ??= DataUserAttandance();
+      schedule.dateCheckIn ??= DateTime.now().toIso8601String();
+
+      final existingDateAttendence =
+          schedule.dataUserAttandance?.dateAttendence;
+      if (existingDateAttendence == null || existingDateAttendence.isEmpty) {
+        schedule.dataUserAttandance?.dateAttendence = schedule.dateCheckIn;
+      }
+
+      if (validateData != null) {
+        attendanceInOfficeArea.value = (validateData.flag ?? '').trim() == '1';
+        attendanceDistanceToOffice.value =
+            (validateData.jarak ?? '').toString();
+
+        final checkIn = (validateData.absenIn ?? '').trim();
+        final checkOut = (validateData.absenOut ?? '').trim();
+        if (checkIn.isNotEmpty) {
+          schedule.dataUserAttandance?.checkIn = checkIn;
+        }
+        if (checkOut.isNotEmpty) {
+          schedule.dataUserAttandance?.checkOut = checkOut;
+        }
+      } else {
+        attendanceInOfficeArea.value = false;
+        attendanceDistanceToOffice.value = '';
+      }
+
+      attendanceSchedule.value = schedule;
     } catch (_) {
       attendanceSchedule.value = null;
+      attendanceInOfficeArea.value = false;
+      attendanceDistanceToOffice.value = '';
     } finally {
       attendanceInfoLoading.value = false;
     }
   }
 
-  void getDataBenefit() async {
-    final res = await apiRepository
-        .listBenefitDashboard(IdRequest(id: userId.value, token: token.value));
-    final data = res?.data;
-    benefitDashboard.value =
-        (data != null && data.isNotEmpty) ? data.first : null;
-  }
+  // void getDataBenefit() async {
+  //   final res = await apiRepository.listBenefitDashboard(
+  //     IdRequest(id: userId.value, token: token.value),
+  //   );
+  //   final data = res?.data;
+  //   benefitDashboard.value = (data != null && data.isNotEmpty)
+  //       ? data.first
+  //       : null;
+  // }
 
   void getStore(page) async {
     try {
       final res = await apiRepository.listStore(
-          page: page, data: UserIdRequest(id: userId.value));
+        page: page,
+        data: UserIdRequest(id: userId.value),
+      );
 
       final data = res?.data;
       if (data != null && data.isNotEmpty) {
@@ -973,10 +1092,12 @@ class HomeController extends BaseController {
   }
 
   int? get attendanceLateMinutes {
-    final checkIn =
-        _parseTimeOfDay(attendanceSchedule.value?.dataUserAttandance?.checkIn);
-    final start =
-        _parseTimeOfDay(attendanceSchedule.value?.scheduleShift?.startTime);
+    final checkIn = _parseTimeOfDay(
+      attendanceSchedule.value?.dataUserAttandance?.checkIn,
+    );
+    final start = _parseTimeOfDay(
+      attendanceSchedule.value?.scheduleShift?.startTime,
+    );
     if (checkIn == null || start == null) return null;
     final checkInMinutes = checkIn.hour * 60 + checkIn.minute;
     final startMinutes = start.hour * 60 + start.minute;
@@ -1026,17 +1147,21 @@ class HomeController extends BaseController {
     return '$h:$m';
   }
 
-  void goToDetailPages(
-      {String id = "",
-      String type = '',
-      String storeName = '',
-      String statusKunjungan = ''}) {
-    Get.toNamed(Routes.DETAIL_STORE, arguments: {
-      'id': id,
-      'type': type,
-      'storeName': storeName,
-      'status_kunjungan': statusKunjungan
-    });
+  void goToDetailPages({
+    String id = "",
+    String type = '',
+    String storeName = '',
+    String statusKunjungan = '',
+  }) {
+    Get.toNamed(
+      Routes.DETAIL_STORE,
+      arguments: {
+        'id': id,
+        'type': type,
+        'storeName': storeName,
+        'status_kunjungan': statusKunjungan,
+      },
+    );
   }
 
   void goToAddPages() {
@@ -1063,20 +1188,40 @@ class HomeController extends BaseController {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _moodIcon(context, 'Sangat Senang',
-                      Icons.sentiment_very_satisfied, Colors.green, onSelected),
-                  _moodIcon(context, 'Cukup Baik', Icons.sentiment_satisfied,
-                      Colors.lightGreen, onSelected),
+                  _moodIcon(
+                    context,
+                    'Sangat Senang',
+                    Icons.sentiment_very_satisfied,
+                    Colors.green,
+                    onSelected,
+                  ),
+                  _moodIcon(
+                    context,
+                    'Cukup Baik',
+                    Icons.sentiment_satisfied,
+                    Colors.lightGreen,
+                    onSelected,
+                  ),
                 ],
               ),
               SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _moodIcon(context, 'Biasa Saja', Icons.sentiment_neutral,
-                      Colors.amber, onSelected),
-                  _moodIcon(context, 'Sedikit Lelah',
-                      Icons.sentiment_dissatisfied, Colors.orange, onSelected),
+                  _moodIcon(
+                    context,
+                    'Biasa Saja',
+                    Icons.sentiment_neutral,
+                    Colors.amber,
+                    onSelected,
+                  ),
+                  _moodIcon(
+                    context,
+                    'Sedikit Lelah',
+                    Icons.sentiment_dissatisfied,
+                    Colors.orange,
+                    onSelected,
+                  ),
                 ],
               ),
               SizedBox(height: 12),
@@ -1084,11 +1229,12 @@ class HomeController extends BaseController {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _moodIcon(
-                      context,
-                      'Kurang bersemangat',
-                      Icons.sentiment_very_dissatisfied,
-                      Colors.red,
-                      onSelected),
+                    context,
+                    'Kurang bersemangat',
+                    Icons.sentiment_very_dissatisfied,
+                    Colors.red,
+                    onSelected,
+                  ),
                 ],
               ),
             ],
@@ -1098,8 +1244,13 @@ class HomeController extends BaseController {
     );
   }
 
-  Widget _moodIcon(BuildContext context, String label, IconData icon,
-      Color color, Function(String) onSelected) {
+  Widget _moodIcon(
+    BuildContext context,
+    String label,
+    IconData icon,
+    Color color,
+    Function(String) onSelected,
+  ) {
     return Container(
       width: SizeConfig().screenWidth * .30,
       decoration: BoxDecoration(
@@ -1120,9 +1271,10 @@ class HomeController extends BaseController {
               },
             ),
             CommonWidget.minSubtitleText(
-                text: label,
-                color: ColorConstants.black,
-                textAlign: TextAlign.center)
+              text: label,
+              color: ColorConstants.black,
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -1148,10 +1300,7 @@ class HomeController extends BaseController {
 
   void submitDialogMood(String value) async {
     final res = await apiRepository.sumbmitDialogMood(
-      SubmitDialogMoodRequest(
-        idUser: userId.value,
-        value: value,
-      ),
+      SubmitDialogMoodRequest(idUser: userId.value, value: value),
     );
     if (res?.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
@@ -1166,13 +1315,15 @@ class HomeController extends BaseController {
 
   void getDataDashboard() async {
     final monthly = await apiRepository.getDashboardKunjungan(
-        DashboardRequest(id: userId.value, type: 'bulan'));
+      DashboardRequest(id: userId.value, type: 'bulan'),
+    );
     if (monthly?.data != null && monthly!.data!.isNotEmpty) {
       montlyProgressCount.value = monthly.data!.first.count ?? 0;
     }
 
     final daily = await apiRepository.getDashboardKunjungan(
-        DashboardRequest(id: userId.value, type: 'hari'));
+      DashboardRequest(id: userId.value, type: 'hari'),
+    );
     if (daily?.data != null && daily!.data!.isNotEmpty) {
       dailyProgressCount.value = daily.data!.first.count ?? 0;
     }

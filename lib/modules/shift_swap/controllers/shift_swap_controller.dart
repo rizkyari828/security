@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/shift_swap/submit_shift_swap_request.dart';
-import 'package:sales/modules/home/base_controller.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/shift_swap/submit_shift_swap_request.dart';
+import 'package:staffku/modules/home/base_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ShiftSwapController extends BaseController {
   ShiftSwapController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   final TextEditingController tglTukarController = TextEditingController();
   final TextEditingController userIdPenggantiController =
@@ -18,11 +18,7 @@ class ShiftSwapController extends BaseController {
   final RxString shiftTukar = ''.obs;
   DateTime selectedTglTukar = DateTime.now();
 
-  final List<String> shiftOptions = const [
-    'Pagi',
-    'Siang',
-    'Malam',
-  ];
+  final List<String> shiftOptions = const ['Pagi', 'Siang', 'Malam'];
 
   bool get canSubmit {
     return userId.value.trim().isNotEmpty &&
@@ -41,7 +37,10 @@ class ShiftSwapController extends BaseController {
     );
     if (selected == null) return;
     selectedTglTukar = selected;
-    tglTukarController.text = DateFormat('yyyy-MM-dd', 'id_ID').format(selected);
+    tglTukarController.text = DateFormat(
+      'yyyy-MM-dd',
+      'id_ID',
+    ).format(selected);
   }
 
   SubmitShiftSwapRequest buildRequest() {
@@ -90,4 +89,3 @@ class ShiftSwapController extends BaseController {
     super.onClose();
   }
 }
-

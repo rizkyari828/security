@@ -1,51 +1,26 @@
 {
   "project_info": {
-    "project_number": "301855838376",
-    "project_id": "com-tam-revi",
-    "storage_bucket": "com-tam-revi.appspot.com"
+    "project_number": "810027223836",
+    "project_id": "staffku",
+    "storage_bucket": "staffku.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:301855838376:android:da8fd40ee0c58dcea6329d",
+        "mobilesdk_app_id": "1:810027223836:android:0614eec55c53b83cd748d9",
         "android_client_info": {
-          "package_name": "com.tam.revi"
+          "package_name": "com.tama.staffku"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "301855838376-29aakpakh4uuub3j5npl1lb3hler2kr3.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.tam.revi",
-            "certificate_hash": "a59750396730747fe7cd2068cc22f2e3f4dcaecf"
-          }
-        },
-        {
-          "client_id": "301855838376-vbgjnep17l7er6jil7i7vshi47q2bc13.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCfyGHxXijDMLys7gzVYJ2DA5J1T80sw-k"
+          "current_key": "AIzaSyDD897K2vZ8tmyQfD3RHUsApIQzhWKHoew"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "301855838376-vbgjnep17l7er6jil7i7vshi47q2bc13.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "301855838376-nrkk6jkv0ite3qqionuncfp3tjqdg9c6.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com-tam-revi"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

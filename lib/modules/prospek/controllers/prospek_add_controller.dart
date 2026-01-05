@@ -1,6 +1,6 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/overtime/submit_request_overtime.dart';
-import 'package:sales/models/response/prospek/master_data_response.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/overtime/submit_request_overtime.dart';
+import 'package:staffku/models/response/prospek/master_data_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -51,13 +51,14 @@ class ProspekAddController extends GetxController {
   void submitProspek() async {
     final res = await apiRepository.submitOvertime(
       SubmitOvertimeRequest(
-          userId: int.parse(userId.value),
-          name: nickname.text,
-          sourceId: idSource.value,
-          token: token.value,
-          latitude: latitude.value.toString(),
-          longitude: longitude.value.toString(),
-          note: noteController.text),
+        userId: int.parse(userId.value),
+        name: nickname.text,
+        sourceId: idSource.value,
+        token: token.value,
+        latitude: latitude.value.toString(),
+        longitude: longitude.value.toString(),
+        note: noteController.text,
+      ),
     );
 
     if (res?.error == false) {

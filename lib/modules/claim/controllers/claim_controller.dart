@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/claim/submit_claim_request.dart';
-import 'package:sales/modules/home/base_controller.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/claim/submit_claim_request.dart';
+import 'package:staffku/modules/home/base_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ClaimController extends BaseController {
   ClaimController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   final TextEditingController tanggalClaimController = TextEditingController();
   final TextEditingController nominalController = TextEditingController();
@@ -34,8 +34,10 @@ class ClaimController extends BaseController {
     );
     if (selected == null) return;
     selectedTanggalClaim = selected;
-    tanggalClaimController.text =
-        DateFormat('yyyy-MM-dd', 'id_ID').format(selected);
+    tanggalClaimController.text = DateFormat(
+      'yyyy-MM-dd',
+      'id_ID',
+    ).format(selected);
   }
 
   SubmitClaimRequest buildRequest() {
@@ -85,4 +87,3 @@ class ClaimController extends BaseController {
     super.onClose();
   }
 }
-

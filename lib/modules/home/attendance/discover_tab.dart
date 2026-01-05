@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:sales/modules/home/attendance/attendance_controller.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/services/face_recognition/face_recognition_wiget.dart';
-import 'package:sales/shared/widgets/button.dart';
+import 'package:staffku/modules/home/attendance/attendance_controller.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/services/face_recognition/face_recognition_wiget.dart';
+import 'package:staffku/shared/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -21,8 +21,9 @@ class DiscoverTab extends GetView<AttendanceController> {
     const initialSheet = 0.28;
     const maxSheet = 0.58;
 
-    final mapPadding =
-        EdgeInsets.only(bottom: (sh * maxSheet) + bottomSafe + 24);
+    final mapPadding = EdgeInsets.only(
+      bottom: (sh * maxSheet) + bottomSafe + 24,
+    );
 
     return Scaffold(
       body: Stack(
@@ -31,8 +32,10 @@ class DiscoverTab extends GetView<AttendanceController> {
             child: Obx(
               () => GoogleMap(
                 padding: mapPadding,
-                initialCameraPosition:
-                    CameraPosition(target: controller.myLocation, zoom: 18.0),
+                initialCameraPosition: CameraPosition(
+                  target: controller.myLocation,
+                  zoom: 18.0,
+                ),
                 mapType: MapType.terrain,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
@@ -52,8 +55,10 @@ class DiscoverTab extends GetView<AttendanceController> {
                 child: Obx(
                   () => _AttendancePanel(
                     scrollController: scrollController,
-                    dateText: DateFormat("EEEE, d MMMM yyyy", "id_ID")
-                        .format(DateTime.now()),
+                    dateText: DateFormat(
+                      "EEEE, d MMMM yyyy",
+                      "id_ID",
+                    ).format(DateTime.now()),
                     isInOfficeArea: controller.isClockIn.value,
                     distanceText: controller.distanceToOffice.value,
                     timeIn: controller.timeIn.value,
@@ -341,11 +346,7 @@ class _DetailCard extends StatelessWidget {
                 : 'Radius absensi: 150 m',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 12,
-              color: muted,
-            ),
+            style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: muted),
           ),
         ],
       ),
@@ -354,11 +355,7 @@ class _DetailCard extends StatelessWidget {
 }
 
 class _Metric extends StatelessWidget {
-  const _Metric({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
+  const _Metric({required this.label, required this.value, required this.icon});
 
   final String label;
   final String value;
@@ -566,8 +563,10 @@ class _AttendanceActionTile extends StatelessWidget {
                           const Duration(seconds: 1),
                           builder: (context) {
                             return Text(
-                              DateFormat("HH:mm:ss", "id_ID")
-                                  .format(DateTime.now()),
+                              DateFormat(
+                                "HH:mm:ss",
+                                "id_ID",
+                              ).format(DateTime.now()),
                               key: const ValueKey('live'),
                               style: TextStyle(
                                 fontFamily: 'Poppins',

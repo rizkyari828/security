@@ -1,16 +1,16 @@
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/detail_request_leave.dart';
-import 'package:sales/models/request/izin/update_approval_request.dart';
-import 'package:sales/models/response/izin/show_izin.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/detail_request_leave.dart';
+import 'package:staffku/models/request/izin/update_approval_request.dart';
+import 'package:staffku/models/response/izin/show_izin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales/modules/home/base_controller.dart';
-import 'package:sales/shared/utils/common_widget.dart';
+import 'package:staffku/modules/home/base_controller.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LeaveDetailController extends BaseController {
   LeaveDetailController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   final argm = Get.arguments;
   var detail = DataIzin().obs;
@@ -58,8 +58,9 @@ class LeaveDetailController extends BaseController {
   }
 
   void getDetailIzin() async {
-    final res =
-        await apiRepository.showIzin(ShowLeaveRequest(id: argm.toString()));
+    final res = await apiRepository.showIzin(
+      ShowLeaveRequest(id: argm.toString()),
+    );
     final data = res?.data;
     if (data == null || data.isEmpty) {
       CommonWidget.errorSnackBar('Gagal memuat detail izin');
@@ -68,15 +69,14 @@ class LeaveDetailController extends BaseController {
     detail.value = data.first;
   }
 
-  void approval({
-    action = "reject",
-  }) async {
+  void approval({action = "reject"}) async {
     await apiRepository.updateApprovalIzin(
-        detail.value.id.toString(),
-        UpdateApprovalIzinRequest(
-          action: action,
-          noteApproval: noteApprovalController.text,
-        ));
+      detail.value.id.toString(),
+      UpdateApprovalIzinRequest(
+        action: action,
+        noteApproval: noteApprovalController.text,
+      ),
+    );
     // if (res?.error == false) {
     //   EasyLoading.showSuccess('Berhasil disimpan');
     //   getDetailIzin();

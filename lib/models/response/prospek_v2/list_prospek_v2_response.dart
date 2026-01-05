@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:sales/models/response/prospek_v2/detail_prospek_v2_response.dart';
+import 'package:staffku/models/response/prospek_v2/detail_prospek_v2_response.dart';
 
 ProspekV2Response prospekV2ResponseFromJson(String str) =>
     ProspekV2Response.fromJson(json.decode(str));
@@ -13,11 +13,7 @@ String prospekV2ResponseToJson(ProspekV2Response data) =>
     json.encode(data.toJson());
 
 class ProspekV2Response {
-  ProspekV2Response({
-    this.status,
-    this.message,
-    this.data,
-  });
+  ProspekV2Response({this.status, this.message, this.data});
 
   String? status;
   String? message;
@@ -30,14 +26,15 @@ class ProspekV2Response {
         data: json["Data"] == null
             ? null
             : List<ProspekDetailV2>.from(
-                json["Data"].map((x) => ProspekDetailV2.fromJson(x))),
+                json["Data"].map((x) => ProspekDetailV2.fromJson(x)),
+              ),
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status == null ? null : status,
-        "message": message == null ? null : message,
-        "Data": data == null
-            ? null
-            : List<dynamic>.from(data!.map((x) => x.toJson())),
-      };
+    "status": status == null ? null : status,
+    "message": message == null ? null : message,
+    "Data": data == null
+        ? null
+        : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
 }

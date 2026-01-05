@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sales/modules/auth/auth.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/modules/auth/auth.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:get/get.dart';
 
 class RegisterScreen extends StatelessWidget {

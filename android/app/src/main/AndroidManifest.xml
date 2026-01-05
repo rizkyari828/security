@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tam.revi">
+    package="com.tama.staffku">
    <application
         android:name="${applicationName}"
-        android:label="SALES"
+        android:label="Staffku"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true">
         <meta-data android:name="com.google.android.geo.API_KEY"

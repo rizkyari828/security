@@ -1,5 +1,5 @@
-import 'package:sales/routes/routes.dart';
-import 'package:sales/shared/shared.dart';
+import 'package:staffku/routes/routes.dart';
+import 'package:staffku/shared/shared.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

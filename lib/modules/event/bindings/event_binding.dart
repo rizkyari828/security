@@ -1,4 +1,4 @@
-import 'package:sales/modules/event/controllers/event_detail_controller.dart';
+import 'package:staffku/modules/event/controllers/event_detail_controller.dart';
 import 'package:get/get.dart';
 
 import '../controllers/event_controller.dart';

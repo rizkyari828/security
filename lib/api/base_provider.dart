@@ -8,7 +8,7 @@ class BaseProvider extends GetConnect {
     httpClient.baseUrl = ApiConstants.baseUrl;
     httpClient.timeout = Duration(seconds: 120);
     httpClient.sendUserAgent = true;
-    httpClient.userAgent = 'SALES/1.0 (Flutter; GetConnect)';
+    httpClient.userAgent = 'Staffku/1.0 (Flutter; GetConnect)';
     httpClient.addAuthenticator(authInterceptor);
     httpClient.addRequestModifier<dynamic>((request) async {
       final result = await requestInterceptor(request);

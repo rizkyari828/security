@@ -1,17 +1,17 @@
 import 'package:intl/intl.dart';
-import 'package:sales/api/api_repository.dart';
-import 'package:sales/models/request/prospek_v2/detail_request_cuti.dart';
-import 'package:sales/models/request/prospek_v2/submit_request_prospek_v2.dart';
-import 'package:sales/models/response/master_data_2_response.dart';
+import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/prospek_v2/detail_request_cuti.dart';
+import 'package:staffku/models/request/prospek_v2/submit_request_prospek_v2.dart';
+import 'package:staffku/models/response/master_data_2_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:sales/models/response/prospek_v2/detail_prospek_v2_response.dart';
-import 'package:sales/modules/home/base_controller.dart';
+import 'package:staffku/models/response/prospek_v2/detail_prospek_v2_response.dart';
+import 'package:staffku/modules/home/base_controller.dart';
 
 class ProspekV2AddController extends BaseController {
   ProspekV2AddController({required ApiRepository apiRepository})
-      : super(apiRepository: apiRepository);
+    : super(apiRepository: apiRepository);
 
   String date = "";
   DateTime selectedDate = DateTime.now();
@@ -89,8 +89,9 @@ class ProspekV2AddController extends BaseController {
   void getDetailProspek() async {
     var argmLead = argm['data_lead'];
     print(argmLead.id);
-    final res = await apiRepository
-        .showProspekV2(ShowProspectV2Request(id: argmLead.id.toString()));
+    final res = await apiRepository.showProspekV2(
+      ShowProspectV2Request(id: argmLead.id.toString()),
+    );
     detail.value = res?.data?.first ?? ProspekDetailV2();
     // detail.value = argm['data_lead'];
     if (detail.value.sourceOrderValue == 'tidak order') {
@@ -154,12 +155,16 @@ class ProspekV2AddController extends BaseController {
       lastDate: DateTime(2028),
     );
     if (selected != null && selected != selectedDate) selectedDate = selected;
-    controller.text =
-        DateFormat("yyyy-MM-dd", "id_ID").format(selectedDate).toString();
+    controller.text = DateFormat(
+      "yyyy-MM-dd",
+      "id_ID",
+    ).format(selectedDate).toString();
   }
 
   Future<void> selectTime(
-      BuildContext context, TextEditingController controller) async {
+    BuildContext context,
+    TextEditingController controller,
+  ) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -212,24 +217,26 @@ class ProspekV2AddController extends BaseController {
     }
 
     final req = SubmitProspekV2Request(
-        id: detail.value.id == null ? '0' : detail.value.id.toString(),
-        userId: userId.value,
-        prospectName: prospectNameController.text,
-        idProductName: minatProductId.value.toString(),
-        otherProduct: otherProduct.text,
-        totalTransaction: totalTransaction.text,
-        idStatusProspect: idStatusProspect.value.toString(),
-        // dateCalled: dateCalled.text,
-        idMediaCommunication: idMediaCommunication.value.toString(),
-        dateFu: dateFu.text,
-        noteCommunication: noteCommunication.text,
-        statusOrder: idSource.value.toString(),
-        reasonNotOrder: reasonNotOrder.text,
-        idLead:
-            detail.value.idLead == null ? '0' : detail.value.idLead.toString(),
-        gender: idGender.value,
-        age: ageController.text,
-        statusPekerjaan: statusPekerjaanId.toString());
+      id: detail.value.id == null ? '0' : detail.value.id.toString(),
+      userId: userId.value,
+      prospectName: prospectNameController.text,
+      idProductName: minatProductId.value.toString(),
+      otherProduct: otherProduct.text,
+      totalTransaction: totalTransaction.text,
+      idStatusProspect: idStatusProspect.value.toString(),
+      // dateCalled: dateCalled.text,
+      idMediaCommunication: idMediaCommunication.value.toString(),
+      dateFu: dateFu.text,
+      noteCommunication: noteCommunication.text,
+      statusOrder: idSource.value.toString(),
+      reasonNotOrder: reasonNotOrder.text,
+      idLead: detail.value.idLead == null
+          ? '0'
+          : detail.value.idLead.toString(),
+      gender: idGender.value,
+      age: ageController.text,
+      statusPekerjaan: statusPekerjaanId.toString(),
+    );
 
     final res = await apiRepository.submitProspectV2(req);
 
@@ -243,8 +250,9 @@ class ProspekV2AddController extends BaseController {
 
   void getMasterData() async {
     masterData.clear();
-    final resListLeadSource =
-        await apiRepository.getMasterData2('Status Order');
+    final resListLeadSource = await apiRepository.getMasterData2(
+      'Status Order',
+    );
     final statusOrderData = resListLeadSource?.data;
     if (statusOrderData != null) {
       masterData.value = statusOrderData;
@@ -256,8 +264,9 @@ class ProspekV2AddController extends BaseController {
     }
 
     masterData.clear();
-    final resListLeadCategory =
-        await apiRepository.getMasterData2('Status Prospek');
+    final resListLeadCategory = await apiRepository.getMasterData2(
+      'Status Prospek',
+    );
     final statusProspekData = resListLeadCategory?.data;
     if (statusProspekData != null) {
       masterData.value = statusProspekData;
@@ -269,8 +278,9 @@ class ProspekV2AddController extends BaseController {
     }
 
     masterData.clear();
-    final resListStatusLead =
-        await apiRepository.getMasterData2('Media Prospek');
+    final resListStatusLead = await apiRepository.getMasterData2(
+      'Media Prospek',
+    );
     final mediaProspekData = resListStatusLead?.data;
     if (mediaProspekData != null) {
       masterData.value = mediaProspekData;
@@ -282,8 +292,10 @@ class ProspekV2AddController extends BaseController {
     }
 
     masterData.clear();
-    final resListMinatProduct =
-        await apiRepository.getMasterData2('Produk', userId: userId.value);
+    final resListMinatProduct = await apiRepository.getMasterData2(
+      'Produk',
+      userId: userId.value,
+    );
     final produkData = resListMinatProduct?.data;
     if (produkData != null) {
       masterData.value = produkData;
@@ -295,8 +307,9 @@ class ProspekV2AddController extends BaseController {
     }
 
     masterData.clear();
-    final resListStatusPekerjaan =
-        await apiRepository.getMasterData2('Status Kerja Leads');
+    final resListStatusPekerjaan = await apiRepository.getMasterData2(
+      'Status Kerja Leads',
+    );
     final statusPekerjaanData = resListStatusPekerjaan?.data;
     if (statusPekerjaanData != null) {
       masterData.value = statusPekerjaanData;

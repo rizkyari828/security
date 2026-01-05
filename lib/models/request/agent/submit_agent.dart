@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:sales/models/request/attendance/attendance_wrapper.dart';
+import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
 
 SubmitAgentRequest SubmitAgentRequestFromJson(String str) =>
     SubmitAgentRequest.fromJson(json.decode(str));
@@ -62,17 +62,17 @@ class SubmitAgentRequest {
       );
 
   Map<String, dynamic> toJson() => {
-        'user_id': idUser,
-        'full_name': fullName,
-        'agent_name': agentName,
-        'email': email,
-        'alamat': alamat,
-        'placement': placement,
-        'join_date': joinDate,
-        'type_agent_id': typeAgentId,
-        'register_by': registerBy,
-        'status_active_id': statusActiveId,
-        'signature': signature?.map((e) => e.toJson()).toList(),
-        'photos': photos?.map((e) => e.toJson()).toList(),
-      };
+    'user_id': idUser,
+    'full_name': fullName,
+    'agent_name': agentName,
+    'email': email,
+    'alamat': alamat,
+    'placement': placement,
+    'join_date': joinDate,
+    'type_agent_id': typeAgentId,
+    'register_by': registerBy,
+    'status_active_id': statusActiveId,
+    'signature': signature?.map((e) => e.toJson()).toList(),
+    'photos': photos?.map((e) => e.toJson()).toList(),
+  };
 }

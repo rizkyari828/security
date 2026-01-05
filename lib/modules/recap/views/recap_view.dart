@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:sales/models/response/recap_history.dart';
-import 'package:sales/shared/constants/colors.dart';
-import 'package:sales/shared/utils/common_widget.dart';
+import 'package:staffku/models/response/recap_history.dart';
+import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/utils/common_widget.dart';
 
 import '../controllers/recap_controller.dart';
 
@@ -310,10 +310,12 @@ class _RecapRowCard extends StatelessWidget {
     final date = item.tanggal ?? DateTime.now();
     final day = DateFormat('EEEE', 'id_ID').format(date);
     final dateText = DateFormat('dd MMM yyyy', 'id_ID').format(date);
-    final inText =
-        (item.absenIn ?? '').trim().isEmpty ? '--:--' : item.absenIn!.trim();
-    final outText =
-        (item.absenOut ?? '').trim().isEmpty ? '--:--' : item.absenOut!.trim();
+    final inText = (item.absenIn ?? '').trim().isEmpty
+        ? '--:--'
+        : item.absenIn!.trim();
+    final outText = (item.absenOut ?? '').trim().isEmpty
+        ? '--:--'
+        : item.absenOut!.trim();
     final isComplete = inText != '--:--' && outText != '--:--';
 
     return Container(
