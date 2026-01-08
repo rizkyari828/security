@@ -239,7 +239,7 @@ packages:
       path: "."
       ref: HEAD
       resolved-ref: da727192f4dbf131712fd490a4a2d71602ecb4b0
-      url: "https://github.com/rizkyari828/face_camera"
+      url: "git@github.com:rizkyari828/face_camera.git"
     source: git
     version: "0.1.4"
   fake_async:

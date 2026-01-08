@@ -30,7 +30,7 @@ late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   applySalesHttpOverrides();
-  // await FaceCamera.initialize();
+  await FaceCamera.initialize();
   await DenpendencyInjection.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_messageHandler);

@@ -47,7 +47,7 @@ dependencies:
       url: https://github.com/rizkyari828/pull_to_refresh
   face_camera:
     git:
-      url: https://github.com/rizkyari828/face_camera
+      url: git@github.com:rizkyari828/face_camera.git
   timer_builder: ^2.0.0
   image_picker: ^1.1.2
   dropdown_search: ^6.0.2

@@ -174,24 +174,24 @@ class CustomExpandedCardView extends StatelessWidget {
 
   bool _hasText(String value) => value.trim().isNotEmpty;
 
-  IconData? _iconForTitle(String text) {
-    final hasYear = RegExp(r'\\d{4}').hasMatch(text);
-    if (hasYear && text.contains(',')) return Icons.event_rounded;
-    return null;
-  }
-
   IconData? _iconForName(String text) {
-    if (text.contains('@')) return Icons.mail_outline_rounded;
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return null;
+    if (trimmed.contains('@')) return Icons.mail_outline_rounded;
+
+    final looksLikeDate =
+        RegExp(r'\\d{4}').hasMatch(trimmed) && trimmed.contains(',');
+    if (looksLikeDate) return Icons.calendar_today_outlined;
     return null;
   }
 
   IconData? _iconForLabel(String label) {
     final lower = label.trim().toLowerCase();
     if (lower.contains('mulai') || lower.contains('awal')) {
-      return Icons.play_circle_outline_rounded;
+      return Icons.calendar_today_outlined;
     }
     if (lower.contains('selesai') || lower.contains('akhir')) {
-      return Icons.flag_outlined;
+      return Icons.event_outlined;
     }
     if (lower.contains('tanggal') || lower.contains('date')) {
       return Icons.calendar_month_outlined;
@@ -236,6 +236,19 @@ class CustomExpandedCardView extends StatelessWidget {
       height: 1.2,
     );
 
+    Widget leadingIcon(IconData icon, {Color? color}) {
+      final fg = color ?? Colors.black.withValues(alpha: 0.60);
+      return Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, size: 16, color: fg),
+      );
+    }
+
     Widget infoLine({required String label, required String value}) {
       final trimmedLabel = label.trim();
       final icon = _iconForLabel(trimmedLabel);
@@ -243,11 +256,11 @@ class CustomExpandedCardView extends StatelessWidget {
 
       if (trimmedLabel.isEmpty) {
         return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 16, color: iconColor),
-              const SizedBox(width: 8),
+              leadingIcon(icon, color: iconColor),
+              const SizedBox(width: 10),
             ],
             Expanded(
               child: Text(
@@ -262,11 +275,11 @@ class CustomExpandedCardView extends StatelessWidget {
       }
 
       return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 16, color: iconColor),
-            const SizedBox(width: 8),
+            leadingIcon(icon, color: iconColor),
+            const SizedBox(width: 10),
           ],
           Expanded(
             child: Text.rich(
@@ -289,13 +302,12 @@ class CustomExpandedCardView extends StatelessWidget {
       required TextStyle style,
       IconData? icon,
     }) {
-      final iconColor = Colors.black.withValues(alpha: 0.60);
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 18, color: iconColor),
-            const SizedBox(width: 8),
+            leadingIcon(icon),
+            const SizedBox(width: 10),
           ],
           Expanded(
             child: Text(
@@ -350,7 +362,7 @@ class CustomExpandedCardView extends StatelessWidget {
       margin: const EdgeInsets.only(left: 16.0, right: 16.0, top: 10.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.0),
+        borderRadius: BorderRadius.circular(16.0),
         border: Border.all(
           width: 1.0,
           color: ColorConstants.borderColor.withValues(alpha: 0.85),
@@ -365,7 +377,7 @@ class CustomExpandedCardView extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,10 +386,9 @@ class CustomExpandedCardView extends StatelessWidget {
               headline(
                 text: firstParagraf,
                 style: titleStyle,
-                icon: _iconForTitle(firstParagraf),
               ),
             if (_hasText(firstParagraf) && _hasText(name))
-              const SizedBox(height: 2),
+              const SizedBox(height: 6),
             if (_hasText(name))
               headline(
                 text: name,
@@ -387,17 +398,17 @@ class CustomExpandedCardView extends StatelessWidget {
             if (_hasText(secondParagrafValue) ||
                 _hasText(thirdParagrafValue) ||
                 _hasText(forthParagraf))
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
             if (_hasText(secondParagrafValue))
               infoLine(label: secondParagrafLabel, value: secondParagrafValue),
             if (_hasText(secondParagrafValue) && _hasText(thirdParagrafValue))
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
             if (_hasText(thirdParagrafValue))
               infoLine(label: thirdParagrafLabel, value: thirdParagrafValue),
             if ((_hasText(secondParagrafValue) ||
                     _hasText(thirdParagrafValue)) &&
                 _hasText(forthParagraf))
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
             if (_hasText(forthParagraf))
               Text(
                 forthParagraf,
