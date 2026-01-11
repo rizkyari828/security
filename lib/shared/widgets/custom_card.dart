@@ -112,15 +112,15 @@ class CustomCardView extends StatelessWidget {
                             (approval == "approved")
                                 ? Icons.check_circle_outlined
                                 : (approval == "pengajuan" ||
-                                      approval == "proses")
-                                ? Icons.access_time_outlined
-                                : Icons.close,
+                                        approval == "proses")
+                                    ? Icons.access_time_outlined
+                                    : Icons.close,
                             color: (approval == "approved")
                                 ? Colors.green
                                 : (approval == "pengajuan" ||
-                                      approval == "proses")
-                                ? Colors.orange
-                                : Colors.red,
+                                        approval == "proses")
+                                    ? Colors.orange
+                                    : Colors.red,
                             size: 30,
                           ),
                           CommonWidget.captionText(
@@ -128,9 +128,9 @@ class CustomCardView extends StatelessWidget {
                             color: (approval == "approved")
                                 ? Colors.green
                                 : (approval == "pengajuan" ||
-                                      approval == "proses")
-                                ? Colors.orange
-                                : Colors.red,
+                                        approval == "proses")
+                                    ? Colors.orange
+                                    : Colors.red,
                           ),
                         ],
                       ),
@@ -520,12 +520,12 @@ class _ApprovalTone {
     final approval = normalizedApproval.trim();
     final isApproved =
         approval == 'approved' || approval == 'approve' || approval == 'ok';
-    final isPending =
-        approval == 'pengajuan' ||
+    final isPending = approval == 'pengajuan' ||
         approval == 'proses' ||
         approval == 'process' ||
         approval == 'waiting' ||
-        approval == 'pending';
+        approval == 'pending' ||
+        approval == 'new';
 
     if (isApproved) {
       return _ApprovalTone(

@@ -32,7 +32,6 @@ import 'package:staffku/modules/prospek_v2/bindings/prospek_v2_binding.dart';
 import 'package:staffku/modules/prospek_v2/views/add_prospek_view.dart';
 import 'package:staffku/modules/prospek_v2/views/prospek_view.dart';
 import 'package:staffku/modules/store/bindings/store_binding.dart';
-import 'package:staffku/modules/store/views/add_store_view.dart';
 import 'package:staffku/modules/store/views/detail_store_view.dart';
 import 'package:staffku/modules/store/views/result_kunjungan.dart';
 import 'package:staffku/modules/store/views/store_view.dart';
@@ -159,11 +158,6 @@ class AppPages {
     GetPage(
       name: Routes.STORE,
       page: () => StoreView(),
-      binding: StoreBinding(),
-    ),
-    GetPage(
-      name: Routes.ADD_STORE,
-      page: () => AddStoreView(),
       binding: StoreBinding(),
     ),
     GetPage(

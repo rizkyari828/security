@@ -1020,7 +1020,9 @@ class MainTab extends GetView<HomeController> {
       onRefresh: controller.onRefresh,
       onLoading: controller.onLoading,
       child: ListView.builder(
-        itemCount: controller.listStore.length,
+        itemCount: controller.listPatroli.isEmpty
+            ? 1
+            : controller.listPatroli.length,
         itemBuilder: (context, i) => Column(
           children: [
             i == 0
@@ -1069,29 +1071,8 @@ class MainTab extends GetView<HomeController> {
                     ],
                   )
                 : SizedBox(),
-            controller.listStore[i].tokoId.toString() != "0"
-                ? InkWell(
-                    onTap: () {
-                      controller.goToDetailPages(
-                        id: controller.listStore[i].tokoId.toString(),
-                        type: controller.listStore[i].typList.toString(),
-                        storeName: controller.listStore[i].namaToko ?? '',
-                        statusKunjungan:
-                            controller.listStore[i].statusKunjungan ?? '',
-                      );
-                    },
-                    child: customStockExpandedCard(
-                      name: controller.listStore[i].namaToko ?? '',
-                      photo: controller.listStore[i].pathToko ?? '',
-                      type: controller.listStore[i].typList == '1'
-                          ? 'Patroli Terjadwal'
-                          : 'Patroli Tidak Terjadwal',
-                      address: controller.listStore[i].alamatToko ?? '',
-                      statusKunjungan:
-                          controller.listStore[i].statusKunjungan ?? '',
-                    ),
-                  )
-                : Column(
+            controller.listPatroli.isEmpty
+                ? Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1125,6 +1106,65 @@ class MainTab extends GetView<HomeController> {
                         ),
                       ),
                     ],
+                  )
+                : InkWell(
+                    onTap: () => controller.goToDetailPages(
+                      controller.listPatroli[i],
+                    ),
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                        left: 15.0,
+                        right: 15.0,
+                        top: 15.0,
+                      ),
+                      padding: const EdgeInsets.all(15.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                        border: Border.all(
+                          width: 2.0,
+                          color: ColorConstants.borderColor,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            controller.listPatroli[i].status == '1'
+                                ? Icons.check_circle_rounded
+                                : Icons.timelapse,
+                            color: controller.listPatroli[i].status == '1'
+                                ? Colors.green
+                                : Colors.orange,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CommonWidget.minHeadText(
+                                  text:
+                                      controller.listPatroli[i].namaJadwal ??
+                                      '-',
+                                  color: ColorConstants.mainColor,
+                                ),
+                                const SizedBox(height: 6),
+                                CommonWidget.captionText(
+                                  text: controller.listPatroli[i].status == '1'
+                                      ? 'Sudah patroli'
+                                      : 'Belum patroli',
+                                  color: ColorConstants.mainColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.chevron_right,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
           ],
         ),

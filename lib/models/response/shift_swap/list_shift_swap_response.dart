@@ -91,4 +91,3 @@ class ShiftSwapListItem {
         'level': levelApproval,
       };
 }
-

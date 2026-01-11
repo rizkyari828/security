@@ -109,44 +109,121 @@ class ApprovalFlow {
   }
 
   static Widget buttonApprovalFlow(controller) {
-    final sw = SizeConfig().screenWidth;
-    return controller.statusApproval.toString().toLowerCase() == 'pengajuan' ||
-            controller.statusApproval.toString().toLowerCase() == 'proses'
-        ? Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CommonWidget.bodyText(text: "Catatan Approval"),
-              SizedBox(height: 10.0),
-              TextAreaField(controller: controller.noteApprovalController),
-              SizedBox(height: 20.0),
-              SizedBox(height: 50.0),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final status = controller.statusApproval.toString().toLowerCase().trim();
+    final canApprove = status == 'pengajuan' ||
+        status == 'proses' ||
+        status == 'waiting' ||
+        status == 'waiting for approval' ||
+        status == 'pending';
+
+    return canApprove
+        ? Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                width: 1.0,
+                color: ColorConstants.borderColor.withValues(alpha: 0.90),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 18.0,
+                  spreadRadius: 0.0,
+                  offset: const Offset(0.0, 10.0),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Approval',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: ColorConstants.black,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Tambahkan catatan jika diperlukan.',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black.withValues(alpha: 0.60),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextAreaField(
+                  controller: controller.noteApprovalController,
+                  hintText: 'Catatan (opsional)',
+                  minLines: 3,
+                  maxLines: 4,
+                ),
+                const SizedBox(height: 14),
+                Row(
                   children: [
-                    CustomButton(
-                      buttonColor: Colors.red,
-                      buttonText: 'REJECT',
-                      width: sw / 2.5,
-                      onPressed: () {
-                        controller.approval(action: 'reject');
-                      },
+                    Expanded(
+                      child: CustomButton(
+                        buttonColor: const Color(0xFFDC2626),
+                        buttonText: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.close_rounded, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'TOLAK',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.1,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                          ],
+                        ),
+                        width: double.infinity,
+                        height: 48,
+                        elevation: 0,
+                        onPressed: () => controller.approval(action: 'reject'),
+                      ),
                     ),
-                    CustomButton(
-                      buttonColor: Colors.green,
-                      buttonText: 'APPROVE',
-                      width: sw / 2.5,
-                      onPressed: () {
-                        controller.approval(action: 'approve');
-                      },
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: CustomButton(
+                        buttonColor: const Color(0xFF16A34A),
+                        buttonText: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.check_rounded, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'SETUJUI',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.1,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                          ],
+                        ),
+                        width: double.infinity,
+                        height: 48,
+                        elevation: 0,
+                        onPressed: () => controller.approval(action: 'approve'),
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           )
-        : Container();
+        : const SizedBox.shrink();
   }
 
   static Widget buttonLevelCondition(controller, levelCondition, groupId) {
@@ -314,53 +391,147 @@ class ApprovalFlow {
   }
 
   static Widget statusApproval(label, levelApproval) {
-    final sw = SizeConfig().screenWidth;
-    final sh = SizeConfig().screenHeight;
+    final statusRaw = label?.toString().trim() ?? '';
+    final levelRaw = levelApproval?.toString().trim() ?? '';
+    final statusLower = statusRaw.toLowerCase().trim();
+
+    final isUnknown =
+        statusLower.isEmpty || statusLower == 'null' || statusLower == '-';
+
+    final isApproved = statusLower == 'approved' ||
+        statusLower == 'approve' ||
+        statusLower == 'ok';
+    final isPending = statusLower == 'proses' ||
+        statusLower == 'pengajuan' ||
+        statusLower == 'waiting' ||
+        statusLower == 'waiting for approval' ||
+        statusLower == 'pending';
+
+    late final Color statusColor;
+    late final IconData statusIcon;
+    late final String subtitle;
+
+    if (isUnknown) {
+      statusColor = Colors.blueGrey;
+      statusIcon = Icons.info_outline_rounded;
+      subtitle = levelRaw.isNotEmpty && levelRaw != '-'
+          ? 'Menunggu persetujuan ${levelRaw.toUpperCase()}.'
+          : 'Status belum tersedia.';
+    } else if (isApproved) {
+      statusColor = Colors.green;
+      statusIcon = Icons.check_circle_rounded;
+      subtitle = 'Pengajuan sudah disetujui.';
+    } else if (isPending) {
+      statusColor = Colors.orange;
+      statusIcon = Icons.hourglass_top_rounded;
+      subtitle = levelRaw.isNotEmpty && levelRaw != '-'
+          ? 'Menunggu persetujuan ${levelRaw.toUpperCase()}.'
+          : 'Menunggu persetujuan.';
+    } else {
+      statusColor = Colors.red;
+      statusIcon = Icons.cancel_rounded;
+      subtitle = 'Pengajuan ditolak.';
+    }
+
+    Widget chip({required String text, required Color color}) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: color.withValues(alpha: 0.22)),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
+            fontFamily: 'Poppins',
+            letterSpacing: 0.2,
+          ),
+        ),
+      );
+    }
+
     return Container(
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(width: 2.0, color: ColorConstants.borderColor),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          width: 1.0,
+          color: ColorConstants.borderColor.withValues(alpha: 0.90),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18.0,
+            spreadRadius: 0.0,
+            offset: const Offset(0.0, 10.0),
+          ),
+        ],
       ),
-      width: sw,
-      height: sh * .07,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            CommonWidget.bodyText(
-              text: levelApproval.toUpperCase(),
-              color: ColorConstants.black,
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
             ),
-            Card(
-              elevation: 0,
-              color: label.toLowerCase() == 'approved'
-                  ? Colors.green
-                  : label.toLowerCase() == 'proses' ||
-                        label.toLowerCase() == 'pengajuan'
-                  ? Colors.yellow[800]
-                  : Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 8.0,
-                  right: 8.0,
-                  top: 3,
-                  bottom: 3,
-                ),
-                child: Center(
-                  child: CommonWidget.bodyText(
-                    text: label.toString().toUpperCase(),
-                    color: Colors.white,
+            child: Icon(statusIcon, color: statusColor),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  statusRaw.isEmpty ? '-' : statusRaw.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: statusColor,
+                    height: 1.15,
+                    letterSpacing: 0.3,
                   ),
                 ),
-              ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black.withValues(alpha: 0.62),
+                    height: 1.2,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.end,
+            children: [
+              if (levelRaw.isNotEmpty && levelRaw != '-')
+                chip(text: levelRaw.toUpperCase(), color: ColorConstants.black),
+              chip(
+                text: statusRaw.isEmpty ? '-' : statusRaw.toUpperCase(),
+                color: statusColor,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

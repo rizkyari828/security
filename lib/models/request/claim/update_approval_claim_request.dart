@@ -30,4 +30,3 @@ class UpdateApprovalClaimRequest {
         'note': noteApproval,
       };
 }
-

@@ -95,4 +95,3 @@ class ShowShiftSwapItem {
         'level': levelApproval,
       };
 }
-

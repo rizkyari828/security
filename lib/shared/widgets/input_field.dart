@@ -249,6 +249,9 @@ class TextAreaField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final bool isRequired;
   final bool showError;
+  final String hintText;
+  final int minLines;
+  final int maxLines;
 
   TextAreaField({
     required this.controller,
@@ -256,60 +259,74 @@ class TextAreaField extends StatelessWidget {
     this.onChanged,
     this.isRequired = false,
     this.showError = false,
-    s,
+    this.hintText = 'Masukkan teks di sini',
+    this.minLines = 4,
+    this.maxLines = 6,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0.1,
-      color: isDisabled ? Colors.grey[200] : ColorConstants.backgroundTextField,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              readOnly: isDisabled,
-              enableInteractiveSelection: isDisabled,
-              style: TextStyle(
-                color: ColorConstants.black,
-                fontWeight: FontWeight.normal,
-                fontSize: 14,
-                letterSpacing: 0.5,
-                fontFamily: 'Poppins',
-              ),
-              controller: controller,
-              maxLines: 8,
-              onChanged: onChanged,
-              decoration: InputDecoration.collapsed(
-                hintText: "Masukkan text disini",
-                hintStyle: TextStyle(
-                  color: ColorConstants.black,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  letterSpacing: 0.5,
-                  fontFamily: 'Poppins',
-                ),
-                filled: true,
-                fillColor: isDisabled
-                    ? Colors.grey[200]
-                    : ColorConstants.backgroundTextField,
-                focusColor: isDisabled
-                    ? Colors.grey[200]
-                    : ColorConstants.backgroundTextField,
-              ),
-            ),
-            if (isRequired && showError && controller.text.isEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0, left: 4.0),
-                child: Text(
-                  'Harus diisi',
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
-          ],
+    final isError = isRequired && showError && controller.text.trim().isEmpty;
+    final baseBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12.0),
+      borderSide: BorderSide(
+        color: isError ? Colors.red : ColorConstants.borderColor,
+        width: 1.0,
+      ),
+    );
+
+    return TextFormField(
+      controller: controller,
+      minLines: minLines,
+      maxLines: maxLines,
+      readOnly: isDisabled,
+      enabled: !isDisabled,
+      keyboardType: TextInputType.multiline,
+      onChanged: onChanged,
+      style: const TextStyle(
+        color: ColorConstants.black,
+        fontWeight: FontWeight.normal,
+        fontSize: 14,
+        letterSpacing: 0.2,
+        fontFamily: 'Poppins',
+      ),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: ColorConstants.darkGray,
+          fontWeight: FontWeight.normal,
+          fontSize: 14,
+          letterSpacing: 0.2,
+          fontFamily: 'Poppins',
+        ),
+        filled: true,
+        fillColor: isDisabled
+            ? (Colors.grey[200] ?? ColorConstants.backgroundTextField)
+            : ColorConstants.backgroundTextField,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
+        border: baseBorder,
+        enabledBorder: baseBorder,
+        focusedBorder: baseBorder.copyWith(
+          borderSide: BorderSide(
+            color: isError ? Colors.red : ColorConstants.mainColor,
+            width: 1.4,
+          ),
+        ),
+        disabledBorder: baseBorder.copyWith(
+          borderSide: BorderSide(
+            color: Colors.grey[300] ?? ColorConstants.borderColor,
+            width: 1.0,
+          ),
+        ),
+        errorText: isError ? 'Harus diisi' : null,
+        errorStyle: const TextStyle(
+          color: Colors.red,
+          fontSize: 12,
+          height: 1.2,
+          fontFamily: 'Poppins',
         ),
       ),
     );
@@ -337,6 +354,14 @@ class CustomDropDownSearch extends StatelessWidget {
     final int itemCount = listItem.length;
     final double itemHeight = 48.0; // tinggi item dropdown
     final double maxPopupHeight = itemCount * itemHeight + 16.0; // padding
+
+    final baseBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12.0),
+      borderSide: BorderSide(
+        color: enabled ? ColorConstants.borderColor : Colors.grey[300] ?? Colors.grey,
+        width: 1.0,
+      ),
+    );
 
     return Container(
       child: DropdownSearch<dynamic>(
@@ -366,19 +391,21 @@ class CustomDropDownSearch extends StatelessWidget {
             ),
             labelText: labelText,
             filled: true,
-            fillColor: enabled ? Colors.white : Colors.grey[200],
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: ColorConstants.mainColor),
+            fillColor: enabled
+                ? ColorConstants.backgroundTextField
+                : (Colors.grey[200] ?? ColorConstants.backgroundTextField),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 14,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: ColorConstants.mainColor),
+            focusedBorder: baseBorder.copyWith(
+              borderSide: const BorderSide(
+                color: ColorConstants.mainColor,
+                width: 1.4,
+              ),
             ),
-            disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: ColorConstants.mainColor),
-            ),
+            enabledBorder: baseBorder,
+            disabledBorder: baseBorder,
           ),
         ),
         enabled: enabled,

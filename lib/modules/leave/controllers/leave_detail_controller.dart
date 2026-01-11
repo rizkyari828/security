@@ -1,3 +1,4 @@
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:staffku/api/api_repository.dart';
 import 'package:staffku/models/request/detail_request_leave.dart';
 import 'package:staffku/models/request/izin/update_approval_request.dart';
@@ -27,6 +28,8 @@ class LeaveDetailController extends BaseController {
   RxString nameItem = "".obs;
   RxString groupName = "".obs;
   RxString groupId = "".obs;
+  RxString statusApproval = "".obs;
+  RxBool approvalCondition = false.obs;
 
   @override
   void onInit() {
@@ -36,8 +39,7 @@ class LeaveDetailController extends BaseController {
   @override
   void onReady() {
     super.onReady();
-    getDetailIzin();
-    loadUsers();
+    loadUsers().then((_) => getDetailIzin());
   }
 
   @override
@@ -46,12 +48,11 @@ class LeaveDetailController extends BaseController {
   }
 
   Future<void> onRefresh() async {
+    await loadUsers();
     getDetailIzin();
-    // getItemCnC();
-    loadUsers();
   }
 
-  loadUsers() async {
+  Future<void> loadUsers() async {
     var prefs = Get.find<SharedPreferences>();
     groupName.value = prefs.getString('groupName') ?? "";
     groupId.value = prefs.getString('groupId') ?? "";
@@ -67,23 +68,62 @@ class LeaveDetailController extends BaseController {
       return;
     }
     detail.value = data.first;
+
+    final status = (detail.value.statusIjin ?? '').trim();
+    statusApproval.value = status.toLowerCase();
+
+    final level = (detail.value.levelApproval ?? '').trim();
+    if (level.isNotEmpty) {
+      final idRoleDetail = stringRoletoId(level);
+      approvalCondition.value = idRoleDetail == groupId.value;
+    } else {
+      approvalCondition.value = groupId.value != '1';
+    }
+
+    if (statusApproval.value.isEmpty && approvalCondition.value) {
+      statusApproval.value = 'pengajuan';
+    }
+  }
+
+  String stringRoletoId(String role) {
+    final normalized = role.toLowerCase().trim();
+    switch (normalized) {
+      case '1':
+      case 'staff':
+        return '1';
+      case '2':
+      case 'spv':
+      case 'cabang':
+      case 'branch':
+        return '2';
+      case '3':
+      case 'area':
+        return '3';
+      case '4':
+      case 'client':
+        return '4';
+      default:
+        final numeric = int.tryParse(normalized);
+        if (numeric != null) return normalized;
+        return '1';
+    }
   }
 
   void approval({action = "reject"}) async {
-    await apiRepository.updateApprovalIzin(
+    final res = await apiRepository.updateApprovalIzin(
       detail.value.id.toString(),
       UpdateApprovalIzinRequest(
         action: action,
         noteApproval: noteApprovalController.text,
       ),
     );
-    // if (res?.error == false) {
-    //   EasyLoading.showSuccess('Berhasil disimpan');
-    //   getDetailIzin();
-    //   loadUsers();
-    // } else {
-    //   EasyLoading.showError('Gagal disimpan');
-    // }
+    if (res?.error == false) {
+      EasyLoading.showSuccess(res?.message ?? 'Berhasil disimpan');
+      getDetailIzin();
+      return;
+    }
+
+    EasyLoading.showError(res?.message ?? 'Gagal disimpan');
   }
 
   selectDate(BuildContext context) async {

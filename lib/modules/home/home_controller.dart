@@ -10,7 +10,6 @@ import 'package:staffku/models/request/store/update_qty_request.dart';
 import 'package:staffku/models/request/submit_mood_request.dart';
 import 'package:staffku/models/request/update_fcm_profile_request.dart';
 import 'package:staffku/models/request/update_photo_profile_request.dart';
-import 'package:staffku/models/request/user_id_request.dart';
 import 'package:staffku/models/response/benefit/benefit_dashboard_response.dart';
 import 'package:staffku/models/response/dashboard/dashboard_response.dart';
 import 'package:staffku/models/response/rate/show_rate_review_response.dart';
@@ -19,7 +18,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:staffku/api/api.dart';
-import 'package:staffku/models/response/store/list_store.dart';
+import 'package:staffku/models/request/patroli/patroli_list_request.dart';
+import 'package:staffku/models/response/patroli/patroli_list_response.dart';
 import 'package:staffku/models/response/user/user_schedule.dart';
 import 'package:staffku/models/response/user/users_response.dart';
 import 'package:staffku/modules/home/base_controller.dart';
@@ -114,7 +114,7 @@ class HomeController extends BaseController {
 
   double position = 0;
 
-  var listStore = <DataStore>[].obs;
+  var listPatroli = <PatroliListItem>[].obs;
   RxString groupName = "".obs;
   RxString groupId = "".obs;
 
@@ -161,11 +161,7 @@ class HomeController extends BaseController {
   }
 
   void onLoading() async {
-    page.value = page.value + 1;
-
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    getStore(page.value);
+    await Future.delayed(const Duration(milliseconds: 500));
     refreshController.loadComplete();
   }
 
@@ -177,8 +173,8 @@ class HomeController extends BaseController {
       await determinePosition();
     } catch (_) {}
     // getDataBenefit();
-    getStore(page.value);
-    getDataDashboard();
+    // getPatroli();
+    // getDataDashboard();
     getAttendanceInfo();
   }
 
@@ -976,8 +972,8 @@ class HomeController extends BaseController {
 
       if (validateData != null) {
         attendanceInOfficeArea.value = (validateData.flag ?? '').trim() == '1';
-        attendanceDistanceToOffice.value =
-            (validateData.jarak ?? '').toString();
+        attendanceDistanceToOffice.value = (validateData.jarak ?? '')
+            .toString();
 
         final checkIn = (validateData.absenIn ?? '').trim();
         final checkOut = (validateData.absenOut ?? '').trim();
@@ -1012,54 +1008,21 @@ class HomeController extends BaseController {
   //       : null;
   // }
 
-  void getStore(page) async {
+  Future<void> getPatroli() async {
     try {
-      final res = await apiRepository.listStore(
-        page: page,
-        data: UserIdRequest(id: userId.value),
+      final res = await apiRepository.listPatroli(
+        PatroliListRequest(idUser: userId.value),
       );
-
-      final data = res?.data;
-      if (data != null && data.isNotEmpty) {
-        // Ubah objek DataStore ke JSON sebelum simpan
-        final jsonList = data.map((e) => e.toJson()).toList();
-        box.write('cached_items_page_$page', jsonList);
-        listStore.addAll(data);
-      } else {
-        _loadFromCache(page);
-      }
-    } catch (e) {
-      // Gagal fetch, ambil dari cache
-      _loadFromCache(page);
-    }
-  }
-
-  void _loadFromCache(int page) {
-    final cachedData = box.read('cached_items_page_$page');
-    if (cachedData is! List || cachedData.isEmpty) {
-      listStore.add(DataStore(tokoId: 0));
-      return;
-    }
-
-    try {
-      listStore.addAll(
-        cachedData.map((e) {
-          if (e is Map) {
-            return DataStore.fromJson(Map<String, dynamic>.from(e));
-          }
-          throw StateError('Invalid cached item type: ${e.runtimeType}');
-        }),
-      );
+      listPatroli.assignAll(res?.data ?? []);
     } catch (_) {
-      listStore.add(DataStore(tokoId: 0));
+      listPatroli.clear();
     }
   }
 
   Future<void> onRefresh() async {
     await Future.delayed(Duration(milliseconds: 1000));
-    listStore.clear();
-    page.value = 1;
-    getStore(page.value);
+    listPatroli.clear();
+    await getPatroli();
     loadUsers();
     getAttendanceInfo();
     refreshController.refreshCompleted();
@@ -1147,19 +1110,14 @@ class HomeController extends BaseController {
     return '$h:$m';
   }
 
-  void goToDetailPages({
-    String id = "",
-    String type = '',
-    String storeName = '',
-    String statusKunjungan = '',
-  }) {
+  void goToDetailPages(PatroliListItem item) {
     Get.toNamed(
       Routes.DETAIL_STORE,
       arguments: {
-        'id': id,
-        'type': type,
-        'storeName': storeName,
-        'status_kunjungan': statusKunjungan,
+        'id': item.id?.toString() ?? '',
+        'id_jadwal': item.idJadwal?.toString() ?? '',
+        'nama_jadwal': item.namaJadwal?.toString() ?? '',
+        'status': item.status?.toString() ?? '',
       },
     );
   }

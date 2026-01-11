@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:staffku/modules/store/controllers/result_kunjungan_controller.dart';
-import 'package:staffku/modules/store/controllers/store_add_controller.dart';
 import 'package:staffku/modules/store/controllers/store_detail_controller.dart';
 import 'package:staffku/modules/store/controllers/store_list_controller.dart';
 
@@ -23,10 +22,6 @@ class StoreBinding extends Bindings {
 
     Get.lazyPut<ResultKunjunganController>(
       () => ResultKunjunganController(apiRepository: Get.find()),
-    );
-
-    Get.lazyPut<StoreAddController>(
-      () => StoreAddController(apiRepository: Get.find()),
     );
   }
 }

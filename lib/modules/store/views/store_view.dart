@@ -1,104 +1,218 @@
-import 'package:staffku/modules/store/controllers/store_list_controller.dart';
-import 'package:staffku/shared/constants/constants.dart';
-import 'package:staffku/shared/utils/common_widget.dart';
-import 'package:staffku/shared/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:staffku/shared/widgets/approval.dart';
+import 'package:staffku/modules/store/controllers/store_list_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/widgets/button.dart';
 import 'package:staffku/shared/widgets/custom_appbar.dart';
 
 class StoreView extends GetView<StoreListController> {
   @override
   Widget build(BuildContext context) {
-    double scaleWidth = MediaQuery.of(context).size.width / 360;
+    final scaleWidth = MediaQuery.of(context).size.width / 360;
+
     return Obx(
       () => Scaffold(
         appBar: CustomAppBarWithNetwork(
           title: 'Patroli',
           networkStatus: controller.qualityNetwork,
-          addButton: ApprovalFlow.addButtonApproval(
-            controller: controller,
-            onPressed: controller.goToAddPages,
-          ),
         ),
         floatingActionButton: controller.isConnectedToInternetWidget.value
             ? Padding(
                 padding: EdgeInsets.only(left: scaleWidth * 30),
                 child: controller.internetConnection(),
               )
-            : SizedBox(),
-        body: _getItems(controller),
+            : const SizedBox(),
+        backgroundColor: ColorConstants.lightGray,
+        body: SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: false,
+          header: const WaterDropHeader(),
+          controller: controller.refreshController,
+          onRefresh: controller.onRefresh,
+          child: Obx(() => _body()),
+        ),
       ),
     );
   }
 
-  SmartRefresher _getItems(StoreListController controller) {
-    return SmartRefresher(
-      enablePullDown: true,
-      enablePullUp: false,
-      header: WaterDropHeader(),
-      controller: controller.refreshController,
-      onRefresh: controller.onRefresh,
-      onLoading: controller.onLoading,
-      child: ListView.builder(
-        itemCount: controller.listStore.length,
-        itemBuilder: (context, i) => Column(
+  Widget _body() {
+    final items = controller.listPatroli;
+
+    if (controller.isLoading.value && items.isEmpty) {
+      return Center(
+        child: CircularProgressIndicator(
+          backgroundColor: ColorConstants.mainColor,
+        ),
+      );
+    }
+
+    final error = controller.errorMessage.value;
+    if (error != null && items.isEmpty) {
+      return _EmptyState(
+        title: 'Gagal memuat jadwal',
+        description: error,
+        onRetry: controller.getPatroli,
+      );
+    }
+
+    if (items.isEmpty) {
+      return _EmptyState(
+        title: 'Belum ada jadwal patroli',
+        description: 'Tarik ke bawah untuk memuat ulang.',
+        onRetry: controller.getPatroli,
+      );
+    }
+
+    final total = items.length;
+    final doneCount = items.where((e) => (e.status ?? '0') == '1').length;
+    final pendingCount = total - doneCount;
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      itemCount: items.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _SummaryCard(
+              total: total,
+              done: doneCount,
+              pending: pendingCount,
+            ),
+          );
+        }
+
+        final item = items[index - 1];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _PatroliItemCard(
+            title: (item.namaJadwal ?? '-').trim(),
+            status: (item.status ?? '0').trim(),
+            onTap: () => controller.goToDetailPages(item),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard({
+    required this.total,
+    required this.done,
+    required this.pending,
+  });
+
+  final int total;
+  final int done;
+  final int pending;
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = total <= 0 ? 0.0 : (done / total).clamp(0.0, 1.0);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [ColorConstants.mainColor, ColorConstants.secondaryColor],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(Icons.shield_rounded, color: Colors.white),
+              SizedBox(width: 8),
+              Text(
+                'Ringkasan Patroli',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _SummaryMetric(label: 'Total', value: total.toString()),
+              const SizedBox(width: 10),
+              _SummaryMetric(label: 'Selesai', value: done.toString()),
+              const SizedBox(width: 10),
+              _SummaryMetric(label: 'Belum', value: pending.toString()),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: Colors.white.withValues(alpha: 0.22),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Colors.white.withValues(alpha: 0.95),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryMetric extends StatelessWidget {
+  const _SummaryMetric({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: Colors.white.withValues(alpha: 0.16),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.20),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            i == 0
-                ? Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Obx(
-                              () => pendingTask(
-                                '${controller.dailyProgressCount.value}',
-                                'Patroli hari ini',
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Obx(
-                              () => pendingTask(
-                                '${controller.montlyProgressCount.value}',
-                                'Patroli bulan ini',
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 20),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 20.0,
-                          right: 20,
-                          bottom: 10,
-                          top: 10,
-                        ),
-                        child: Divider(color: ColorConstants.borderColor),
-                      ),
-                    ],
-                  )
-                : SizedBox(),
-            InkWell(
-              onTap: () {
-                controller.goToDetailPages(
-                  id: controller.listStore[i].tokoId.toString(),
-                  type: controller.listStore[i].typList.toString(),
-                  storeName: controller.listStore[i].namaToko ?? '',
-                  statusKunjungan:
-                      controller.listStore[i].statusKunjungan ?? '',
-                );
-              },
-              child: customStockExpandedCard(
-                name: controller.listStore[i].namaToko ?? '',
-                photo: controller.listStore[i].pathToko ?? '',
-                type: controller.listStore[i].typList == '1'
-                    ? 'Patroli Terjadwal'
-                    : 'Patroli Tidak Terjadwal',
-                address: controller.listStore[i].alamatToko ?? '',
-                statusKunjungan: controller.listStore[i].statusKunjungan ?? '',
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.88),
+                fontSize: 12,
+                fontFamily: 'Poppins',
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                fontFamily: 'Poppins',
               ),
             ),
           ],
@@ -106,55 +220,75 @@ class StoreView extends GetView<StoreListController> {
       ),
     );
   }
+}
 
-  Widget pendingTask(String value, String title) {
-    // Pilih icon sesuai jenis patroli
-    IconData iconData;
-    Color iconColor;
-    if (title.toLowerCase().contains('bulan')) {
-      iconData = Icons.calendar_month;
-      iconColor = Colors.deepPurple;
-    } else {
-      iconData = Icons.assignment_turned_in;
-      iconColor = ColorConstants.secondaryAppColor;
-    }
-    return Padding(
-      padding: const EdgeInsets.only(left: 20.0, bottom: 10, top: 10),
-      child: Container(
-        decoration: BoxDecoration(
-          color: iconColor.withAlpha((0.2 * 255).toInt()),
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(width: 2.0, color: ColorConstants.borderColor),
-        ),
+class _PatroliItemCard extends StatelessWidget {
+  const _PatroliItemCard({
+    required this.title,
+    required this.status,
+    required this.onTap,
+  });
+
+  final String title;
+  final String status;
+  final VoidCallback onTap;
+
+  bool get _isDone => status == '1';
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = _isDone ? Colors.green : Colors.orange;
+    final statusLabel = _isDone ? 'Selesai' : 'Belum patroli';
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                decoration: new BoxDecoration(
-                  color: Colors.white,
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Icon(
-                    iconData,
-                    color: iconColor,
-                    size: SizeConfig().screenWidth * .05,
-                  ),
+                child: Icon(
+                  _isDone ? Icons.check_rounded : Icons.schedule_rounded,
+                  color: statusColor,
                 ),
               ),
-              SizedBox(height: 5),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title.isEmpty ? '-' : title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: ColorConstants.black,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  CommonWidget.minHeadText(text: value, color: Colors.black),
-                  CommonWidget.subtitleText(
-                    text: ' $title',
-                    color: Colors.black,
-                  ),
+                  _StatusChip(color: statusColor, label: statusLabel),
+                  const SizedBox(width: 8),
+                  Icon(Icons.chevron_right, color: ColorConstants.darkGray),
                 ],
               ),
             ],
@@ -163,150 +297,105 @@ class StoreView extends GetView<StoreListController> {
       ),
     );
   }
+}
 
-  Widget customStockExpandedCard({
-    String photo = '',
-    String name = '',
-    String type = '',
-    String address = '',
-    String statusKunjungan = '',
-    VoidCallback? onPressed,
-  }) {
-    final sh = SizeConfig().screenHeight;
-    final sw = SizeConfig().screenWidth;
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.color, required this.label});
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
-      height: name == '' ? sh * .15 : sh * .16,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(width: 2.0, color: ColorConstants.borderColor),
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.20)),
       ),
-      child: InkWell(
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        photo == ''
-                            ? Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                  color: Colors.red,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(3.0),
-                                  child: Icon(
-                                    Icons.store_rounded,
-                                    color: Colors.white,
-                                    size: 60,
-                                  ),
-                                ),
-                              )
-                            : Container(
-                                height: 70,
-                                width: 70,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: ColorConstants.secondaryAppColor,
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    photo,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Center(
-                                        child: Icon(
-                                          Icons.store_rounded,
-                                          color: Colors.white,
-                                          size: 65,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                        SizedBox(width: 20),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              child: CommonWidget.subtitleText(
-                                text: name,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            // CommonWidget.subtitleText(text: type),
-                            SizedBox(height: 5),
-                            Container(
-                              width: SizeConfig().screenWidth * .50,
-                              child: CommonWidget.subtitleText(
-                                text: 'Alamat : ' + address,
-                                // fontWeight: FontWeight.bold,
-                                color: ColorConstants.mainColor,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            CommonWidget.subtitleText(
-                              text: type,
-                              // fontWeight: FontWeight.bold,
-                              color: ColorConstants.mainColor,
-                            ),
-                            SizedBox(height: 5),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    Container(
-                      width: sw * .85,
-                      decoration: BoxDecoration(
-                        color: statusKunjungan == '1'
-                            ? Colors.green[100]
-                            : Colors.yellow[100],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.all(5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            statusKunjungan == '1'
-                                ? Icons.check_circle
-                                : Icons.warning_amber_rounded,
-                            color: statusKunjungan == '1'
-                                ? Colors.green
-                                : Colors.orange,
-                          ),
-                          const SizedBox(width: 10),
-                          CommonWidget.captionText(
-                            text: statusKunjungan == '1'
-                                ? 'Sudah dikunjungi'
-                                : 'Belum dikunjungi',
-                            color: ColorConstants.mainColor,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+          fontFamily: 'Poppins',
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({
+    required this.title,
+    required this.description,
+    required this.onRetry,
+  });
+
+  final String title;
+  final String description;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final sw = MediaQuery.of(context).size.width;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-            ],
-          ),
+              child: const Icon(
+                Icons.assignment_rounded,
+                size: 34,
+                color: ColorConstants.mainColor,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: ColorConstants.black,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                fontFamily: 'Poppins',
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: ColorConstants.darkGray,
+                fontSize: 13,
+                fontFamily: 'Poppins',
+              ),
+            ),
+            const SizedBox(height: 16),
+            CustomButton(
+              buttonText: 'COBA LAGI',
+              width: sw,
+              onPressed: () => onRetry(),
+            ),
+          ],
         ),
       ),
     );

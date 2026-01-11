@@ -43,6 +43,8 @@ class DataIzin {
         this.dateIn,
         this.dateOut,
         this.keterangan,
+        this.statusIjin,
+        this.levelApproval,
     });
 
     int? id;
@@ -50,6 +52,8 @@ class DataIzin {
     DateTime? dateIn;
     DateTime? dateOut;
     String? keterangan;
+    String? statusIjin;
+    String? levelApproval;
 
     factory DataIzin.fromJson(Map<String, dynamic> json) => DataIzin(
         id: json["id"] == null ? null : json["id"],
@@ -57,6 +61,16 @@ class DataIzin {
         dateIn: json["date_in"] == null ? null : DateTime.parse(json["date_in"]),
         dateOut: json["date_out"] == null ? null : DateTime.parse(json["date_out"]),
         keterangan: json["keterangan"] == null ? null : json["keterangan"],
+        statusIjin: (json["status_ijin"] ??
+                json["status_izin"] ??
+                json["status"] ??
+                json["status_leave"])
+            ?.toString(),
+        levelApproval: (json["level"] ??
+                json["level_approval"] ??
+                json["levelApproval"] ??
+                json["approval_level"])
+            ?.toString(),
     );
 
     Map<String, dynamic> toJson() => {
@@ -65,5 +79,7 @@ class DataIzin {
         "date_in": dateIn == null ? null : "${dateIn?.year.toString().padLeft(4, '0')}-${dateIn?.month.toString().padLeft(2, '0')}-${dateIn?.day.toString().padLeft(2, '0')}",
         "date_out": dateOut == null ? null : "${dateOut?.year.toString().padLeft(4, '0')}-${dateOut?.month.toString().padLeft(2, '0')}-${dateOut?.day.toString().padLeft(2, '0')}",
         "keterangan": keterangan == null ? null : keterangan,
+        "status_ijin": statusIjin,
+        "level": levelApproval,
     };
 }

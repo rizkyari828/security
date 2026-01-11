@@ -14,12 +14,18 @@ class ClaimListResponse {
   String? status;
   String? message;
   bool? error;
+  int? nominal;
+  int? sisa;
+  int? terpakai;
   List<ClaimListItem>? data;
 
   ClaimListResponse({
     this.status,
     this.message,
     this.error,
+    this.nominal,
+    this.sisa,
+    this.terpakai,
     this.data,
   });
 
@@ -28,6 +34,9 @@ class ClaimListResponse {
         status: json['status']?.toString(),
         message: json['message']?.toString(),
         error: json['error'] == true,
+        nominal: _tryParseInt(json['nominal']),
+        sisa: _tryParseInt(json['sisa']),
+        terpakai: _tryParseInt(json['terpakai']),
         data: json['Data'] == null
             ? []
             : List<ClaimListItem>.from(
@@ -39,49 +48,69 @@ class ClaimListResponse {
         'status': status,
         'message': message,
         'error': error,
-        'Data': data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+        'nominal': nominal,
+        'sisa': sisa,
+        'terpakai': terpakai,
+        'Data': data == null
+            ? []
+            : List<dynamic>.from(data!.map((x) => x.toJson())),
       };
 }
 
 class ClaimListItem {
-  dynamic tanggalPengajuan;
-  DateTime? tanggalClaim;
-  String? nominal;
-  String? statusClaim;
-  String? user;
-  int? idClaim;
-  String? levelApproval;
+  int? id;
+  DateTime? tanggal;
+  String? keterangan;
+  int? nominal;
+  String? status;
+  String? note;
+  String? fotoUrl;
 
   ClaimListItem({
-    this.tanggalPengajuan,
-    this.tanggalClaim,
+    this.id,
+    this.tanggal,
+    this.keterangan,
     this.nominal,
-    this.statusClaim,
-    this.user,
-    this.idClaim,
-    this.levelApproval,
+    this.status,
+    this.note,
+    this.fotoUrl,
   });
 
   factory ClaimListItem.fromJson(Map<String, dynamic> json) => ClaimListItem(
-        tanggalPengajuan: json['tanggal_pengajuan'],
-        tanggalClaim: json['tgl_claim'] == null
-            ? null
-            : DateTime.tryParse(json['tgl_claim'].toString()),
-        nominal: (json['nominal'] ?? json['amount'])?.toString(),
-        statusClaim: (json['status_claim'] ?? json['status'])?.toString(),
-        user: json['user']?.toString(),
-        idClaim: int.tryParse((json['id_claim'] ?? json['id_klaim'] ?? '').toString()),
-        levelApproval: json['level']?.toString(),
+        id: _tryParseInt(json['id'] ?? json['id_claim'] ?? json['id_klaim']),
+        tanggal: _tryParseDateTime(json['tanggal'] ?? json['tgl_claim']),
+        keterangan: json['keterangan']?.toString(),
+        nominal: _tryParseInt(json['nominal'] ?? json['amount']),
+        status:
+            (json['sts'] ?? json['status_claim'] ?? json['status'])?.toString(),
+        note: (json['note'] ?? json['catatan'])?.toString(),
+        fotoUrl: (json['foto'] ?? json['img'])?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
-        'tanggal_pengajuan': tanggalPengajuan,
-        'tgl_claim': tanggalClaim?.toIso8601String(),
+        'id': id,
+        'tanggal': tanggal?.toIso8601String(),
+        'keterangan': keterangan,
         'nominal': nominal,
-        'status_claim': statusClaim,
-        'user': user,
-        'id_claim': idClaim,
-        'level': levelApproval,
+        'sts': status,
+        'note': note,
+        'foto': fotoUrl,
       };
 }
 
+int? _tryParseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  return int.tryParse(value.toString());
+}
+
+DateTime? _tryParseDateTime(dynamic value) {
+  if (value == null) return null;
+  final raw = value.toString().trim();
+  if (raw.isEmpty) return null;
+
+  final normalized = raw.contains(' ') && !raw.contains('T')
+      ? raw.replaceFirst(' ', 'T')
+      : raw;
+  return DateTime.tryParse(normalized);
+}

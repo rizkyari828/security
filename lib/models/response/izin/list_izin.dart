@@ -50,6 +50,8 @@ class DataIzin {
     this.dateOut,
     this.keterangan,
     this.cDate,
+    this.statusIjin,
+    this.levelApproval,
   });
 
   int? id;
@@ -58,6 +60,8 @@ class DataIzin {
   DateTime? dateOut;
   DateTime? cDate;
   String? keterangan;
+  String? statusIjin;
+  String? levelApproval;
 
   factory DataIzin.fromJson(Map<String, dynamic> json) => DataIzin(
         id: json["id"] == null ? null : json["id"],
@@ -68,6 +72,16 @@ class DataIzin {
             json["date_out"] == null ? null : DateTime.parse(json["date_out"]),
         cDate: json["c_date"] == null ? null : DateTime.parse(json["c_date"]),
         keterangan: json["keterangan"] == null ? null : json["keterangan"],
+        statusIjin: (json["status_ijin"] ??
+                json["status_izin"] ??
+                json["status"] ??
+                json["status_leave"])
+            ?.toString(),
+        levelApproval: (json["level"] ??
+                json["level_approval"] ??
+                json["levelApproval"] ??
+                json["approval_level"])
+            ?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -83,5 +97,7 @@ class DataIzin {
             ? null
             : "${cDate?.year.toString().padLeft(4, '0')}-${cDate?.month.toString().padLeft(2, '0')}-${cDate?.day.toString().padLeft(2, '0')}",
         "keterangan": keterangan == null ? null : keterangan,
+        "status_ijin": statusIjin,
+        "level": levelApproval,
       };
 }

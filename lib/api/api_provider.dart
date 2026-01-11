@@ -6,6 +6,7 @@ import 'package:staffku/models/request/attendance/submit_attendance.dart';
 import 'package:staffku/models/request/attendance/validate_attenance.dart';
 import 'package:staffku/models/request/benefit_request.dart';
 import 'package:staffku/models/request/claim/detail_claim_request.dart';
+import 'package:staffku/models/request/claim/list_claim_request.dart';
 import 'package:staffku/models/request/claim/submit_claim_request.dart';
 import 'package:staffku/models/request/claim/update_approval_claim_request.dart';
 import 'package:staffku/models/request/cuti/submit_cuti_request.dart';
@@ -41,6 +42,9 @@ import 'package:staffku/models/request/prospek_v2/submit_request_prospek_v2.dart
 import 'package:staffku/models/request/rate/submit_rate_request.dart';
 import 'package:staffku/models/request/reliver/approve_reliver_request.dart';
 import 'package:staffku/models/request/reliver/create_reliver_request.dart';
+import 'package:staffku/models/request/patroli/patroli_id_request.dart';
+import 'package:staffku/models/request/patroli/patroli_list_request.dart';
+import 'package:staffku/models/request/patroli/submit_patroli_request.dart';
 import 'package:staffku/models/request/store/detail_request_leave.dart';
 import 'package:staffku/models/request/store/update_qty_request.dart';
 import 'package:staffku/models/request/submit_mood_request.dart';
@@ -459,17 +463,28 @@ class ApiProvider extends BaseProvider {
   //END SHIFT SWAP
 
   //START CLAIM
-  Future<Response> getClaim(String path, UserIdRequest data) {
-    return post(path, data.toJson());
+  Future<Response> getClaim(String path, ListClaimRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
   }
 
   Future<Response> getShowClaim(String path, ShowClaimRequest data) {
-    return post(path, data.toJson());
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
   }
 
   Future<Response> submitClaim(String path, SubmitClaimRequest data) {
-    print(data.toJson());
-    return post(path, data.toJson());
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
   }
 
   Future<Response> updateApprovalClaim(
@@ -538,5 +553,29 @@ class ApiProvider extends BaseProvider {
 
   Future<Response> getAgent(String path, UserIdRequest data) {
     return post(path, data.toJson());
+  }
+
+  Future<Response> submitPatroli(String path, SubmitPatroliRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
+  }
+
+  Future<Response> detailPatroli(String path, PatroliIdRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
+  }
+
+  Future<Response> listPatroli(String path, PatroliListRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
   }
 }

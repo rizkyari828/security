@@ -1,24 +1,31 @@
-import 'package:dotted_border/dotted_border.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:staffku/modules/store/controllers/store_detail_controller.dart';
-import 'package:staffku/shared/shared.dart';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:staffku/modules/store/controllers/store_detail_controller.dart';
+import 'package:staffku/shared/constants/constants.dart';
+import 'package:staffku/shared/utils/utils.dart';
 import 'package:staffku/shared/widgets/button.dart';
 import 'package:staffku/shared/widgets/custom_appbar.dart';
-import 'package:staffku/shared/widgets/image_picker.dart';
+import 'package:staffku/shared/widgets/input_field.dart';
 
 class StoreDetailView extends GetView<StoreDetailController> {
-  final data = Get.arguments;
+  const StoreDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    double scaleWidth = MediaQuery.of(context).size.width / 360;
+    final scaleWidth = MediaQuery.of(context).size.width / 360;
+    final sw = MediaQuery.of(context).size.width;
+
     return Obx(
       () => Scaffold(
+        backgroundColor: Colors.white,
         appBar: CustomAppBarWithNetwork(
-          title: 'Detail Patroli',
+          title: controller.namaJadwal.value.isEmpty
+              ? 'Detail Patroli'
+              : controller.namaJadwal.value,
           networkStatus: controller.qualityNetwork,
         ),
         floatingActionButton: controller.isConnectedToInternetWidget.value
@@ -26,463 +33,179 @@ class StoreDetailView extends GetView<StoreDetailController> {
                 padding: EdgeInsets.only(left: scaleWidth * 30),
                 child: controller.internetConnection(),
               )
-            : SizedBox(),
-        backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
-        body: controller.detail.value.typList == null
-            ? Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: ColorConstants.mainColor,
-                ),
-              )
-            : controller.typeStore == '1'
-            ? controller.statusKunjungan == '0'
-                  ? _buildViewSchedule(context)
-                  : _buildViewScheduleSubmit(context)
-            : _buildViewNon(context),
-      ),
-    );
-  }
-
-  Widget _buildViewSchedule(BuildContext context) {
-    final sw = SizeConfig().screenWidth;
-    return Scaffold(
-      backgroundColor: ColorConstants.lightScaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // SizedBox(height: 10.0),
-            !controller.isShowMaps.value
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: () => controller.showMaps(),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          height: sw * .12,
-                          width: sw * .5,
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  color: Colors.transparent,
-                                  child: Image(
-                                    image: AssetImage('assets/icons/gm.png'),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CommonWidget.subtitleText(
-                                      text: 'Klik',
-                                      color: ColorConstants.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    CommonWidget.captionText(
-                                      text: 'Untuk membuka Maps',
-                                      color: Colors.white70,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      Container(
-                        width: sw,
-                        height: sw * .8,
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: GoogleMap(
-                                initialCameraPosition: CameraPosition(
-                                  target: controller.myLocation,
-                                  zoom: 18.0,
-                                ),
-                                mapType: MapType.terrain,
-                                myLocationEnabled: true,
-                                myLocationButtonEnabled: true,
-                                markers: Set<Marker>.of(controller.markers),
-                                circles: controller.circles,
-                              ),
-                            ),
-                            Positioned(
-                              top: sw * .02,
-                              left: sw * .02,
-                              child: InkWell(
-                                onTap: () => controller.hideMaps(),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    border: Border.all(
-                                      width: 2.0,
-                                      color: ColorConstants.borderColor,
-                                    ),
-                                  ),
-                                  height: sw * .1,
-                                  width: sw * .1,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.close,
-                                        color: Colors.redAccent,
-                                        size: 30,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 30.0),
-                    ],
-                  ),
-            CommonWidget.labelIconExpanded(
-              color: Colors.green,
-              text: controller.storeName.value,
-              fontWeight2: FontWeight.w500,
-              icon: Icon(Icons.store, size: 30, color: Colors.green),
-            ),
-            CommonWidget.labelIconExpanded(
-              text: controller.locationDetail.value,
-              icon: Icon(
-                Icons.location_pin,
-                size: 30,
-                color: Colors.orangeAccent,
+            : const SizedBox(),
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: ColorConstants.mainColor,
               ),
-              isSubtitle: false,
-            ),
-            SizedBox(height: 20.0),
-            CommonWidget.minSubtitleText(
-              text: "Silahkan upload bukti Foto patroli anda",
-            ),
-            SizedBox(height: 10.0),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Obx(() => CustomImagePicker.previewGridImages(controller)),
-            ),
-            controller.imageFileList.length < 3
-                ? InkWell(
-                    onTap: () {
-                      controller.onImageButtonPressed(
-                        ImageSource.camera,
-                        context: context,
-                      );
-                    },
-                    child: DottedBorder(
-                      options: RectDottedBorderOptions(
-                        color: Colors.grey,
-                        dashPattern: [8, 4],
-                        strokeWidth: 1,
-                      ),
-                      child: Container(
-                        height: 50,
-                        width: sw,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.camera_alt,
-                              color: Colors.grey,
-                              size: 30,
-                            ),
-                            SizedBox(width: 10.0),
-                            CommonWidget.bodyText(
-                              text: "Ambil Photos",
-                              color: Colors.grey,
-                            ),
-                          ],
+            );
+          }
+
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CommonWidget.labelExpanded(
+                    label: 'Status',
+                    value: controller.isDone ? 'Sudah patroli' : 'Belum patroli',
+                  ),
+                  const SizedBox(height: 10.0),
+                  CommonWidget.bodyText(text: 'Keterangan'),
+                  const SizedBox(height: 10.0),
+                  TextAreaField(
+                    controller: controller.keteranganController,
+                    isRequired: true,
+                    showError: controller.showInputError.value,
+                    isDisabled: controller.isDone,
+                  ),
+                  const SizedBox(height: 16.0),
+                  CommonWidget.bodyText(text: 'Bukti (Foto)'),
+                  const SizedBox(height: 10.0),
+                  _photoPicker(context),
+                  if (!controller.isDone &&
+                      controller.showInputError.value &&
+                      controller.selectedPhoto.value == null)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Foto wajib diisi',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                     ),
-                  )
-                : Container(),
-            SizedBox(height: 10.0),
-            CommonWidget.captionText(
-              text: "Maksimal melampirkan 3 Foto",
-              color: Colors.red,
-            ),
-            SizedBox(height: 90), // beri jarak agar button tidak tertutup
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 25),
-        child: CustomButton(
-          buttonColor: Colors.white,
-          borderColor: controller.isConnectedToInternetWidget.value
-              ? ColorConstants.backgroundTextField
-              : ColorConstants.mainColor,
-          buttonTextColor: controller.isConnectedToInternetWidget.value
-              ? ColorConstants.black
-              : ColorConstants.mainColor,
-          isDisabled: controller.imageFileList.length < 1,
-          buttonText: controller.isConnectedToInternetWidget.value
-              ? 'SIMPAN SEMENTARA'
-              : 'SIMPAN PATROLI',
-          width: MediaQuery.of(context).size.width / 1.13,
-          onPressed: () => controller.submit('Patroli'),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildViewScheduleSubmit(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Column(
-            //   mainAxisAlignment: MainAxisAlignment.start,
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: [
-            //     Row(
-            //       children: [
-            //         CommonWidget.subtitleText(text: 'Hai, '),
-            //         CommonWidget.minHeadText(
-            //             text: controller.name.value,
-            //             color: ColorConstants.mainColor,
-            //             fontWeight: FontWeight.w500),
-            //       ],
-            //     ),
-            //     SizedBox(height: 20.0),
-            //   ],
-            // ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                controller.detail.value.pathToko == ''
-                    ? Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                          color: Colors.red,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Icon(
-                            Icons.store_rounded,
-                            color: Colors.white,
-                            size: 60,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        height: 70,
-                        width: 70,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: ColorConstants.secondaryAppColor,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            controller.detail.value.pathToko ?? '',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Center(
-                                child: Icon(
-                                  Icons.store_rounded,
-                                  color: Colors.white,
-                                  size: 65,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                SizedBox(width: 20),
-                CommonWidget.minHeadText(
-                  text: controller.detail.value.namaToko ?? '',
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Divider(color: ColorConstants.borderColor),
-            SizedBox(height: 20.0),
-            CommonWidget.twoLabelIconExpanded(
-              text: controller.detail.value.alamatToko,
-              text2: controller.locationStore.value,
-              icon: Icon(
-                Icons.location_pin,
-                size: 30,
-                color: Colors.orangeAccent,
+                  if (!controller.isDone) ...[
+                    const SizedBox(height: 30.0),
+                    CustomButton(
+                      buttonText: controller.isSubmitting.value
+                          ? 'MENGIRIM...'
+                          : 'SIMPAN',
+                      width: sw,
+                      isDisabled: controller.isSubmitting.value,
+                      onPressed: controller.submit,
+                    ),
+                  ],
+                ],
               ),
-              isSubtitle: false,
             ),
-            SizedBox(height: 20.0),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Obx(() => CustomImagePicker.previewGridImages(controller)),
-            ),
-            SizedBox(height: 20.0),
-          ],
-        ),
+          );
+        }),
       ),
     );
   }
 
-  Widget _buildViewNon(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Column(
-            //   mainAxisAlignment: MainAxisAlignment.start,
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: [
-            //     Row(
-            //       children: [
-            //         CommonWidget.subtitleText(text: 'Hai, '),
-            //         CommonWidget.minHeadText(
-            //             text: controller.name.value,
-            //             color: ColorConstants.mainColor,
-            //             fontWeight: FontWeight.w500),
-            //       ],
-            //     ),
-            //     SizedBox(height: 20.0),
-            //   ],
-            // ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
+  Widget _photoPicker(BuildContext context) {
+    final file = controller.selectedPhoto.value;
+    final url = (controller.detail.value?.foto ?? '').trim();
+    final hasPhoto = file != null || url.isNotEmpty;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (hasPhoto)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              height: 190,
+              width: double.infinity,
+              color: ColorConstants.backgroundTextField,
+              child: file != null
+                  ? (kIsWeb
+                      ? Image.network(file.path, fit: BoxFit.cover)
+                      : Image.file(File(file.path), fit: BoxFit.cover))
+                  : Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _emptyPhoto(),
+                    ),
+            ),
+          )
+        else
+          Container(
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: ColorConstants.backgroundTextField,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: ColorConstants.borderColor),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                controller.detail.value.pathToko == ''
-                    ? Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                          color: Colors.red,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Icon(
-                            Icons.store_rounded,
-                            color: Colors.white,
-                            size: 60,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        height: 70,
-                        width: 70,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: ColorConstants.secondaryAppColor,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            controller.detail.value.pathToko,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Center(
-                                child: Icon(
-                                  Icons.store_rounded,
-                                  color: Colors.white,
-                                  size: 65,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                SizedBox(width: 20),
-                Container(
-                  width: SizeConfig().screenWidth * .60,
-                  child: CommonWidget.minHeadText(
-                    text: controller.detail.value.namaToko ?? '',
+                Icon(
+                  Icons.photo_camera_rounded,
+                  color: Colors.black.withValues(alpha: 0.45),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Upload foto patroli',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black.withValues(alpha: 0.60),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Divider(color: ColorConstants.borderColor),
-            SizedBox(height: 20.0),
-            CommonWidget.twoLabelIconExpanded(
-              text: controller.detail.value.alamatToko,
-              text2: controller.locationStore.value,
-              icon: Icon(
-                Icons.location_pin,
-                size: 30,
-                color: Colors.orangeAccent,
+          ),
+        if (!controller.isDone) ...[
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => controller.pickPhoto(ImageSource.camera),
+                  icon: const Icon(Icons.camera_alt_rounded),
+                  label: const Text('Kamera'),
+                ),
               ),
-              isSubtitle: false,
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => controller.pickPhoto(ImageSource.gallery),
+                  icon: const Icon(Icons.photo_library_rounded),
+                  label: const Text('Galeri'),
+                ),
+              ),
+            ],
+          ),
+          if (file != null) ...[
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () => controller.selectedPhoto.value = null,
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.red,
+                ),
+                label: const Text(
+                  'Hapus foto',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
             ),
-            SizedBox(height: 20.0),
-            CommonWidget.subtitleText(text: "Catatan"),
-            SizedBox(height: 10.0),
-            CommonWidget.subtitleText(
-              text: controller.detail.value.catatan ?? '',
-            ),
-            SizedBox(height: 10.0),
-            CommonWidget.subtitleText(text: "Rencana"),
-            SizedBox(height: 10.0),
-            CommonWidget.subtitleText(
-              text: controller.detail.value.rencana ?? '',
-            ),
-            SizedBox(height: 20.0),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Obx(() => CustomImagePicker.previewGridImages(controller)),
-            ),
-            SizedBox(height: 20.0),
           ],
-        ),
-      ),
+        ],
+      ],
     );
   }
 
-  Widget textIcon(Icon icon, String text, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        icon,
-        SizedBox(width: 10),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CommonWidget.captionText(text: text),
-            CommonWidget.subtitleText(
-              text: value,
-              color: ColorConstants.mainColor,
-              fontWeight: FontWeight.w500,
-            ),
-          ],
-        ),
-      ],
+  Widget _emptyPhoto() {
+    return Container(
+      color: ColorConstants.backgroundTextField,
+      child: Icon(
+        Icons.broken_image_outlined,
+        color: Colors.black.withValues(alpha: 0.30),
+      ),
     );
   }
 }

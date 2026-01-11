@@ -8,6 +8,7 @@ import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
 import 'package:staffku/models/request/attendance/submit_attendance.dart';
 import 'package:staffku/models/request/attendance/validate_attenance.dart';
 import 'package:staffku/models/request/claim/detail_claim_request.dart';
+import 'package:staffku/models/request/claim/list_claim_request.dart';
 import 'package:staffku/models/request/claim/submit_claim_request.dart';
 import 'package:staffku/models/request/claim/update_approval_claim_request.dart';
 import 'package:staffku/models/request/cuti/submit_cuti_request.dart';
@@ -43,6 +44,9 @@ import 'package:staffku/models/request/prospek_v2/submit_request_prospek_v2.dart
 import 'package:staffku/models/request/rate/submit_rate_request.dart';
 import 'package:staffku/models/request/reliver/approve_reliver_request.dart';
 import 'package:staffku/models/request/reliver/create_reliver_request.dart';
+import 'package:staffku/models/request/patroli/patroli_id_request.dart';
+import 'package:staffku/models/request/patroli/patroli_list_request.dart';
+import 'package:staffku/models/request/patroli/submit_patroli_request.dart';
 import 'package:staffku/models/request/store/detail_request_leave.dart';
 import 'package:staffku/models/request/store/update_qty_request.dart';
 import 'package:staffku/models/request/submit_mood_request.dart';
@@ -76,6 +80,8 @@ import 'package:staffku/models/response/claim/list_claim_response.dart';
 import 'package:staffku/models/response/claim/show_claim_response.dart';
 import 'package:staffku/models/response/payslip/payslip_download_result.dart';
 import 'package:staffku/models/response/payslip/payslip_list_response.dart';
+import 'package:staffku/models/response/patroli/patroli_detail_response.dart';
+import 'package:staffku/models/response/patroli/patroli_list_response.dart';
 import 'package:staffku/models/response/prospek/list.dart';
 import 'package:staffku/models/response/prospek/master_data_response.dart';
 import 'package:staffku/models/response/prospek/master_id_response.dart';
@@ -1276,6 +1282,57 @@ class ApiRepository {
     return null;
   }
 
+  Future<PatroliListResponse?> listPatroli(PatroliListRequest data) async {
+    try {
+      final res = await apiProvider
+          .listPatroli('/api/v2/listPatroli', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return PatroliListResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<PatroliDetailResponse?> detailPatroli(PatroliIdRequest data) async {
+    try {
+      final res = await apiProvider
+          .detailPatroli('/api/v2/detailPatroli', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return PatroliDetailResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ErrorResponse?> submitPatroli(SubmitPatroliRequest data) async {
+    try {
+      final res = await apiProvider
+          .submitPatroli('/api/v2/simpanPatroli', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ErrorResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
   //START LEMBUR
   Future<CutiSalesResponse?> listCuti({required UserIdRequest data}) async {
     try {
@@ -1448,10 +1505,10 @@ class ApiRepository {
   //END SHIFT SWAP
 
   //START CLAIM
-  Future<ClaimListResponse?> listClaim({required UserIdRequest data}) async {
+  Future<ClaimListResponse?> listClaim({required ListClaimRequest data}) async {
     try {
       final res = await apiProvider
-          .getClaim('/api/v2/list_claim', data)
+          .getClaim('/api/v2/listClaim', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ClaimListResponse.fromJson(res.body);
@@ -1468,7 +1525,7 @@ class ApiRepository {
   Future<ShowClaimResponse?> showClaim(ShowClaimRequest data) async {
     try {
       final res = await apiProvider
-          .getShowClaim('/api/v2/detail_claim', data)
+          .getShowClaim('/api/v2/detailClaim', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ShowClaimResponse.fromJson(res.body);
@@ -1485,7 +1542,7 @@ class ApiRepository {
   Future<ErrorResponse?> submitClaim(SubmitClaimRequest data) async {
     try {
       final res = await apiProvider
-          .submitClaim('/api/v2/simpan_claim', data)
+          .submitClaim('/api/v2/simpanClaim', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1627,8 +1684,7 @@ class ApiRepository {
         return null;
       }
 
-      final filename =
-          _filenameFromContentDisposition(
+      final filename = _filenameFromContentDisposition(
             _headerValue(fileRes.headers, 'content-disposition'),
           ) ??
           Uri.tryParse(path)?.pathSegments.last;
@@ -1676,8 +1732,7 @@ class ApiRepository {
   String? _filenameFromContentDisposition(String? contentDisposition) {
     if (contentDisposition == null) return null;
     final value = contentDisposition;
-    final match =
-        RegExp(
+    final match = RegExp(
           r"filename\\*=UTF-8''([^;]+)",
           caseSensitive: false,
         ).firstMatch(value) ??

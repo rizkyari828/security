@@ -39,53 +39,66 @@ class ShowClaimResponse {
         'status': status,
         'message': message,
         'error': error,
-        'Data': data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+        'Data': data == null
+            ? []
+            : List<dynamic>.from(data!.map((x) => x.toJson())),
       };
 }
 
 class ShowClaimItem {
-  dynamic tanggalPengajuan;
-  DateTime? tanggalClaim;
-  String? nominal;
-  String? statusClaim;
-  int? idClaim;
-  String? user;
+  int? id;
+  DateTime? tanggal;
   String? keterangan;
-  String? levelApproval;
+  int? nominal;
+  String? status;
+  String? note;
+  String? fotoUrl;
 
   ShowClaimItem({
-    this.tanggalPengajuan,
-    this.tanggalClaim,
-    this.nominal,
-    this.statusClaim,
-    this.idClaim,
-    this.user,
+    this.id,
+    this.tanggal,
     this.keterangan,
-    this.levelApproval,
+    this.nominal,
+    this.status,
+    this.note,
+    this.fotoUrl,
   });
 
   factory ShowClaimItem.fromJson(Map<String, dynamic> json) => ShowClaimItem(
-        tanggalPengajuan: json['tanggal_pengajuan'],
-        tanggalClaim: json['tgl_claim'] == null
-            ? null
-            : DateTime.tryParse(json['tgl_claim'].toString()),
-        nominal: (json['nominal'] ?? json['amount'])?.toString(),
-        statusClaim: (json['status_claim'] ?? json['status'])?.toString(),
-        idClaim: int.tryParse((json['id_claim'] ?? json['id_klaim'] ?? '').toString()),
-        user: json['user']?.toString(),
-        keterangan: (json['keterangan'] ?? json['note'])?.toString(),
-        levelApproval: json['level']?.toString(),
+        id: _tryParseInt(json['id'] ?? json['id_claim'] ?? json['id_klaim']),
+        tanggal: _tryParseDateTime(json['tanggal'] ?? json['tgl_claim']),
+        keterangan: json['keterangan']?.toString(),
+        nominal: _tryParseInt(json['nominal'] ?? json['amount']),
+        status:
+            (json['sts'] ?? json['status_claim'] ?? json['status'])?.toString(),
+        note: (json['note'] ?? json['catatan'])?.toString(),
+        fotoUrl: (json['foto'] ?? json['img'])?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
-        'tanggal_pengajuan': tanggalPengajuan,
-        'tgl_claim': tanggalClaim?.toIso8601String(),
-        'nominal': nominal,
-        'status_claim': statusClaim,
-        'id_claim': idClaim,
-        'user': user,
+        'id': id,
+        'tanggal': tanggal?.toIso8601String(),
         'keterangan': keterangan,
-        'level': levelApproval,
+        'nominal': nominal,
+        'sts': status,
+        'note': note,
+        'foto': fotoUrl,
       };
 }
 
+int? _tryParseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  return int.tryParse(value.toString());
+}
+
+DateTime? _tryParseDateTime(dynamic value) {
+  if (value == null) return null;
+  final raw = value.toString().trim();
+  if (raw.isEmpty) return null;
+
+  final normalized = raw.contains(' ') && !raw.contains('T')
+      ? raw.replaceFirst(' ', 'T')
+      : raw;
+  return DateTime.tryParse(normalized);
+}

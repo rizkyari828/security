@@ -35,8 +35,7 @@ class OvertimeDetailController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    getDetailLembur();
-    loadUsers();
+    loadUsers().then((_) => getDetailLembur());
   }
 
   @override
@@ -45,12 +44,11 @@ class OvertimeDetailController extends GetxController {
   }
 
   Future<void> onRefresh() async {
+    await loadUsers();
     getDetailLembur();
-    // getItemCnC();
-    loadUsers();
   }
 
-  loadUsers() async {
+  Future<void> loadUsers() async {
     var prefs = Get.find<SharedPreferences>();
     groupName.value = prefs.getString('groupName') ?? "";
     groupId.value = prefs.getString('groupId') ?? "";
@@ -74,16 +72,25 @@ class OvertimeDetailController extends GetxController {
   }
 
   String stringRoletoId(String role) {
-    switch (role.toLowerCase()) {
+    final normalized = role.toLowerCase().trim();
+    switch (normalized) {
+      case '1':
       case 'staff':
         return '1';
+      case '2':
       case 'spv':
+      case 'cabang':
+      case 'branch':
         return '2';
-      // case 'area':
-      //   return '3';
-      // case 'client':
-      //   return '4';
+      case '3':
+      case 'area':
+        return '3';
+      case '4':
+      case 'client':
+        return '4';
       default:
+        final numeric = int.tryParse(normalized);
+        if (numeric != null) return normalized;
         return '1';
     }
   }

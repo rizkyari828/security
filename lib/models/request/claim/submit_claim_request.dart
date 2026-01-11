@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:get/get.dart';
+
 SubmitClaimRequest submitClaimRequestFromJson(String str) =>
     SubmitClaimRequest.fromJson(json.decode(str));
 
@@ -8,30 +10,31 @@ String submitClaimRequestToJson(SubmitClaimRequest data) =>
 
 class SubmitClaimRequest {
   SubmitClaimRequest({
-    this.idUser,
-    this.tanggalClaim,
-    this.nominal,
-    this.keterangan,
+    required this.idUser,
+    required this.nominal,
+    required this.keterangan,
+    required this.foto,
   });
 
-  String? idUser;
-  String? tanggalClaim;
-  String? nominal;
-  String? keterangan;
+  final String idUser;
+  final String nominal;
+  final String keterangan;
+  final MultipartFile foto;
 
   factory SubmitClaimRequest.fromJson(Map<String, dynamic> json) =>
       SubmitClaimRequest(
-        idUser: (json['user_id'] ?? json['id_user'])?.toString(),
-        tanggalClaim: (json['tgl_claim'] ?? json['tanggal_claim'])?.toString(),
-        nominal: (json['nominal'] ?? json['amount'])?.toString(),
-        keterangan: (json['keterangan'] ?? json['note'])?.toString(),
+        idUser: (json['id_user'] ?? json['user_id'] ?? '').toString(),
+        nominal: (json['nominal'] ?? json['amount'] ?? '').toString(),
+        keterangan: (json['keterangan'] ?? json['note'] ?? '').toString(),
+        foto: json['foto'],
       );
 
   Map<String, dynamic> toJson() => {
-        'user_id': idUser,
-        'tgl_claim': tanggalClaim,
+        'id_user': idUser,
         'nominal': nominal,
         'keterangan': keterangan,
+        'foto': foto,
       };
-}
 
+  FormData toFormData() => FormData(toJson());
+}
