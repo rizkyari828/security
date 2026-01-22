@@ -126,6 +126,12 @@ class ProspekController extends GetxController {
     refreshController.refreshCompleted();
   }
 
+  Future<void> _reloadFirstPage() async {
+    listProspek.clear();
+    page.value = 1;
+    getProspek(page.value);
+  }
+
   void getMasterStatusProspek() async {
     final res = await apiRepository.getMasterStatus();
     final data = res?.data;
@@ -139,11 +145,15 @@ class ProspekController extends GetxController {
     // }
   }
 
-  void goToDetailPages({String id = ""}) {
-    Get.toNamed(Routes.DETAIL_PROSPEK, arguments: id);
+  Future<void> goToDetailPages({String id = ""}) async {
+    await Get.toNamed(Routes.DETAIL_PROSPEK, arguments: id);
+    await _reloadFirstPage();
   }
 
-  void goToAddPages() {
-    Get.toNamed(Routes.ADD_PROSPEK);
+  Future<void> goToAddPages() async {
+    final result = await Get.toNamed(Routes.ADD_PROSPEK);
+    if (result == true) {
+      await _reloadFirstPage();
+    }
   }
 }

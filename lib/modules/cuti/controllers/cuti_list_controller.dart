@@ -71,17 +71,22 @@ class CutiListController extends GetxController {
     refreshController.refreshCompleted();
   }
 
-  void goToDetailPages({String id = ""}) {
-    Get.toNamed(Routes.DETAIL_CUTI_SALES, arguments: id);
+  Future<void> _reloadFirstPage() async {
+    listCuti.clear();
+    page.value = 1;
+    getCutiSales(page.value);
+  }
+
+  Future<void> goToDetailPages({String id = ""}) async {
+    await Get.toNamed(Routes.DETAIL_CUTI_SALES, arguments: id);
+    await _reloadFirstPage();
   }
 
   void goToAddPages() async {
     var result = await Get.toNamed(Routes.ADD_CUTI_SALES);
     if (result == true) {
       // Refresh data jika submit sukses
-      listCuti.clear();
-      page.value = 1;
-      getCutiSales(page.value);
+      await _reloadFirstPage();
     }
   }
 }

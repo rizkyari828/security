@@ -114,7 +114,10 @@ class ApprovalFlow {
         status == 'proses' ||
         status == 'waiting' ||
         status == 'waiting for approval' ||
-        status == 'pending';
+        status == 'pending' ||
+        status == 'menunggu' ||
+        status == 'menunggu persetujuan' ||
+        status == 'diproses';
 
     return canApprove
         ? Container(
@@ -400,12 +403,17 @@ class ApprovalFlow {
 
     final isApproved = statusLower == 'approved' ||
         statusLower == 'approve' ||
-        statusLower == 'ok';
+        statusLower == 'ok' ||
+        statusLower == 'disetujui' ||
+        statusLower == 'setujui';
     final isPending = statusLower == 'proses' ||
         statusLower == 'pengajuan' ||
         statusLower == 'waiting' ||
         statusLower == 'waiting for approval' ||
-        statusLower == 'pending';
+        statusLower == 'pending' ||
+        statusLower == 'menunggu' ||
+        statusLower == 'menunggu persetujuan' ||
+        statusLower == 'diproses';
 
     late final Color statusColor;
     late final IconData statusIcon;
@@ -425,8 +433,8 @@ class ApprovalFlow {
       statusColor = Colors.orange;
       statusIcon = Icons.hourglass_top_rounded;
       subtitle = levelRaw.isNotEmpty && levelRaw != '-'
-          ? 'Menunggu persetujuan ${levelRaw.toUpperCase()}.'
-          : 'Menunggu persetujuan.';
+          ? 'Menunggu keputusan ${levelRaw.toUpperCase()}.'
+          : 'Sedang diproses.';
     } else {
       statusColor = Colors.red;
       statusIcon = Icons.cancel_rounded;
@@ -489,7 +497,7 @@ class ApprovalFlow {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  statusRaw.isEmpty ? '-' : statusRaw.toUpperCase(),
+                  'STATUS',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -525,10 +533,8 @@ class ApprovalFlow {
             children: [
               if (levelRaw.isNotEmpty && levelRaw != '-')
                 chip(text: levelRaw.toUpperCase(), color: ColorConstants.black),
-              chip(
-                text: statusRaw.isEmpty ? '-' : statusRaw.toUpperCase(),
-                color: statusColor,
-              ),
+              if (statusRaw.isNotEmpty && statusRaw != '-')
+                chip(text: statusRaw.toUpperCase(), color: statusColor),
             ],
           ),
         ],

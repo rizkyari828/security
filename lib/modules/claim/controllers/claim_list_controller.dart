@@ -68,8 +68,13 @@ class ClaimListController extends GetxController {
     refreshController.loadNoData();
   }
 
-  void goToDetailPages({String id = ''}) {
-    Get.toNamed(Routes.DETAIL_CLAIM, arguments: id);
+  Future<void> _reload() async {
+    await fetchClaims();
+  }
+
+  Future<void> goToDetailPages({String id = ''}) async {
+    await Get.toNamed(Routes.DETAIL_CLAIM, arguments: id);
+    await _reload();
   }
 
   void goToAddPages() async {

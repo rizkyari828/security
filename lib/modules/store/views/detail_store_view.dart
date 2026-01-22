@@ -51,7 +51,7 @@ class StoreDetailView extends GetView<StoreDetailController> {
                 children: [
                   CommonWidget.labelExpanded(
                     label: 'Status',
-                    value: controller.isDone ? 'Sudah patroli' : 'Belum patroli',
+                    value: controller.statusLabel,
                   ),
                   const SizedBox(height: 10.0),
                   CommonWidget.bodyText(text: 'Keterangan'),

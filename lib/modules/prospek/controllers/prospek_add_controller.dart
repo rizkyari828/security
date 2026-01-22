@@ -63,7 +63,7 @@ class ProspekAddController extends GetxController {
 
     if (res?.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
-      Get.back();
+      Get.back(result: true);
     } else {
       EasyLoading.showError('Gagal disimpan');
     }

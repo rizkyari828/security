@@ -71,16 +71,21 @@ class OvertimeListController extends GetxController {
     refreshController.refreshCompleted();
   }
 
-  void goToDetailPages({String id = ""}) {
-    Get.toNamed(Routes.DETAIL_OVERTIME, arguments: id);
+  Future<void> _reloadFirstPage() async {
+    listLembur.clear();
+    page.value = 1;
+    getLembur(page.value);
+  }
+
+  Future<void> goToDetailPages({String id = ""}) async {
+    await Get.toNamed(Routes.DETAIL_OVERTIME, arguments: id);
+    await _reloadFirstPage();
   }
 
   void goToAddPages() async {
     var result = await Get.toNamed(Routes.ADD_OVERTIME);
     if (result == true) {
-      listLembur.clear();
-      page.value = 1;
-      getLembur(page.value);
+      await _reloadFirstPage();
     }
   }
 }

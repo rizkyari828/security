@@ -5,10 +5,12 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:staffku/api/api_repository.dart';
+import 'package:staffku/models/request/patroli/pending_patroli_upload.dart';
 import 'package:staffku/models/request/patroli/patroli_id_request.dart';
 import 'package:staffku/models/request/patroli/submit_patroli_request.dart';
 import 'package:staffku/models/response/patroli/patroli_detail_response.dart';
 import 'package:staffku/modules/home/base_controller.dart';
+import 'package:path_provider/path_provider.dart';
 
 class StoreDetailController extends BaseController {
   StoreDetailController({required ApiRepository apiRepository})
@@ -45,7 +47,14 @@ class StoreDetailController extends BaseController {
     await fetchDetail();
   }
 
-  bool get isDone => status.value.trim() == '1';
+  bool get isPendingUpload => status.value.trim() == 'pending_upload';
+
+  bool get isDone => status.value.trim() == '1' || isPendingUpload;
+
+  String get statusLabel {
+    if (isPendingUpload) return 'Pending upload';
+    return isDone ? 'Sudah patroli' : 'Belum patroli';
+  }
 
   Future<void> fetchDetail() async {
     final id = patroliId.value.trim();
@@ -87,11 +96,6 @@ class StoreDetailController extends BaseController {
 
     showInputError.value = false;
 
-    if (!isConnectedToInternet.value) {
-      EasyLoading.showError('Tidak ada koneksi internet');
-      return;
-    }
-
     final jadwal = idJadwal.value.trim();
     final keterangan = keteranganController.text.trim();
     final photo = selectedPhoto.value;
@@ -116,6 +120,38 @@ class StoreDetailController extends BaseController {
     final photoFile = File(photo.path);
     if (!(await photoFile.exists())) {
       EasyLoading.showError('Foto tidak ditemukan');
+      return;
+    }
+
+    if (!isConnectedToInternet.value) {
+      isSubmitting.value = true;
+      EasyLoading.show(status: 'Menyimpan...');
+      try {
+        final savedPath = await _persistPendingPhoto(
+          sourceFile: photoFile,
+          idJadwal: jadwal,
+        );
+
+        await savePendingPatroliUpload(
+          PendingPatroliUpload(
+            idUser: userId.value,
+            idJadwal: jadwal,
+            keterangan: keterangan,
+            fotoPath: savedPath,
+            createdAtIso: DateTime.now().toIso8601String(),
+          ),
+        );
+
+        status.value = 'pending_upload';
+        EasyLoading.showSuccess('Patroli tersimpan, akan dikirim saat online');
+        Get.back(result: 'pending_upload');
+        return;
+      } catch (_) {
+        EasyLoading.showError('Gagal menyimpan patroli');
+      } finally {
+        EasyLoading.dismiss();
+        isSubmitting.value = false;
+      }
       return;
     }
 
@@ -144,6 +180,27 @@ class StoreDetailController extends BaseController {
       EasyLoading.dismiss();
       isSubmitting.value = false;
     }
+  }
+
+  Future<String> _persistPendingPhoto({
+    required File sourceFile,
+    required String idJadwal,
+  }) async {
+    final docs = await getApplicationDocumentsDirectory();
+    final pendingDir = Directory('${docs.path}/pending_upload/patroli');
+    if (!(await pendingDir.exists())) {
+      await pendingDir.create(recursive: true);
+    }
+
+    final baseName = sourceFile.path.split(RegExp(r'[\\\\/]')).last;
+    final dotIndex = baseName.lastIndexOf('.');
+    final ext = dotIndex >= 0 ? baseName.substring(dotIndex) : '';
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    final fileName = 'patroli_${idJadwal}_$timestamp$ext';
+    final targetPath = '${pendingDir.path}/$fileName';
+    final copied = await sourceFile.copy(targetPath);
+    return copied.path;
   }
 
   @override

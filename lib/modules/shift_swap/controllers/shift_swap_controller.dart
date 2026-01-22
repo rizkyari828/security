@@ -3,7 +3,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:staffku/api/api_repository.dart';
-import 'package:staffku/models/request/shift_swap/submit_shift_swap_request.dart';
+import 'package:staffku/models/request/shift_swap/simpan_shift_request.dart';
+import 'package:staffku/models/response/shift_swap/get_shift_response.dart';
 import 'package:staffku/modules/home/base_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,19 +13,23 @@ class ShiftSwapController extends BaseController {
     : super(apiRepository: apiRepository);
 
   final TextEditingController tglTukarController = TextEditingController();
-  final TextEditingController userIdPenggantiController =
-      TextEditingController();
+  final TextEditingController noteController = TextEditingController();
 
-  final RxString shiftTukar = ''.obs;
   DateTime selectedTglTukar = DateTime.now();
 
-  final List<String> shiftOptions = const ['Pagi', 'Siang', 'Malam'];
+  final RxList<ShiftOption> shiftOptions = <ShiftOption>[].obs;
+  final Rxn<ShiftOption> selectedShift = Rxn<ShiftOption>();
+  final RxBool isLoadingShiftOptions = false.obs;
+  final formVersion = 0.obs;
+
+  void markFormDirty() => formVersion.value++;
 
   bool get canSubmit {
+    formVersion.value;
     return userId.value.trim().isNotEmpty &&
         tglTukarController.text.trim().isNotEmpty &&
-        shiftTukar.value.isNotEmpty &&
-        userIdPenggantiController.text.trim().isNotEmpty;
+        (selectedShift.value?.idShift != null) &&
+        noteController.text.trim().isNotEmpty;
   }
 
   Future<void> selectTglTukar(BuildContext context) async {
@@ -41,14 +46,15 @@ class ShiftSwapController extends BaseController {
       'yyyy-MM-dd',
       'id_ID',
     ).format(selected);
+    markFormDirty();
   }
 
-  SubmitShiftSwapRequest buildRequest() {
-    return SubmitShiftSwapRequest(
-      userId: userId.value.trim(),
-      tanggalTukar: tglTukarController.text.trim(),
-      shiftTukar: shiftTukar.value,
-      userIdPengganti: userIdPenggantiController.text.trim(),
+  SimpanShiftRequest buildRequest() {
+    return SimpanShiftRequest(
+      idShift: selectedShift.value?.idShift?.toString() ?? '',
+      tanggal: tglTukarController.text.trim(),
+      note: noteController.text.trim(),
+      idUser: userId.value.trim(),
     );
   }
 
@@ -59,7 +65,7 @@ class ShiftSwapController extends BaseController {
       return;
     }
 
-    final res = await apiRepository.submitShiftSwap(buildRequest());
+    final res = await apiRepository.simpanShift(buildRequest());
     if (res?.error == false) {
       EasyLoading.showSuccess('Berhasil disimpan');
       EasyLoading.dismiss();
@@ -74,6 +80,7 @@ class ShiftSwapController extends BaseController {
   void onReady() {
     super.onReady();
     _loadUsers();
+    loadShiftOptions();
   }
 
   Future<void> _loadUsers() async {
@@ -82,10 +89,17 @@ class ShiftSwapController extends BaseController {
     groupId.value = prefs.getString('groupId') ?? '';
   }
 
+  Future<void> loadShiftOptions() async {
+    isLoadingShiftOptions.value = true;
+    final res = await apiRepository.getShiftOptions();
+    shiftOptions.assignAll(res?.data ?? []);
+    isLoadingShiftOptions.value = false;
+  }
+
   @override
   void onClose() {
     tglTukarController.dispose();
-    userIdPenggantiController.dispose();
+    noteController.dispose();
     super.onClose();
   }
 }

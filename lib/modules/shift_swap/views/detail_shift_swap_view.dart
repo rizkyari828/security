@@ -14,15 +14,36 @@ class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('EEEE, d MMMM yyyy', 'id_ID');
 
+    String clean(String? value) {
+      final text = (value ?? '').toString().trim();
+      if (text.isEmpty) return '-';
+      if (text.toLowerCase() == 'null') return '-';
+      return text;
+    }
+
     return Scaffold(
       backgroundColor: ColorConstants.lightGray,
       appBar: CommonWidget.appBar(title: 'Detail Tukar Shift'),
       body: Obx(() {
         final detail = controller.detail.value;
-        if (detail.idTukarShift == null) {
+        if (controller.isLoading.value && detail == null) {
           return Center(
             child: CircularProgressIndicator(
               backgroundColor: ColorConstants.mainColor,
+            ),
+          );
+        }
+
+        if (detail == null) {
+          return Center(
+            child: Text(
+              'Data tidak ditemukan',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: Colors.black.withValues(alpha: 0.65),
+              ),
             ),
           );
         }
@@ -32,10 +53,17 @@ class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
             status == 'proses' ||
             status == 'waiting' ||
             status == 'waiting for approval' ||
-            status == 'pending';
+            status == 'pending' ||
+            status == 'menunggu' ||
+            status == 'menunggu persetujuan' ||
+            status == 'diproses';
         final showApproval = controller.groupId.value != '1' &&
             controller.approvalCondition.value == true &&
             canApprove;
+
+        final displayStatus = controller.status.value.trim().isNotEmpty
+            ? controller.status.value
+            : controller.statusApproval.value;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -43,8 +71,8 @@ class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ApprovalFlow.statusApproval(
-                (detail.statusTukar ?? '').toString(),
-                (detail.levelApproval ?? '').toString(),
+                displayStatus,
+                '',
               ),
               const SizedBox(height: 12),
               const DetailSectionTitle(title: 'Informasi'),
@@ -55,38 +83,55 @@ class ShiftSwapDetailView extends GetView<ShiftSwapDetailController> {
                     DetailInfoRow(
                       icon: Icons.person_outline_rounded,
                       label: 'Username',
-                      value: (detail.user ?? '').toString(),
+                      value: clean(controller.nama.value),
                     ),
                     const SizedBox(height: 12),
                     DetailInfoRow(
                       icon: Icons.calendar_today_outlined,
                       label: 'Tanggal tukar',
-                      value: detail.tanggalTukar == null
+                      value: detail.tglTukar == null
                           ? '-'
-                          : dateFormat.format(detail.tanggalTukar!),
+                          : dateFormat.format(detail.tglTukar!),
                     ),
                     const SizedBox(height: 12),
                     DetailInfoRow(
                       icon: Icons.swap_horiz_rounded,
-                      label: 'Shift tukar',
-                      value: (detail.shiftTukar ?? '-').toString(),
+                      label: 'Shift sebelum',
+                      value: clean(detail.shiftBefore),
                     ),
                     const SizedBox(height: 12),
                     DetailInfoRow(
-                      icon: Icons.person_add_alt_1_outlined,
-                      label: 'Pengganti',
-                      value: (detail.userPengganti ?? '-').toString(),
+                      icon: Icons.swap_horiz_rounded,
+                      label: 'Shift sesudah',
+                      value: clean(detail.shiftAfter),
                     ),
                   ],
                 ),
               ),
-              if ((detail.alasan ?? '').toString().trim().isNotEmpty) ...[
+              if (clean(detail.note) != '-') ...[
                 const SizedBox(height: 12),
-                const DetailSectionTitle(title: 'Alasan'),
+                const DetailSectionTitle(title: 'Catatan'),
                 const SizedBox(height: 8),
                 DetailSectionCard(
                   child: Text(
-                    (detail.alasan ?? '').toString().trim(),
+                    clean(detail.note),
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: ColorConstants.black,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+              ],
+              if (clean(detail.noteTolak) != '-') ...[
+                const SizedBox(height: 12),
+                const DetailSectionTitle(title: 'Catatan Approval'),
+                const SizedBox(height: 8),
+                DetailSectionCard(
+                  child: Text(
+                    clean(detail.noteTolak),
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13.5,

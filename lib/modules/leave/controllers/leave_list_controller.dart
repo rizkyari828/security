@@ -57,7 +57,7 @@ class LeaveListController extends BaseController {
     super.onClose();
   }
 
-  void getIzin(page) async {
+  Future<void> getIzin(page) async {
     final res = await apiRepository.listIzin(
       page: page,
       data: IdRequest(id: userId.value, token: token.value),
@@ -65,19 +65,27 @@ class LeaveListController extends BaseController {
     listIzin.addAll(res?.data ?? []);
   }
 
-  Future<void> onRefresh() async {
-    await Future.delayed(Duration(milliseconds: 1000));
+  Future<void> _reloadFirstPage() async {
     listIzin.clear();
     page.value = 1;
-    getIzin(page.value);
+    await getIzin(page.value);
+  }
+
+  Future<void> onRefresh() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    await _reloadFirstPage();
     refreshController.refreshCompleted();
   }
 
-  void goToDetailPages({String id = ""}) {
-    Get.toNamed(Routes.DETAIL_LEAVE, arguments: id);
+  Future<void> goToDetailPages({String id = ""}) async {
+    await Get.toNamed(Routes.DETAIL_LEAVE, arguments: id);
+    await _reloadFirstPage();
   }
 
-  void goToAddPages() {
-    Get.toNamed(Routes.ADD_LEAVE);
+  Future<void> goToAddPages() async {
+    final result = await Get.toNamed(Routes.ADD_LEAVE);
+    if (result == true) {
+      await _reloadFirstPage();
+    }
   }
 }

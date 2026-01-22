@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:staffku/api/base_provider.dart';
 import 'package:staffku/models/models.dart';
 import 'package:staffku/models/request/agent/submit_agent.dart';
@@ -48,9 +50,10 @@ import 'package:staffku/models/request/patroli/submit_patroli_request.dart';
 import 'package:staffku/models/request/store/detail_request_leave.dart';
 import 'package:staffku/models/request/store/update_qty_request.dart';
 import 'package:staffku/models/request/submit_mood_request.dart';
-import 'package:staffku/models/request/shift_swap/detail_shift_swap_request.dart';
-import 'package:staffku/models/request/shift_swap/submit_shift_swap_request.dart';
-import 'package:staffku/models/request/shift_swap/update_approval_shift_swap_request.dart';
+import 'package:staffku/models/request/shift_swap/detail_shift_request.dart';
+import 'package:staffku/models/request/shift_swap/list_shift_request.dart';
+import 'package:staffku/models/request/shift_swap/simpan_shift_request.dart';
+import 'package:staffku/models/request/shift_swap/approve_shift_request.dart';
 import 'package:staffku/models/request/update_fcm_profile_request.dart';
 import 'package:staffku/models/request/update_photo_profile_request.dart';
 import 'package:get/get.dart';
@@ -441,25 +444,39 @@ class ApiProvider extends BaseProvider {
   //ENDIZIN
 
   //START SHIFT SWAP
-  Future<Response> getShiftSwap(String path, UserIdRequest data) {
-    return post(path, data.toJson());
+  Future<Response> listShift(String path, ListShiftRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
   }
 
-  Future<Response> getShowShiftSwap(String path, ShowShiftSwapRequest data) {
-    return post(path, data.toJson());
+  Future<Response> detailShift(String path, DetailShiftRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
   }
 
-  Future<Response> submitShiftSwap(String path, SubmitShiftSwapRequest data) {
-    print(data.toJson());
-    return post(path, data.toJson());
+  Future<Response> simpanShift(String path, SimpanShiftRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
   }
 
-  Future<Response> updateApprovalShiftSwap(
-    String path,
-    UpdateApprovalShiftSwapRequest data,
-  ) {
-    return post(path, data.toJson());
+  Future<Response> approveShift(String path, ApproveShiftRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
   }
+
+  Future<Response> getShiftOptions(String path) => get(path);
   //END SHIFT SWAP
 
   //START CLAIM
@@ -517,9 +534,28 @@ class ApiProvider extends BaseProvider {
   }
 
   Future<Response> downloadFileFromUrl(String url) {
-    return get(
+    return httpClient.get<Uint8List>(
       url,
       headers: const {'X-Show-Error': '1', 'accept': 'application/pdf'},
+      responseInterceptor: (request, _, response) async {
+        final headers = <String, String>{};
+        response.headers.forEach((key, values) {
+          headers[key] = values.join(',');
+        });
+
+        final builder = BytesBuilder(copy: false);
+        await for (final chunk in response) {
+          builder.add(chunk);
+        }
+        final bytes = builder.takeBytes();
+
+        return Response<Uint8List>(
+          headers: headers,
+          statusCode: response.statusCode,
+          statusText: response.reasonPhrase,
+          body: bytes,
+        );
+      },
     );
   }
   //END PAYSLIP

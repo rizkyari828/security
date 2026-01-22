@@ -71,16 +71,26 @@ class AgentListController extends GetxController {
     refreshController.refreshCompleted();
   }
 
-  void goToDetailPages({DataAgent? dataAgent}) {
-    Get.toNamed(Routes.DETAIL_AGENT, arguments: {'data_lead': dataAgent});
+  Future<void> _reloadFirstPage() async {
+    list.clear();
+    page.value = 1;
+    getAgent(page.value);
+  }
+
+  Future<void> goToDetailPages({DataAgent? dataAgent}) async {
+    final result = await Get.toNamed(
+      Routes.DETAIL_AGENT,
+      arguments: {'data_lead': dataAgent},
+    );
+    if (result == true) {
+      await _reloadFirstPage();
+    }
   }
 
   void goToAddPages() async {
     var result = await Get.toNamed(Routes.ADD_AGENT);
     if (result == true) {
-      list.clear();
-      page.value = 1;
-      getAgent(page.value);
+      await _reloadFirstPage();
     }
   }
 }

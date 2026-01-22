@@ -65,7 +65,10 @@ class StoreView extends GetView<StoreListController> {
     }
 
     final total = items.length;
-    final doneCount = items.where((e) => (e.status ?? '0') == '1').length;
+    final doneCount = items.where((e) {
+      final status = (e.status ?? '0').trim();
+      return status == '1' || status == 'pending_upload';
+    }).length;
     final pendingCount = total - doneCount;
 
     return ListView.builder(
@@ -235,10 +238,17 @@ class _PatroliItemCard extends StatelessWidget {
 
   bool get _isDone => status == '1';
 
+  bool get _isPendingUpload => status == 'pending_upload';
+
   @override
   Widget build(BuildContext context) {
     final statusColor = _isDone ? Colors.green : Colors.orange;
-    final statusLabel = _isDone ? 'Selesai' : 'Belum patroli';
+    final statusLabel = _isDone
+        ? 'Selesai'
+        : (_isPendingUpload ? 'Pending Upload' : 'Belum patroli');
+    final statusIcon = _isDone
+        ? Icons.check_rounded
+        : (_isPendingUpload ? Icons.cloud_upload_rounded : Icons.schedule_rounded);
 
     return Material(
       color: Colors.white,
@@ -259,7 +269,7 @@ class _PatroliItemCard extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  _isDone ? Icons.check_rounded : Icons.schedule_rounded,
+                  statusIcon,
                   color: statusColor,
                 ),
               ),

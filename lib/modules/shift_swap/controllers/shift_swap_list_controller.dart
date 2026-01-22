@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:staffku/api/api_repository.dart';
-import 'package:staffku/models/request/user_id_request.dart';
-import 'package:staffku/models/response/shift_swap/list_shift_swap_response.dart';
+import 'package:staffku/models/request/shift_swap/list_shift_request.dart';
+import 'package:staffku/models/response/shift_swap/list_shift_response.dart';
 import 'package:staffku/routes/app_pages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,20 +10,20 @@ class ShiftSwapListController extends GetxController {
   final ApiRepository apiRepository;
   ShiftSwapListController({required this.apiRepository});
 
-  var listShiftSwap = <ShiftSwapListItem>[].obs;
+  var listShift = <ListShiftItem>[].obs;
   RxString groupId = ''.obs;
   RxString userId = ''.obs;
-  RxInt page = 1.obs;
+  RxBool isLoading = false.obs;
 
   RefreshController refreshController = RefreshController(
     initialRefresh: false,
   );
 
   @override
-  void onReady() {
+  void onReady() async {
     super.onReady();
-    _loadUsers();
-    getShiftSwap(page.value);
+    await _loadUsers();
+    await fetchList();
   }
 
   Future<void> _loadUsers() async {
@@ -32,38 +32,42 @@ class ShiftSwapListController extends GetxController {
     userId.value = prefs.getString('userId') ?? '';
   }
 
-  void getShiftSwap(int page) async {
-    final res = await apiRepository.listShiftSwap(
-      data: UserIdRequest(id: userId.value, page: page.toString(), limit: '10'),
+  Future<void> fetchList() async {
+    isLoading.value = true;
+    final res = await apiRepository.listShift(
+      data: ListShiftRequest(idUser: userId.value),
     );
-    listShiftSwap.addAll(res?.data ?? []);
+    listShift.assignAll(res?.data ?? []);
+    isLoading.value = false;
   }
 
   Future<void> onRefresh() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-    listShiftSwap.clear();
-    page.value = 1;
-    getShiftSwap(page.value);
+    await fetchList();
     refreshController.refreshCompleted();
   }
 
-  void onLoading() async {
-    page.value = page.value + 1;
-    await Future.delayed(const Duration(milliseconds: 1000));
-    getShiftSwap(page.value);
-    refreshController.loadComplete();
-  }
-
-  void goToDetailPages({String id = ''}) {
-    Get.toNamed(Routes.DETAIL_SHIFT_SWAP, arguments: id);
+  Future<void> goToDetailPages({required ListShiftItem item}) async {
+    await Get.toNamed(
+      Routes.DETAIL_SHIFT_SWAP,
+      arguments: {
+        'id': item.id?.toString() ?? '',
+        'status': item.status ?? '',
+        'nama': item.nama ?? '',
+      },
+    );
+    await fetchList();
   }
 
   void goToAddPages() async {
     final result = await Get.toNamed(Routes.ADD_SHIFT_SWAP);
     if (result == true) {
-      listShiftSwap.clear();
-      page.value = 1;
-      getShiftSwap(page.value);
+      fetchList();
     }
+  }
+
+  @override
+  void onClose() {
+    refreshController.dispose();
+    super.onClose();
   }
 }

@@ -18,8 +18,14 @@ FutureOr<Response> responseInterceptor(
   try {
     if (kDebugMode) {
       print(request.url);
-      if (response.body != null) {
-        print(response.body);
+      final body = response.body;
+      if (body != null &&
+          (body is String ||
+              body is Map ||
+              body is List ||
+              body is num ||
+              body is bool)) {
+        print(body);
       }
     }
 
@@ -30,7 +36,11 @@ FutureOr<Response> responseInterceptor(
       return response;
     }
 
-    if (response.statusCode == 200) {
+    final contentType =
+        (response.headers?['content-type'] ?? '').toLowerCase();
+    final isJson = contentType.contains('application/json');
+
+    if (response.statusCode == 200 && isJson && response.body != null) {
       try {
         final message = ErrorResponse.fromJson(response.body);
         if (message.error == true) {

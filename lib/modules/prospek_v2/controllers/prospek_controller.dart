@@ -74,16 +74,26 @@ class ProspekV2Controller extends GetxController {
     refreshController.refreshCompleted();
   }
 
-  void goToDetailPages({ProspekDetailV2? dataProspect}) {
-    Get.toNamed(Routes.ADD_PROSPEK_V2, arguments: {'data_lead': dataProspect});
+  Future<void> _reloadFirstPage() async {
+    listProspek.clear();
+    page.value = 1;
+    getProspek(page.value);
+  }
+
+  Future<void> goToDetailPages({ProspekDetailV2? dataProspect}) async {
+    final result = await Get.toNamed(
+      Routes.ADD_PROSPEK_V2,
+      arguments: {'data_lead': dataProspect},
+    );
+    if (result == true) {
+      await _reloadFirstPage();
+    }
   }
 
   void goToAddPages() async {
     var result = await Get.toNamed(Routes.ADD_PROSPEK_V2);
     if (result == true) {
-      listProspek.clear();
-      page.value = 1;
-      getProspek(page.value);
+      await _reloadFirstPage();
     }
   }
 }

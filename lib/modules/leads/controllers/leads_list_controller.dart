@@ -71,16 +71,21 @@ class LeadsListController extends GetxController {
     refreshController.refreshCompleted();
   }
 
-  void goToDetailPages({DataLead? dataLead}) {
-    Get.toNamed(Routes.DETAIL_LEADS, arguments: {'data_lead': dataLead});
+  Future<void> _reloadFirstPage() async {
+    list.clear();
+    page.value = 1;
+    getLeads(page.value);
+  }
+
+  Future<void> goToDetailPages({DataLead? dataLead}) async {
+    await Get.toNamed(Routes.DETAIL_LEADS, arguments: {'data_lead': dataLead});
+    await _reloadFirstPage();
   }
 
   void goToAddPages() async {
     var result = await Get.toNamed(Routes.ADD_LEADS);
     if (result == true) {
-      list.clear();
-      page.value = 1;
-      getLeads(page.value);
+      await _reloadFirstPage();
     }
   }
 }

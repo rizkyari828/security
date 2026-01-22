@@ -8,6 +8,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:staffku/api/api_repository.dart';
 import 'package:staffku/models/request/attendance/attendance_wrapper.dart';
 import 'package:staffku/models/request/kunjungan/non_schedule_request.dart';
+import 'package:staffku/models/request/patroli/pending_patroli_upload.dart';
+import 'package:staffku/models/request/patroli/submit_patroli_request.dart';
 import 'package:staffku/shared/constants/colors.dart';
 import 'package:staffku/shared/utils/common_widget.dart';
 import 'package:staffku/shared/utils/size_config.dart';
@@ -20,6 +22,13 @@ class BaseController extends GetxController {
 
   RxBool isConnectedToInternet = true.obs;
   RxBool isConnectedToInternetWidget = false.obs;
+
+  static const String _pendingPatroliStorageKey = 'pendingPatroli';
+  static final RxInt _pendingPatroliCount = 0.obs;
+  static final RxBool _isSubmittingPendingPatroli = false.obs;
+
+  RxInt get pendingPatroliCount => _pendingPatroliCount;
+  RxBool get isSubmittingPendingPatroli => _isSubmittingPendingPatroli;
 
   final connectionMonitor = ConnectionTypeMonitor();
 
@@ -68,6 +77,7 @@ class BaseController extends GetxController {
       });
     }
     loadUsers();
+    refreshPendingPatroliCount();
   }
 
   final speedTest = SpeedTest();
@@ -293,6 +303,168 @@ class BaseController extends GetxController {
 
   void closeWidget() {
     isConnectedToInternetWidget.value = false;
+  }
+
+  void refreshPendingPatroliCount() {
+    final storage = GetStorage();
+    final dataList = storage.read<List<dynamic>>(_pendingPatroliStorageKey);
+    pendingPatroliCount.value = dataList?.length ?? 0;
+  }
+
+  Set<String> get pendingPatroliJadwalIds {
+    final storage = GetStorage();
+    final dataList = storage.read<List<dynamic>>(_pendingPatroliStorageKey);
+    if (dataList == null || dataList.isEmpty) return <String>{};
+
+    final ids = <String>{};
+    for (final item in dataList) {
+      if (item is! Map) continue;
+      final map = Map<String, dynamic>.from(item);
+      final id = map['id_jadwal']?.toString().trim();
+      if (id != null && id.isNotEmpty) {
+        ids.add(id);
+      }
+    }
+    return ids;
+  }
+
+  Future<void> savePendingPatroliUpload(PendingPatroliUpload upload) async {
+    final idUser = upload.idUser.trim();
+    final idJadwal = upload.idJadwal.trim();
+    if (idUser.isEmpty || idJadwal.isEmpty) return;
+
+    final storage = GetStorage();
+    final dataList = storage.read<List<dynamic>>(_pendingPatroliStorageKey);
+    final existing = <Map<String, dynamic>>[];
+    if (dataList != null) {
+      for (final item in dataList) {
+        if (item is! Map) continue;
+        existing.add(Map<String, dynamic>.from(item));
+      }
+    }
+
+    final List<Map<String, dynamic>> filtered = [];
+    for (final entry in existing) {
+      final existingUser = entry['id_user']?.toString().trim() ?? '';
+      final existingJadwal = entry['id_jadwal']?.toString().trim() ?? '';
+      if (existingUser == idUser && existingJadwal == idJadwal) {
+        final oldPath = entry['foto_path']?.toString().trim() ?? '';
+        final newPath = upload.fotoPath.trim();
+        if (oldPath.isNotEmpty && oldPath != newPath) {
+          try {
+            final file = File(oldPath);
+            if (await file.exists()) {
+              await file.delete();
+            }
+          } catch (_) {}
+        }
+        continue;
+      }
+      filtered.add(entry);
+    }
+
+    filtered.add(upload.toJson());
+    storage.write(_pendingPatroliStorageKey, filtered);
+    pendingPatroliCount.value = filtered.length;
+  }
+
+  Future<void> submitPendingPatroli() async {
+    if (isSubmittingPendingPatroli.value) return;
+    if (!isConnectedToInternet.value) {
+      EasyLoading.showError('Tidak ada koneksi internet');
+      return;
+    }
+
+    final storage = GetStorage();
+    final dataList = storage.read<List<dynamic>>(_pendingPatroliStorageKey);
+    if (dataList == null || dataList.isEmpty) return;
+
+    isSubmittingPendingPatroli.value = true;
+    EasyLoading.show(status: 'Mengirim...');
+
+    String? successMessage;
+    String? infoMessage;
+    try {
+      final updatedList = <Map<String, dynamic>>[];
+      for (final item in dataList) {
+        if (item is! Map) continue;
+        updatedList.add(Map<String, dynamic>.from(item));
+      }
+      final List<Map<String, dynamic>> failedToSubmit = [];
+
+      for (final data in updatedList) {
+        try {
+          final upload = PendingPatroliUpload.fromJson(data);
+          final success = await _submitPatroli(upload);
+          if (!success) {
+            failedToSubmit.add(data);
+          }
+        } catch (_) {
+          failedToSubmit.add(data);
+        }
+      }
+
+      if (failedToSubmit.isEmpty) {
+        storage.remove(_pendingPatroliStorageKey);
+        pendingPatroliCount.value = 0;
+        successMessage = 'Semua pending upload patroli berhasil dikirim';
+      } else {
+        storage.write(_pendingPatroliStorageKey, failedToSubmit);
+        pendingPatroliCount.value = failedToSubmit.length;
+        infoMessage = '${failedToSubmit.length} data patroli masih gagal dikirim';
+      }
+    } finally {
+      EasyLoading.dismiss();
+      isSubmittingPendingPatroli.value = false;
+    }
+
+    if (successMessage != null) {
+      EasyLoading.showSuccess(successMessage);
+      return;
+    }
+    if (infoMessage != null) {
+      EasyLoading.showInfo(infoMessage);
+      return;
+    }
+  }
+
+  Future<bool> _submitPatroli(PendingPatroliUpload upload) async {
+    try {
+      final idUser = upload.idUser.trim();
+      final idJadwal = upload.idJadwal.trim();
+      final keterangan = upload.keterangan.trim();
+      final fotoPath = upload.fotoPath.trim();
+
+      if (idUser.isEmpty || idJadwal.isEmpty || keterangan.isEmpty || fotoPath.isEmpty) {
+        return false;
+      }
+
+      final fotoFile = File(fotoPath);
+      if (!(await fotoFile.exists())) return false;
+
+      final req = SubmitPatroliRequest(
+        idUser: idUser,
+        idJadwal: idJadwal,
+        keterangan: keterangan,
+        foto: MultipartFile(
+          await fotoFile.readAsBytes(),
+          filename: fotoPath.split(RegExp(r'[\\\\/]')).last,
+        ),
+      );
+
+      final res = await apiRepository.submitPatroli(req);
+      final success = res?.error == false;
+
+      if (success) {
+        try {
+          await fotoFile.delete();
+        } catch (_) {}
+      }
+
+      return success;
+    } catch (_) {
+      return false;
+    }
   }
 
   int get pendingAttendanceCount {

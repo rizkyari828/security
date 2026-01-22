@@ -31,7 +31,18 @@ class StoreListController extends BaseController {
       final res = await apiRepository.listPatroli(
         PatroliListRequest(idUser: userId.value),
       );
-      listPatroli.assignAll(res?.data ?? []);
+      final items = (res?.data ?? []).toList();
+      final pendingIds = pendingPatroliJadwalIds;
+      if (pendingIds.isNotEmpty) {
+        for (final item in items) {
+          final idJadwal = (item.idJadwal ?? '').trim();
+          final status = (item.status ?? '0').trim();
+          if (status != '1' && idJadwal.isNotEmpty && pendingIds.contains(idJadwal)) {
+            item.status = 'pending_upload';
+          }
+        }
+      }
+      listPatroli.assignAll(items);
     } catch (_) {
       listPatroli.clear();
       errorMessage.value = 'Gagal memuat jadwal patroli';
@@ -64,6 +75,12 @@ class StoreListController extends BaseController {
 
     if (result == true) {
       await getPatroli();
+      return;
+    }
+
+    if (result == 'pending_upload') {
+      item.status = 'pending_upload';
+      listPatroli.refresh();
     }
   }
 }

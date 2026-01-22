@@ -368,77 +368,79 @@ class MainTab extends GetView<HomeController> {
         ),
         CommonWidget.rowWidth(width: sw * .03),
         Expanded(
-          child: _summaryCard(
-            title: 'Pending Upload',
-            icon: Icons.cloud_upload_rounded,
-            color: (controller.pendingAttendanceCount > 0)
-                ? Colors.orange
-                : Colors.green,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${controller.pendingAttendanceCount}',
-                  style: TextStyle(
-                    color: ColorConstants.black,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 22,
-                    letterSpacing: 0.2,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-                CommonWidget.captionText(
-                  text: 'data belum terkirim',
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 14),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: CommonWidget.setOpacity(
-                      ColorConstants.mainColor,
-                      0.10,
+          child: Obx(() {
+            final pendingCount = controller.pendingPatroliCount.value;
+            final canSend = pendingCount > 0;
+            final primaryColor = canSend
+                ? ColorConstants.mainColor
+                : Colors.grey.withValues(alpha: 0.55);
+            return _summaryCard(
+              title: 'Pending Upload Patroli',
+              icon: Icons.cloud_upload_rounded,
+              color: canSend ? Colors.orange : Colors.green,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$pendingCount',
+                    style: TextStyle(
+                      color: ColorConstants.black,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 22,
+                      letterSpacing: 0.2,
+                      fontFamily: 'Poppins',
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      width: 1,
+                  ),
+                  CommonWidget.captionText(
+                    text: 'data patroli belum terkirim',
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
                       color: CommonWidget.setOpacity(
-                        ColorConstants.mainColor,
-                        0.22,
+                        primaryColor,
+                        0.10,
                       ),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'KIRIM',
-                        style: TextStyle(
-                          color: ColorConstants.mainColor,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 11,
-                          letterSpacing: 0.4,
-                          fontFamily: 'Poppins',
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        width: 1,
+                        color: CommonWidget.setOpacity(
+                          primaryColor,
+                          0.22,
                         ),
                       ),
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 16,
-                        color: ColorConstants.mainColor,
-                      ),
-                    ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'KIRIM',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11,
+                            letterSpacing: 0.4,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 16,
+                          color: primaryColor,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            onTap: () async {
-              if (controller.pendingAttendanceCount == 0) return;
-              await controller.submitPendingAttendance();
-            },
-          ),
+                ],
+              ),
+              onTap: canSend ? () => controller.submitPendingPatroli() : null,
+            );
+          }),
         ),
       ],
     );
@@ -449,7 +451,7 @@ class MainTab extends GetView<HomeController> {
     required IconData icon,
     required Color color,
     required Widget child,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
     return InkWell(
       borderRadius: BorderRadius.circular(14),
@@ -475,14 +477,18 @@ class MainTab extends GetView<HomeController> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  title.toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w800,
-                    fontSize: 11,
-                    letterSpacing: 0.6,
-                    fontFamily: 'Poppins',
+                Expanded(
+                  child: Text(
+                    title.toUpperCase(),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11,
+                      letterSpacing: 0.6,
+                      fontFamily: 'Poppins',
+                    ),
                   ),
                 ),
                 Container(

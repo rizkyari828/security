@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:staffku/models/response/shift_swap/get_shift_response.dart';
 import 'package:staffku/modules/shift_swap/controllers/shift_swap_controller.dart';
 import 'package:staffku/shared/utils/common_widget.dart';
 import 'package:staffku/shared/widgets/button.dart';
@@ -40,18 +41,23 @@ class AddShiftSwapView extends GetView<ShiftSwapController> {
                   onSuffixPressed: () => controller.selectTglTukar(context),
                 ),
                 const SizedBox(height: 10.0),
+                if (controller.isLoadingShiftOptions.value)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10.0),
+                    child: LinearProgressIndicator(minHeight: 2),
+                  ),
                 CustomDropDownSearch(
                   listItem: controller.shiftOptions,
-                  labelText: 'Shift Tukar',
-                  selectedItem: controller.shiftTukar.value.isEmpty
-                      ? null
-                      : controller.shiftTukar.value,
+                  labelText: 'Shift',
+                  enabled: !controller.isLoadingShiftOptions.value,
+                  selectedItem: controller.selectedShift.value,
                   onChanged: (value) {
-                    controller.shiftTukar.value = (value ?? '').toString();
+                    controller.selectedShift.value = value as ShiftOption?;
+                    controller.markFormDirty();
                   },
                 ),
                 if (controller.showInputError.value &&
-                    controller.shiftTukar.value.isEmpty)
+                    controller.selectedShift.value == null)
                   const Padding(
                     padding: EdgeInsets.only(top: 4.0, left: 4.0),
                     child: Text(
@@ -59,12 +65,28 @@ class AddShiftSwapView extends GetView<ShiftSwapController> {
                       style: TextStyle(color: Colors.red, fontSize: 12),
                     ),
                   ),
-                InputInputField(
-                  controller: controller.userIdPenggantiController,
-                  labelText: 'User ID Pengganti',
-                  keyboardType: TextInputType.number,
+                const SizedBox(height: 20.0),
+                const Padding(
+                  padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
+                  child: Text(
+                    'Catatan / alasan',
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 14,
+                      letterSpacing: 0.5,
+                      color: Color.fromARGB(255, 20, 22, 24),
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ),
+                TextAreaField(
+                  controller: controller.noteController,
+                  hintText: 'Tulis catatan / alasan',
                   isRequired: true,
                   showError: controller.showInputError.value,
+                  minLines: 3,
+                  maxLines: 5,
+                  onChanged: (_) => controller.markFormDirty(),
                 ),
                 const SizedBox(height: 30.0),
                 CustomButton(

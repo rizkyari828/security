@@ -50,9 +50,10 @@ import 'package:staffku/models/request/patroli/submit_patroli_request.dart';
 import 'package:staffku/models/request/store/detail_request_leave.dart';
 import 'package:staffku/models/request/store/update_qty_request.dart';
 import 'package:staffku/models/request/submit_mood_request.dart';
-import 'package:staffku/models/request/shift_swap/detail_shift_swap_request.dart';
-import 'package:staffku/models/request/shift_swap/submit_shift_swap_request.dart';
-import 'package:staffku/models/request/shift_swap/update_approval_shift_swap_request.dart';
+import 'package:staffku/models/request/shift_swap/detail_shift_request.dart';
+import 'package:staffku/models/request/shift_swap/list_shift_request.dart';
+import 'package:staffku/models/request/shift_swap/simpan_shift_request.dart';
+import 'package:staffku/models/request/shift_swap/approve_shift_request.dart';
 import 'package:staffku/models/request/update_fcm_profile_request.dart';
 import 'package:staffku/models/request/update_photo_profile_request.dart';
 import 'package:staffku/models/request/user_id_request.dart';
@@ -85,8 +86,9 @@ import 'package:staffku/models/response/patroli/patroli_list_response.dart';
 import 'package:staffku/models/response/prospek/list.dart';
 import 'package:staffku/models/response/prospek/master_data_response.dart';
 import 'package:staffku/models/response/prospek/master_id_response.dart';
-import 'package:staffku/models/response/shift_swap/list_shift_swap_response.dart';
-import 'package:staffku/models/response/shift_swap/show_shift_swap_response.dart';
+import 'package:staffku/models/response/shift_swap/detail_shift_response.dart';
+import 'package:staffku/models/response/shift_swap/get_shift_response.dart';
+import 'package:staffku/models/response/shift_swap/list_shift_response.dart';
 import 'package:staffku/models/response/prospek/master_status_response.dart';
 import 'package:staffku/models/response/prospek/show.dart';
 import 'package:staffku/models/response/prospek_v2/detail_prospek_v2_response.dart';
@@ -103,6 +105,7 @@ import 'package:staffku/models/response/user/logout_response.dart';
 import 'package:staffku/models/response/user/user_schedule.dart';
 import 'package:staffku/models/response/user/users_response.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:staffku/shared/utils/url_utils.dart';
 
 import 'api.dart';
 
@@ -1429,15 +1432,15 @@ class ApiRepository {
   }
 
   //START SHIFT SWAP
-  Future<ShiftSwapListResponse?> listShiftSwap({
-    required UserIdRequest data,
+  Future<ListShiftResponse?> listShift({
+    required ListShiftRequest data,
   }) async {
     try {
       final res = await apiProvider
-          .getShiftSwap('/api/v2/list_tukar_shift', data)
+          .listShift('/api/v2/listShift', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
-        return ShiftSwapListResponse.fromJson(res.body);
+        return ListShiftResponse.fromJson(res.body);
       }
     } on TimeoutException catch (_) {
       EasyLoading.showError('Connection Timeout. Please try again later');
@@ -1448,15 +1451,13 @@ class ApiRepository {
     return null;
   }
 
-  Future<ShowShiftSwapResponse?> showShiftSwap(
-    ShowShiftSwapRequest data,
-  ) async {
+  Future<DetailShiftResponse?> detailShift(DetailShiftRequest data) async {
     try {
       final res = await apiProvider
-          .getShowShiftSwap('/api/v2/detail_tukar_shift', data)
+          .detailShift('/api/v2/detailShift', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
-        return ShowShiftSwapResponse.fromJson(res.body);
+        return DetailShiftResponse.fromJson(res.body);
       }
     } on TimeoutException catch (_) {
       EasyLoading.showError('Connection Timeout. Please try again later');
@@ -1467,10 +1468,10 @@ class ApiRepository {
     return null;
   }
 
-  Future<ErrorResponse?> submitShiftSwap(SubmitShiftSwapRequest data) async {
+  Future<ErrorResponse?> simpanShift(SimpanShiftRequest data) async {
     try {
       final res = await apiProvider
-          .submitShiftSwap('/api/v2/simpan_tukar_shift', data)
+          .simpanShift('/api/v2/simpanShift', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1484,12 +1485,27 @@ class ApiRepository {
     return null;
   }
 
-  Future<ErrorResponse?> updateApprovalShiftSwap(
-    UpdateApprovalShiftSwapRequest data,
-  ) async {
+  Future<GetShiftResponse?> getShiftOptions() async {
     try {
       final res = await apiProvider
-          .updateApprovalShiftSwap('/api/v2/approve_tukar_shift', data)
+          .getShiftOptions('/api/v2/getShift')
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return GetShiftResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ErrorResponse?> approveShift(ApproveShiftRequest data) async {
+    try {
+      final res = await apiProvider
+          .approveShift('/api/v2/approveShift', data)
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return ErrorResponse.fromJson(res.body);
@@ -1660,8 +1676,10 @@ class ApiRepository {
         return null;
       }
 
+      final normalizedPath = normalizeUrlForBase(ApiConstants.baseUrl, path);
+
       final fileRes = await apiProvider
-          .downloadFileFromUrl(path)
+          .downloadFileFromUrl(normalizedPath)
           .timeout(Duration(seconds: timeout));
       if (fileRes.statusCode != 200 && fileRes.statusCode != 401) return null;
 
@@ -1678,7 +1696,7 @@ class ApiRepository {
         return null;
       }
 
-      final bytes = await _collectBodyBytes(fileRes.bodyBytes);
+      final bytes = await _collectBodyBytes(fileRes.bodyBytes ?? fileRes.body);
       if (bytes == null || bytes.isEmpty) {
         EasyLoading.showError('File kosong / tidak ditemukan');
         return null;

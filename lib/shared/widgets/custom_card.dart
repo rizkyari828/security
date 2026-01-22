@@ -193,6 +193,12 @@ class CustomExpandedCardView extends StatelessWidget {
     if (lower.contains('selesai') || lower.contains('akhir')) {
       return Icons.event_outlined;
     }
+    if (lower.contains('sebelum') || lower.contains('before')) {
+      return Icons.arrow_back_rounded;
+    }
+    if (lower.contains('sesudah') || lower.contains('after')) {
+      return Icons.arrow_forward_rounded;
+    }
     if (lower.contains('tanggal') || lower.contains('date')) {
       return Icons.calendar_month_outlined;
     }
@@ -519,13 +525,21 @@ class _ApprovalTone {
   static _ApprovalTone from(String normalizedApproval) {
     final approval = normalizedApproval.trim();
     final isApproved =
-        approval == 'approved' || approval == 'approve' || approval == 'ok';
+        approval == 'approved' ||
+        approval == 'approve' ||
+        approval == 'ok' ||
+        approval == 'disetujui' ||
+        approval == 'setujui';
     final isPending = approval == 'pengajuan' ||
         approval == 'proses' ||
         approval == 'process' ||
         approval == 'waiting' ||
+        approval == 'waiting for approval' ||
         approval == 'pending' ||
-        approval == 'new';
+        approval == 'new' ||
+        approval == 'menunggu' ||
+        approval == 'menunggu persetujuan' ||
+        approval == 'diproses';
 
     if (isApproved) {
       return _ApprovalTone(
