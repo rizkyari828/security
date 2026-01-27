@@ -22,12 +22,14 @@ import 'package:intl/intl.dart';
 import 'package:staffku/shared/widgets/button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:face_camera/face_camera.dart';
+import 'package:staffku/shared/services/face_biometrics/face_biometrics_service.dart';
 
 class AttendanceController extends FaceRecognitionController {
   AttendanceController({required ApiRepository apiRepository})
     : super(apiRepository: apiRepository);
 
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
+  final FaceBiometricsService _faceBiometrics = Get.find<FaceBiometricsService>();
 
   var currentTab = MainTabs.home.obs;
   var users = Rxn<UsersResponse>();
@@ -93,49 +95,78 @@ class AttendanceController extends FaceRecognitionController {
   void submit(String type) async {
     final file = faceCameraCapture?.value;
     if (file != null) {
-      final res = await apiRepository.submitAttendance(
-        AttendanceSubmitRequest(
-          latitude: myLocation.latitude.toString(),
-          longitude: myLocation.longitude.toString(),
-          idUser: userId.value,
-          token: token.value,
-          // photo: MultipartFile(await imageFileList.first.readAsBytes(),
-          //     filename: imageFileList.first.name),
-          photo: MultipartFile(
-            await file.readAsBytes(),
-            filename: file.path.split('/').last,
-          ),
-        ),
-      );
-      if (res == null) {
-        EasyLoading.showError('Gagal mengirim absensi');
+      final currentUserId = userId.value.trim();
+      if (currentUserId.isEmpty) {
+        EasyLoading.showError('User belum tersedia');
+        return;
+      }
+      if (!_faceBiometrics.hasEnrollment(userId: currentUserId)) {
+        EasyLoading.showError('Face ID belum terdaftar. Silakan daftar dulu.');
         return;
       }
 
-      if (res.message == "berhasil absen masuk") {
-        if (type == 'Clock In') {
-          EasyLoading.showSuccess('Berhasil Clock In');
-          var now = new DateTime.now();
-          timeIn.value = DateFormat("HH:mm:ss").format(now);
-        } else {
-          EasyLoading.showSuccess('Berhasil Clock Out');
-          var now = new DateTime.now();
-          timeOut.value = DateFormat("HH:mm:ss").format(now);
+      try {
+        EasyLoading.show(status: 'Verifikasi wajah...');
+        final verify = await _faceBiometrics.verify(
+          userId: currentUserId,
+          sample: file,
+        );
+        EasyLoading.dismiss();
+        if (!verify.matched) {
+          EasyLoading.showError('Wajah tidak cocok. Coba lagi.');
+          return;
         }
-
-        validateAttandance();
-        _refreshHomeAttendanceCard();
-
-        faceCameraCapture?.value = File('');
-        Get.back();
-      } else {
-        faceCameraCapture?.value = File('');
-        if (type == 'Clock In') {
-          EasyLoading.showError('Gagal Clock In');
-        } else {
-          EasyLoading.showError('Gagal Clock Out');
-        }
+      } catch (e) {
+        EasyLoading.dismiss();
+        EasyLoading.showError(
+          e is FaceBiometricsException ? e.message : 'Gagal verifikasi wajah',
+        );
+        return;
       }
+
+      // final res = await apiRepository.submitAttendance(
+      //   AttendanceSubmitRequest(
+      //     latitude: myLocation.latitude.toString(),
+      //     longitude: myLocation.longitude.toString(),
+      //     idUser: userId.value,
+      //     token: token.value,
+      //     // photo: MultipartFile(await imageFileList.first.readAsBytes(),
+      //     //     filename: imageFileList.first.name),
+      //     photo: MultipartFile(
+      //       await file.readAsBytes(),
+      //       filename: file.path.split('/').last,
+      //     ),
+      //   ),
+      // );
+      // if (res == null) {
+      //   EasyLoading.showError('Gagal mengirim absensi');
+      //   return;
+      // }
+
+      // if (res.message == "berhasil absen masuk") {
+      //   if (type == 'Clock In') {
+      //     EasyLoading.showSuccess('Berhasil Clock In');
+      //     var now = new DateTime.now();
+      //     timeIn.value = DateFormat("HH:mm:ss").format(now);
+      //   } else {
+      //     EasyLoading.showSuccess('Berhasil Clock Out');
+      //     var now = new DateTime.now();
+      //     timeOut.value = DateFormat("HH:mm:ss").format(now);
+      //   }
+
+      //   validateAttandance();
+      //   _refreshHomeAttendanceCard();
+
+      //   faceCameraCapture?.value = File('');
+      //   Get.back();
+      // } else {
+      //   faceCameraCapture?.value = File('');
+      //   if (type == 'Clock In') {
+      //     EasyLoading.showError('Gagal Clock In');
+      //   } else {
+      //     EasyLoading.showError('Gagal Clock Out');
+      //   }
+      // }
     } else {
       EasyLoading.showError('Foto belum tersedia');
     }
@@ -144,6 +175,35 @@ class AttendanceController extends FaceRecognitionController {
   void submitOut(String type) async {
     final file = faceCameraCapture?.value;
     if (file != null) {
+      final currentUserId = userId.value.trim();
+      if (currentUserId.isEmpty) {
+        EasyLoading.showError('User belum tersedia');
+        return;
+      }
+      if (!_faceBiometrics.hasEnrollment(userId: currentUserId)) {
+        EasyLoading.showError('Face ID belum terdaftar. Silakan daftar dulu.');
+        return;
+      }
+
+      try {
+        EasyLoading.show(status: 'Verifikasi wajah...');
+        final verify = await _faceBiometrics.verify(
+          userId: currentUserId,
+          sample: file,
+        );
+        EasyLoading.dismiss();
+        if (!verify.matched) {
+          EasyLoading.showError('Wajah tidak cocok. Coba lagi.');
+          return;
+        }
+      } catch (e) {
+        EasyLoading.dismiss();
+        EasyLoading.showError(
+          e is FaceBiometricsException ? e.message : 'Gagal verifikasi wajah',
+        );
+        return;
+      }
+
       final res = await apiRepository.submitAttendanceOut(
         AttendanceSubmitRequest(
           latitude: myLocation.latitude.toString(),

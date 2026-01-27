@@ -15,6 +15,7 @@ const bool _forceManualCapture = bool.fromEnvironment(
 class FaceRecognitionWiget {
   static Widget faceCameraRecognizer(dynamic controller, String status) {
     final label = _statusLabel(status);
+    final allowLoosePositioning = status.trim().toLowerCase() == 'enroll';
 
     return Obx(() {
       final capturedPath = controller.faceCameraCapture?.value.path ?? '';
@@ -31,7 +32,6 @@ class FaceRecognitionWiget {
                   controller.faceCameraCapture?.value = File('');
                 },
                 onSubmit: () async {
-                  await controller.faceCameraController.startImageStream();
                   if (status.toLowerCase() == 'clock out') {
                     controller.submitOut(status);
                   } else {
@@ -42,6 +42,7 @@ class FaceRecognitionWiget {
             : _LiveCamera(
                 controller: controller.faceCameraController,
                 label: label,
+                allowLoosePositioning: allowLoosePositioning,
               ),
       );
     });
@@ -49,6 +50,7 @@ class FaceRecognitionWiget {
 
   static String _statusLabel(String status) {
     final normalized = status.trim().toLowerCase();
+    if (normalized == 'enroll') return 'Daftar Wajah';
     if (normalized == 'clock out') return 'Pulang';
     if (normalized == 'clock in') return 'Datang';
     return status.trim().isEmpty ? 'Absensi' : status;
@@ -56,10 +58,15 @@ class FaceRecognitionWiget {
 }
 
 class _LiveCamera extends StatelessWidget {
-  const _LiveCamera({required this.controller, required this.label});
+  const _LiveCamera({
+    required this.controller,
+    required this.label,
+    required this.allowLoosePositioning,
+  });
 
   final FaceCameraController controller;
   final String label;
+  final bool allowLoosePositioning;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +104,10 @@ class _LiveCamera extends StatelessWidget {
           child: SafeArea(
             top: false,
             minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: _CameraBottomBar(controller: controller),
+            child: _CameraBottomBar(
+              controller: controller,
+              allowLoosePositioning: allowLoosePositioning,
+            ),
           ),
         ),
       ],
@@ -234,9 +244,13 @@ class _CameraHeader extends StatelessWidget {
 }
 
 class _CameraBottomBar extends StatefulWidget {
-  const _CameraBottomBar({required this.controller});
+  const _CameraBottomBar({
+    required this.controller,
+    required this.allowLoosePositioning,
+  });
 
   final FaceCameraController controller;
+  final bool allowLoosePositioning;
 
   @override
   State<_CameraBottomBar> createState() => _CameraBottomBarState();
@@ -255,14 +269,17 @@ class _CameraBottomBarState extends State<_CameraBottomBar> {
         final wellPositioned = detected?.wellPositioned == true;
         final hasFace = detected?.face != null;
         final controlsEnabled = controller.enableControls;
+        final allowLoose = widget.allowLoosePositioning;
 
         final statusText = !hasFace
             ? 'Wajah belum terdeteksi'
-            : (wellPositioned ? 'Siap difoto' : 'Posisikan wajah di tengah');
+            : (wellPositioned || allowLoose
+                  ? 'Siap difoto'
+                  : 'Posisikan wajah di tengah');
 
         final statusColor = !hasFace
             ? const Color(0xFFB42318)
-            : (wellPositioned
+            : ((wellPositioned || allowLoose)
                   ? const Color(0xFF1B7F3B)
                   : const Color(0xFFB54708));
 
@@ -337,7 +354,11 @@ class _CameraBottomBarState extends State<_CameraBottomBar> {
             ),
             const SizedBox(height: 10),
             _CaptureButton(
-              enabled: manualMode ? true : (controlsEnabled && wellPositioned),
+              enabled:
+                  manualMode
+                      ? true
+                      : (controlsEnabled &&
+                          (wellPositioned || (allowLoose && hasFace))),
               onPressed: controller.captureImage,
             ),
           ],

@@ -1,7 +1,9 @@
 import 'dart:ui';
 
 import 'package:staffku/modules/home/attendance/attendance_controller.dart';
+import 'package:staffku/modules/home/attendance/face_id/face_id_enroll_page.dart';
 import 'package:staffku/shared/constants/colors.dart';
+import 'package:staffku/shared/services/face_biometrics/face_biometrics_service.dart';
 import 'package:staffku/shared/services/face_recognition/face_recognition_wiget.dart';
 import 'package:staffku/shared/widgets/button.dart';
 import 'package:flutter/material.dart';
@@ -80,13 +82,43 @@ class DiscoverTab extends GetView<AttendanceController> {
   }
 
   void _openFaceCamera(BuildContext context, String type) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            FaceRecognitionWiget.faceCameraRecognizer(controller, type),
-      ),
-    );
+    () async {
+      await controller.loadUsers();
+      final userId = controller.userId.value.trim();
+      if (userId.isEmpty) {
+        Get.snackbar(
+          "Error",
+          "User belum tersedia, silakan login ulang.",
+          icon: const Icon(Icons.error_outline, color: Colors.white),
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          borderRadius: 20,
+          margin: const EdgeInsets.all(15),
+          colorText: Colors.white,
+          duration: const Duration(seconds: 4),
+        );
+        return;
+      }
+
+      final faceBio = Get.find<FaceBiometricsService>();
+      if (!faceBio.hasEnrollment(userId: userId)) {
+        final enrolled = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(builder: (_) => FaceIdEnrollPage(userId: userId)),
+        );
+        if (enrolled != true || !faceBio.hasEnrollment(userId: userId)) {
+          return;
+        }
+      }
+
+      if (!context.mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => FaceRecognitionWiget.faceCameraRecognizer(controller, type),
+        ),
+      );
+    }();
   }
 }
 
