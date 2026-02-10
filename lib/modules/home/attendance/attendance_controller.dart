@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:staffku/models/request/attendance/submit_attendance.dart';
 import 'package:staffku/models/request/attendance/validate_attenance.dart';
 import 'package:staffku/models/response/attendance/attendance_validate.dart';
 import 'package:flutter/material.dart';
@@ -85,11 +84,6 @@ class AttendanceController extends FaceRecognitionController {
   void submitPhoto() {
     isPhoto.value = true;
     Get.back();
-  }
-
-  void _refreshHomeAttendanceCard() {
-    if (!Get.isRegistered<HomeController>()) return;
-    Get.find<HomeController>().getAttendanceInfo();
   }
 
   void submit(String type) async {
@@ -204,38 +198,38 @@ class AttendanceController extends FaceRecognitionController {
         return;
       }
 
-      final res = await apiRepository.submitAttendanceOut(
-        AttendanceSubmitRequest(
-          latitude: myLocation.latitude.toString(),
-          longitude: myLocation.longitude.toString(),
-          idUser: userId.value,
-          token: token.value,
-          // photo: MultipartFile(await imageFileList.first.readAsBytes(),
-          //     filename: imageFileList.first.name),
-          photo: MultipartFile(
-            await file.readAsBytes(),
-            filename: file.path.split('/').last,
-          ),
-        ),
-      );
-      print(res);
-      if (res == null) {
-        EasyLoading.showError('Gagal mengirim absensi');
-        return;
-      }
+      // final res = await apiRepository.submitAttendanceOut(
+      //   AttendanceSubmitRequest(
+      //     latitude: myLocation.latitude.toString(),
+      //     longitude: myLocation.longitude.toString(),
+      //     idUser: userId.value,
+      //     token: token.value,
+      //     // photo: MultipartFile(await imageFileList.first.readAsBytes(),
+      //     //     filename: imageFileList.first.name),
+      //     photo: MultipartFile(
+      //       await file.readAsBytes(),
+      //       filename: file.path.split('/').last,
+      //     ),
+      //   ),
+      // );
+      // print(res);
+      // if (res == null) {
+      //   EasyLoading.showError('Gagal mengirim absensi');
+      //   return;
+      // }
 
-      if (res.message == "berhasil absen keluar") {
-        EasyLoading.showSuccess('Berhasil Clock Out');
-        var now = new DateTime.now();
-        timeOut.value = DateFormat("HH:mm:ss").format(now);
+      // if (res.message == "berhasil absen keluar") {
+      //   EasyLoading.showSuccess('Berhasil Clock Out');
+      //   var now = new DateTime.now();
+      //   timeOut.value = DateFormat("HH:mm:ss").format(now);
 
-        validateAttandance();
-        _refreshHomeAttendanceCard();
+      //   validateAttandance();
+      //   _refreshHomeAttendanceCard();
 
-        Get.back();
-      } else {
-        EasyLoading.showError('Gagal Clock Out');
-      }
+      //   Get.back();
+      // } else {
+      //   EasyLoading.showError('Gagal Clock Out');
+      // }
     } else {
       EasyLoading.showError('Foto belum tersedia');
     }

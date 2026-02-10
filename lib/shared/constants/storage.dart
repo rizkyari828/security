@@ -10,4 +10,8 @@ class StorageConstants {
   static final String userId = 'userId';
   static final String groupId = 'groupId';
   static final String tipe = 'tipe';
+
+  // FCM
+  static final String fcmToken = 'fcmToken';
+  static final String fcmTokenSynced = 'fcmTokenSynced';
 }

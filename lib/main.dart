@@ -18,7 +18,7 @@ import 'firebase_options.dart';
 import 'package:get_storage/get_storage.dart';
 
 Future<void> _messageHandler(RemoteMessage message) async {
-  print('background message ${message.notification!.body}');
+  print('background message ${message.notification?.body ?? message.data}');
 }
 
 /// Create a [AndroidNotificationChannel] for heads up notifications
@@ -66,6 +66,12 @@ void main() async {
         >()
         ?.createNotificationChannel(channel);
 
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.requestNotificationsPermission();
+
     /// Update the iOS foreground notification presentation options to allow
     /// heads up notifications.
     await FirebaseMessaging.instance
@@ -94,6 +100,11 @@ class _AppState extends State<App> {
   void initState() {
     super.initState();
     initFCM();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        Get.find<FcmTokenService>().initAndSync();
+      } catch (_) {}
+    });
   }
 
   @override
@@ -136,42 +147,16 @@ Future<void> initFCM() async {
   if (Firebase.apps.isEmpty) return;
 
   // if (StringUtils.isEmpty(_userData.token)) return; // stop
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print('User granted permission');
-  } else {
-    print('User declined or has not accepted permission');
-  }
-
-  messaging.getToken().then((value) {
-    print("token FCM " + value.toString());
-  });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage event) {
-    // PushNotification notification = PushNotification(
-    //   title: event.notification?.title,
-    //   body: event.notification?.body,
-    //   // type: event.notification?.type,
-    // );
-
-    FirebaseMessaging.onBackgroundMessage(_messageHandler);
-
     print("message recieved");
-    print(event.notification!.body);
+    print(event.notification?.body ?? event.data);
+    final title = event.notification?.title;
+    final body = event.notification?.body;
+    if (title == null && body == null) return;
     Get.snackbar(
-      event.notification!.title ?? '',
-      event.notification!.body.toString(),
+      title ?? '',
+      body?.toString() ?? '',
       icon: Icon(Icons.person, color: Colors.white),
       snackPosition: SnackPosition.TOP,
       backgroundColor: Colors.green,

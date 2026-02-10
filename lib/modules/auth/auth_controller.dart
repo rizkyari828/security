@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:staffku/api/api.dart';
 import 'package:staffku/models/models.dart';
@@ -94,17 +93,11 @@ class AuthController extends GetxController {
             prefs.setBool('menu_kuisioner', menus.kuisioner ?? false);
           }
 
+          Get.find<FcmTokenService>().syncToken();
           Get.offAllNamed(Routes.HOME);
         }
       }
     }
-
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    messaging.getToken().then((value) {
-      print("token FCM Home $value");
-      submitToken(value);
-    });
   }
 
   void submitToken(token) async {
