@@ -68,6 +68,7 @@ import 'package:staffku/models/response/benefit/type_cuti.dart';
 import 'package:staffku/models/response/cuti_sales/list_cuti_sales.dart';
 import 'package:staffku/models/response/cuti_sales/show_cuti_sales.dart';
 import 'package:staffku/models/response/dashboard/dashboard_kunjungan_response.dart';
+import 'package:staffku/models/response/menu/list_menu_response.dart';
 import 'package:staffku/models/response/izin/list_izin.dart';
 import 'package:staffku/models/response/izin/show_izin.dart';
 import 'package:staffku/models/response/izin/type_izin.dart';
@@ -1874,6 +1875,32 @@ class ApiRepository {
           .timeout(Duration(seconds: timeout));
       if (res.statusCode == 200 || res.statusCode == 401) {
         return AgentResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ListMenuResponse?> listMenu(UserIdRequest data) async {
+    try {
+      final res = await apiProvider
+          .listMenu('/api/v2/list_menu', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        final body = res.body;
+        if (body is Map<String, dynamic>) {
+          return ListMenuResponse.fromJson(body);
+        }
+        if (body is Map) {
+          return ListMenuResponse.fromJson(Map<String, dynamic>.from(body));
+        }
+        if (body is String) {
+          return listMenuResponseFromJson(body);
+        }
       }
     } on TimeoutException catch (_) {
       EasyLoading.showError('Connection Timeout. Please try again later');

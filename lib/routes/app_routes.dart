@@ -51,4 +51,8 @@ abstract class Routes {
   static const ADD_CLAIM = '/add-claim';
   static const DETAIL_CLAIM = '/detail-claim';
   static const PAYSLIP = '/payslip';
+  static const SOS = '/sos';
+  static const ADD_SOS = '/add-sos';
+  static const DETAIL_SOS = '/detail-sos';
+  static const SOS_SAMPLE = '/sos-sample';
 }

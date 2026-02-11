@@ -45,6 +45,11 @@ import 'package:staffku/modules/shift_swap/bindings/shift_swap_binding.dart';
 import 'package:staffku/modules/shift_swap/views/add_shift_swap_view.dart';
 import 'package:staffku/modules/shift_swap/views/detail_shift_swap_view.dart';
 import 'package:staffku/modules/shift_swap/views/shift_swap_view.dart';
+import 'package:staffku/modules/sos/bindings/sos_binding.dart';
+import 'package:staffku/modules/sos/views/add_sos_view.dart';
+import 'package:staffku/modules/sos/views/sos_detail_view.dart';
+import 'package:staffku/modules/sos/views/sos_list_view.dart';
+import 'package:staffku/modules/sos/views/sos_sample_view.dart';
 
 import '../modules/notification/bindings/notification_binding.dart';
 import '../modules/notification/views/notification_view.dart';
@@ -280,6 +285,25 @@ class AppPages {
       name: Routes.PAYSLIP,
       page: () => const PayslipView(),
       binding: PayslipBinding(),
+    ),
+    GetPage(
+      name: Routes.SOS,
+      page: () => const SosListView(),
+      binding: SosBinding(),
+    ),
+    GetPage(
+      name: Routes.ADD_SOS,
+      page: () => const AddSosView(),
+      binding: SosBinding(),
+    ),
+    GetPage(
+      name: Routes.DETAIL_SOS,
+      page: () => const SosDetailView(),
+      binding: SosBinding(),
+    ),
+    GetPage(
+      name: Routes.SOS_SAMPLE,
+      page: () => const SosSampleView(),
     ),
   ];
 }

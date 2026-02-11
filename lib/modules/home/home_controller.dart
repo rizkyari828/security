@@ -10,8 +10,10 @@ import 'package:staffku/models/request/store/update_qty_request.dart';
 import 'package:staffku/models/request/submit_mood_request.dart';
 import 'package:staffku/models/request/update_fcm_profile_request.dart';
 import 'package:staffku/models/request/update_photo_profile_request.dart';
+import 'package:staffku/models/request/user_id_request.dart';
 import 'package:staffku/models/response/benefit/benefit_dashboard_response.dart';
 import 'package:staffku/models/response/dashboard/dashboard_response.dart';
+import 'package:staffku/models/response/menu/list_menu_response.dart';
 import 'package:staffku/models/response/rate/show_rate_review_response.dart';
 import 'dart:io' as Io;
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -40,6 +42,7 @@ class HomeController extends BaseController {
     : super(apiRepository: apiRepository);
 
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
+  static const String _homeMenuCacheKey = 'homeMenus';
   late LatLng myLocation = LatLng(0, 0);
 
   var currentTab = MainTabs.home.obs;
@@ -52,6 +55,10 @@ class HomeController extends BaseController {
   final Rxn<Schedule> attendanceSchedule = Rxn<Schedule>();
   final RxBool attendanceInOfficeArea = false.obs;
   final RxString attendanceDistanceToOffice = ''.obs;
+
+  final RxBool homeMenuLoading = false.obs;
+  final RxBool homeMenuLoadedFromApi = false.obs;
+  final RxList<MenuItem> homeMenus = <MenuItem>[].obs;
 
   late MainTab mainTab;
   late DiscoverTab discoverTab;
@@ -160,6 +167,10 @@ class HomeController extends BaseController {
     Get.toNamed(Routes.PAYSLIP);
   }
 
+  void goToSosPages() {
+    Get.toNamed(Routes.SOS);
+  }
+
   void onLoading() async {
     await Future.delayed(const Duration(milliseconds: 500));
     refreshController.loadComplete();
@@ -168,6 +179,8 @@ class HomeController extends BaseController {
   @override
   void onReady() async {
     super.onReady();
+    await loadUsers();
+    await loadHomeMenus();
     // if (isConnectedToInternetWidget.value == false) {
     try {
       await determinePosition();
@@ -1023,7 +1036,8 @@ class HomeController extends BaseController {
     await Future.delayed(Duration(milliseconds: 1000));
     listPatroli.clear();
     await getPatroli();
-    loadUsers();
+    await loadUsers();
+    await loadHomeMenus();
     getAttendanceInfo();
     refreshController.refreshCompleted();
   }
@@ -1287,65 +1301,181 @@ class HomeController extends BaseController {
     }
   }
 
+  Future<void> loadHomeMenus() async {
+    final id = userId.value.trim();
+    if (id.isEmpty) return;
+
+    homeMenuLoading.value = true;
+    try {
+      final res = await apiRepository.listMenu(UserIdRequest(id: id));
+      homeMenuLoadedFromApi.value = res != null && res.error == false;
+
+      if (homeMenuLoadedFromApi.value) {
+        final items = res?.data ?? <MenuItem>[];
+        homeMenus.assignAll(items);
+        box.write(
+          _homeMenuCacheKey,
+          items.map((x) => x.toJson()).toList(growable: false),
+        );
+      } else {
+        _loadHomeMenusFromCache();
+      }
+    } catch (_) {
+      homeMenuLoadedFromApi.value = false;
+      _loadHomeMenusFromCache();
+    } finally {
+      homeMenuLoading.value = false;
+    }
+  }
+
+  void _loadHomeMenusFromCache() {
+    try {
+      final cached = box.read<List<dynamic>>(_homeMenuCacheKey);
+      if (cached == null || cached.isEmpty) {
+        homeMenus.clear();
+        return;
+      }
+      final items = cached
+          .whereType<Map>()
+          .map((x) => MenuItem.fromJson(Map<String, dynamic>.from(x)))
+          .toList();
+      homeMenus.assignAll(items);
+    } catch (_) {
+      homeMenus.clear();
+    }
+  }
+
+  String _normalizeMenuKey(String? value) {
+    final raw = (value ?? '').toLowerCase().trim();
+    return raw.replaceAll(RegExp(r'[^a-z0-9]+'), '');
+  }
+
+  VoidCallback? _onPressedForMenu(MenuItem item) {
+    final id = item.idMenu;
+    if (id != null) {
+      switch (id) {
+        case 1:
+          return goToAbsensiPages;
+        case 2:
+          return goToCutiPages;
+        case 3:
+          return goToOvertimePages;
+        case 4:
+          return goToIzinPages;
+        case 5:
+          return goToShiftSwapPages;
+        case 6:
+          return goToClaimPages;
+        case 7:
+          return goToPatroliPages;
+        case 8:
+          return goToSosPages;
+        case 9:
+          return goToPayslipPages;
+      }
+    }
+
+    switch (_normalizeMenuKey(item.namaMenu)) {
+      case 'absen':
+      case 'absensi':
+        return goToAbsensiPages;
+      case 'cuti':
+        return goToCutiPages;
+      case 'lembur':
+      case 'overtime':
+        return goToOvertimePages;
+      case 'izin':
+        return goToIzinPages;
+      case 'tukarshift':
+      case 'swapshift':
+      case 'shiftswap':
+        return goToShiftSwapPages;
+      case 'claim':
+      case 'klaim':
+        return goToClaimPages;
+      case 'patroli':
+        return goToPatroliPages;
+      case 'sos':
+        return goToSosPages;
+      case 'payslip':
+        return goToPayslipPages;
+    }
+    return null;
+  }
+
+  IconData _iconForMenu(MenuItem item) {
+    final id = item.idMenu;
+    if (id != null) {
+      switch (id) {
+        case 1:
+          return Icons.calendar_month_rounded;
+        case 2:
+          return Icons.airplane_ticket_rounded;
+        case 3:
+          return Icons.work_rounded;
+        case 4:
+          return Icons.assignment_turned_in_rounded;
+        case 5:
+          return Icons.swap_horiz_rounded;
+        case 6:
+          return Icons.medical_services_rounded;
+        case 7:
+          return Icons.security_rounded;
+        case 8:
+          return Icons.sos_rounded;
+        case 9:
+          return Icons.receipt_long_rounded;
+      }
+    }
+
+    switch (_normalizeMenuKey(item.namaMenu)) {
+      case 'absen':
+      case 'absensi':
+        return Icons.calendar_month_rounded;
+      case 'cuti':
+        return Icons.airplane_ticket_rounded;
+      case 'lembur':
+      case 'overtime':
+        return Icons.work_rounded;
+      case 'izin':
+        return Icons.assignment_turned_in_rounded;
+      case 'tukarshift':
+      case 'swapshift':
+      case 'shiftswap':
+        return Icons.swap_horiz_rounded;
+      case 'claim':
+      case 'klaim':
+        return Icons.medical_services_rounded;
+      case 'patroli':
+        return Icons.security_rounded;
+      case 'sos':
+        return Icons.sos_rounded;
+      case 'payslip':
+        return Icons.receipt_long_rounded;
+    }
+    return Icons.widgets_rounded;
+  }
+
+  Map<String, dynamic> _cardFromMenu(MenuItem item) {
+    final title = (item.namaMenu ?? '').trim();
+    final onPressed = _onPressedForMenu(item);
+    return {
+      'show': true,
+      'icon': _iconForMenu(item),
+      'title': title.isEmpty ? 'Menu' : title,
+      'onPressed': onPressed ??
+          () {
+            EasyLoading.showInfo(
+              title.isEmpty ? 'Menu belum tersedia' : 'Menu "$title" belum tersedia',
+            );
+          },
+      'color': ColorConstants.secondaryColor,
+    };
+  }
+
   List<Map<String, dynamic>> get visibleMenus {
-    return [
-      {
-        'show': true,
-        'icon': Icons.calendar_month_rounded,
-        'title': 'Absensi',
-        'onPressed': goToAbsensiPages,
-        'color': ColorConstants.secondaryColor,
-      },
-      {
-        'show': true,
-        'icon': Icons.airplane_ticket_rounded,
-        'title': 'Cuti',
-        'onPressed': goToCutiPages,
-        'color': ColorConstants.secondaryColor,
-      },
-      {
-        'show': true,
-        'icon': Icons.work_rounded,
-        'title': 'Lembur',
-        'onPressed': goToOvertimePages,
-        'color': ColorConstants.secondaryColor,
-      },
-      {
-        'show': true,
-        'icon': Icons.swap_horiz_rounded,
-        'title': 'Tukar Shift',
-        'onPressed': goToShiftSwapPages,
-        'color': ColorConstants.secondaryColor,
-      },
-      {
-        'show': true,
-        'icon': Icons.assignment_turned_in_rounded,
-        'title': 'Izin',
-        'onPressed': goToIzinPages,
-        'color': ColorConstants.secondaryColor,
-      },
-      {
-        'show': true,
-        'icon': Icons.medical_services_rounded,
-        'title': 'Claim',
-        'onPressed': goToClaimPages,
-        'color': ColorConstants.secondaryColor,
-      },
-      {
-        'show': true,
-        'icon': Icons.security_rounded,
-        'title': 'Patroli',
-        'onPressed': goToPatroliPages,
-        'color': ColorConstants.secondaryColor,
-      },
-      {
-        'show': true,
-        'icon': Icons.receipt_long_rounded,
-        'title': 'Payslip',
-        'onPressed': goToPayslipPages,
-        'color': ColorConstants.secondaryColor,
-      },
-    ];
+    if (homeMenus.isEmpty) return <Map<String, dynamic>>[];
+    return homeMenus.map(_cardFromMenu).toList(growable: false);
   }
 
   @override

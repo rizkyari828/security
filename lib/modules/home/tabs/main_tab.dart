@@ -57,6 +57,9 @@ class MainTab extends GetView<HomeController> {
           .toList(),
     );
 
+    final showQuickActions =
+        controller.homeMenuLoading.value || controller.visibleMenus.isNotEmpty;
+
     final sh = SizeConfig().screenHeight;
     return SingleChildScrollView(
       child: Stack(
@@ -83,20 +86,29 @@ class MainTab extends GetView<HomeController> {
                         padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                         child: _attendanceInfoCard(context),
                       ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            top: 6.0,
-                            bottom: 10.0,
-                          ),
-                          child: CommonWidget.minHeadText(
-                            text: 'Aksi Cepat',
-                            color: ColorConstants.black,
+                      if (showQuickActions) ...[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 6.0,
+                              bottom: 10.0,
+                            ),
+                            child: CommonWidget.minHeadText(
+                              text: 'Aksi Cepat',
+                              color: ColorConstants.black,
+                            ),
                           ),
                         ),
-                      ),
-                      quickActionsGrid,
+                        if (controller.homeMenuLoading.value &&
+                            controller.visibleMenus.isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        else
+                          quickActionsGrid,
+                      ],
                       // Row(
                       //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       //   children: [

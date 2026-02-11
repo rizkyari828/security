@@ -591,6 +591,15 @@ class ApiProvider extends BaseProvider {
     return post(path, data.toJson());
   }
 
+  Future<Response> listMenu(String path, UserIdRequest data) {
+    return post(
+      path,
+      data.toJson(),
+      contentType: 'application/json',
+      headers: const {'accept': 'application/json'},
+    );
+  }
+
   Future<Response> submitPatroli(String path, SubmitPatroliRequest data) {
     return post(
       path,
