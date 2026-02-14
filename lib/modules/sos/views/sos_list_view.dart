@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:staffku/models/response/sos/list_sos_response.dart';
 import 'package:staffku/modules/sos/controllers/sos_list_controller.dart';
-import 'package:staffku/modules/sos/models/sos_report.dart';
+import 'package:staffku/modules/sos/utils/sos_image_utils.dart';
 import 'package:staffku/shared/constants/constants.dart';
 
 class SosListView extends GetView<SosListController> {
@@ -55,11 +56,12 @@ class SosListView extends GetView<SosListController> {
       onRefresh: controller.onRefresh,
       onLoading: controller.onLoading,
       child: ListView.builder(
-        itemCount: (controller.reports.isEmpty ? 1 : controller.reports.length + 1),
+        itemCount:
+            controller.reports.isEmpty ? 1 : controller.reports.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) return _header(context);
           final item = controller.reports[index - 1];
-          return _reportItem(context, item);
+          return _reportItem(item);
         },
       ),
     );
@@ -97,7 +99,9 @@ class SosListView extends GetView<SosListController> {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.16),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.18),
+                      ),
                     ),
                     child: const Icon(Icons.sos_rounded, color: Colors.white),
                   ),
@@ -117,7 +121,7 @@ class SosListView extends GetView<SosListController> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Catat keterangan singkat dan bukti foto. API menyusul.',
+                          'Catat keterangan singkat dan bukti foto untuk kebutuhan tindak lanjut.',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12.5,
@@ -131,11 +135,16 @@ class SosListView extends GetView<SosListController> {
                   ),
                   const SizedBox(width: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.16),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,8 +175,75 @@ class SosListView extends GetView<SosListController> {
               ),
             ),
           ),
-          if (total == 0) _emptyState(context),
+          if (total == 0 && controller.hasError.value) _errorState(context),
+          if (total == 0 && !controller.hasError.value) _emptyState(context),
         ],
+      ),
+    );
+  }
+
+  Widget _errorState(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: ColorConstants.borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Gagal memuat laporan',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: ColorConstants.black,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              controller.errorMessage.value.trim().isEmpty
+                  ? 'Terjadi kendala saat mengambil data SOS.'
+                  : controller.errorMessage.value.trim(),
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: Colors.black.withValues(alpha: 0.68),
+                height: 1.25,
+              ),
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => controller.loadReports(showLoading: true),
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Coba Lagi'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorConstants.mainColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -236,11 +312,14 @@ class SosListView extends GetView<SosListController> {
     );
   }
 
-  Widget _reportItem(BuildContext context, SosReport item) {
+  Widget _reportItem(SosListItem item) {
+    final imagePath = resolveSosImageUrl(item.img ?? '');
+    final keterangan = (item.keterangan ?? '').trim();
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
       child: InkWell(
-        onTap: () => controller.goToDetail(id: item.id),
+        onTap: () => controller.goToDetail(item: item),
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
@@ -258,14 +337,14 @@ class SosListView extends GetView<SosListController> {
           ),
           child: Row(
             children: [
-              _thumb(item.photoPath),
+              _thumb(imagePath),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.keterangan.trim().isEmpty ? 'Laporan SOS' : item.keterangan.trim(),
+                      keterangan.isEmpty ? 'Laporan SOS' : keterangan,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -278,7 +357,7 @@ class SosListView extends GetView<SosListController> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      _formatDateTime(item.createdAt),
+                      _formatDateTime(item.cdate),
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 12,
@@ -290,7 +369,10 @@ class SosListView extends GetView<SosListController> {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(Icons.chevron_right_rounded, color: Colors.black.withValues(alpha: 0.35)),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.black.withValues(alpha: 0.35),
+              ),
             ],
           ),
         ),
@@ -312,24 +394,37 @@ class SosListView extends GetView<SosListController> {
 
   Widget _imageOrPlaceholder(String path) {
     if (path.trim().isEmpty) {
-      return Icon(Icons.image_not_supported_rounded, color: Colors.black.withValues(alpha: 0.35));
+      return Icon(
+        Icons.image_not_supported_rounded,
+        color: Colors.black.withValues(alpha: 0.35),
+      );
     }
 
-    if (kIsWeb) {
-      return Image.network(path, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _placeholder());
+    final isNetwork =
+        path.startsWith('http://') || path.startsWith('https://');
+    if (kIsWeb || isNetwork) {
+      return Image.network(
+        path,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _placeholder(),
+      );
     }
 
     final file = File(path);
     if (!file.existsSync()) return _placeholder();
-    return Image.file(file, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _placeholder());
+    return Image.file(
+      file,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => _placeholder(),
+    );
   }
 
   Widget _placeholder() {
     return Icon(Icons.image_rounded, color: Colors.black.withValues(alpha: 0.35));
   }
 
-  String _formatDateTime(DateTime date) {
-    return DateFormat("d MMM yyyy • HH:mm", "id_ID").format(date);
+  String _formatDateTime(DateTime? date) {
+    if (date == null) return '-';
+    return DateFormat('d MMM yyyy - HH:mm', 'id_ID').format(date);
   }
 }
-

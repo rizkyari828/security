@@ -35,13 +35,14 @@ class MainTab extends GetView<HomeController> {
   Widget _buildGridView(scaleWidth, context, HomeController controller) {
     final sw = SizeConfig().screenWidth;
     final menus = controller.visibleMenus;
-    const cardsPerRow = 4;
+    final cardsPerRow = _quickActionColumns(menus.length, sw);
     final contentWidth = sw * 0.92; // karena container margin kiri/kanan = 4%
-    final spacing = contentWidth * 0.03;
+    final spacing = (contentWidth * 0.022).clamp(8.0, 10.0);
     final tileWidth =
         (contentWidth - (spacing * (cardsPerRow - 1))) / cardsPerRow;
 
     final quickActionsGrid = Wrap(
+      alignment: WrapAlignment.center,
       spacing: spacing,
       runSpacing: spacing,
       children: menus
@@ -210,6 +211,13 @@ class MainTab extends GetView<HomeController> {
         ],
       ),
     );
+  }
+
+  int _quickActionColumns(int menuCount, double screenWidth) {
+    if (menuCount <= 0) return 1;
+    final maxColumns = screenWidth < 350 ? 3 : 4;
+    if (menuCount <= maxColumns) return menuCount;
+    return maxColumns;
   }
 
   Widget header(HomeController controller) {
@@ -529,15 +537,15 @@ class MainTab extends GetView<HomeController> {
     Color colorCircle, {
     double? width,
   }) {
-    final isCompact = (width ?? 0) > 0 && (width ?? 0) < 102;
-    final iconBgSize = isCompact ? 44.0 : 52.0;
-    final iconSize = isCompact ? 24.0 : 28.0;
-    final fontSize = isCompact ? 10.0 : 12.0;
-    final padding = isCompact ? 8.0 : 10.0;
-    const gap = 8.0;
+    final isCompact = (width ?? 0) > 0 && (width ?? 0) < 120;
+    final iconBgSize = isCompact ? 40.0 : 46.0;
+    final iconSize = isCompact ? 20.0 : 23.0;
+    final fontSize = isCompact ? 9.6 : 10.8;
+    final padding = isCompact ? 7.5 : 8.5;
+    const gap = 6.0;
     final minHeight = (padding * 2) + iconBgSize + gap + (fontSize * 2.8);
     final baseHeight = (width ?? 0) > 0
-        ? (width! * (isCompact ? 1.15 : 1.22))
+        ? (width! * (isCompact ? 1.08 : 1.14))
         : SizeConfig().screenHeight * .14;
     final height = math.max(baseHeight, minHeight);
 

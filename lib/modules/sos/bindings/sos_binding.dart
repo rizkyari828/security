@@ -8,7 +8,6 @@ class SosBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<SosListController>(() => SosListController(apiRepository: Get.find()));
     Get.lazyPut<SosFormController>(() => SosFormController(apiRepository: Get.find()));
-    Get.lazyPut<SosDetailController>(() => SosDetailController(apiRepository: Get.find()));
+    Get.lazyPut<SosDetailController>(() => SosDetailController());
   }
 }
-

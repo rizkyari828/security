@@ -1,22 +1,19 @@
 import 'package:get/get.dart';
-import 'package:staffku/api/api_repository.dart';
-import 'package:staffku/modules/sos/controllers/sos_list_controller.dart';
-import 'package:staffku/modules/sos/models/sos_report.dart';
+import 'package:staffku/models/response/sos/list_sos_response.dart';
 
 class SosDetailController extends GetxController {
-  SosDetailController({required this.apiRepository});
-
-  final ApiRepository apiRepository;
-
-  final Rxn<SosReport> report = Rxn<SosReport>();
+  final Rxn<SosListItem> report = Rxn<SosListItem>();
 
   @override
   void onReady() {
     super.onReady();
     final arg = Get.arguments;
-    final id = arg is int ? arg : int.tryParse(arg?.toString() ?? '');
-    if (id == null) return;
-    report.value = Get.find<SosListController>().findById(id);
+    if (arg is SosListItem) {
+      report.value = arg;
+      return;
+    }
+    if (arg is Map) {
+      report.value = SosListItem.fromJson(Map<String, dynamic>.from(arg));
+    }
   }
 }
-

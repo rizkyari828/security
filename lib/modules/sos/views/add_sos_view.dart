@@ -81,7 +81,7 @@ class AddSosView extends GetView<SosFormController> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Isi keterangan singkat dan unggah foto sebagai bukti. Data saat ini disimpan lokal (API menyusul).',
+              'Isi keterangan singkat dan unggah foto sebagai bukti, lalu kirim ke server.',
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 12.5,
@@ -188,4 +188,3 @@ class AddSosView extends GetView<SosFormController> {
     );
   }
 }
-

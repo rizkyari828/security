@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:staffku/modules/sos/controllers/sos_detail_controller.dart';
+import 'package:staffku/modules/sos/utils/sos_image_utils.dart';
 import 'package:staffku/shared/constants/constants.dart';
 import 'package:staffku/shared/utils/common_widget.dart';
 
@@ -32,23 +33,36 @@ class SosDetailView extends GetView<SosDetailController> {
           );
         }
 
+        final imagePath = resolveSosImageUrl(report.img ?? '');
+        final cdate = report.cdate;
+        final user = (report.user ?? '').trim();
+        final keterangan = (report.keterangan ?? '').trim();
+
         return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _photoHero(report.photoPath),
+                _photoHero(imagePath),
                 const SizedBox(height: 14),
                 _metaCard(
                   title: 'Waktu',
-                  value: DateFormat("EEEE, d MMMM yyyy • HH:mm", "id_ID").format(report.createdAt),
+                  value: cdate == null
+                      ? '-'
+                      : DateFormat('EEEE, d MMMM yyyy - HH:mm', 'id_ID').format(cdate),
                   icon: Icons.schedule_rounded,
+                ),
+                const SizedBox(height: 10),
+                _metaCard(
+                  title: 'Pelapor',
+                  value: user.isEmpty ? '-' : user,
+                  icon: Icons.person_rounded,
                 ),
                 const SizedBox(height: 10),
                 _sectionCard(
                   title: 'Keterangan',
-                  body: report.keterangan.trim().isEmpty ? '-' : report.keterangan.trim(),
+                  body: keterangan.isEmpty ? '-' : keterangan,
                 ),
               ],
             ),
@@ -72,9 +86,15 @@ class SosDetailView extends GetView<SosDetailController> {
 
   Widget _imageOrPlaceholder(String path) {
     if (path.trim().isEmpty) {
-      return Icon(Icons.image_not_supported_rounded, color: Colors.black.withValues(alpha: 0.35));
+      return Icon(
+        Icons.image_not_supported_rounded,
+        color: Colors.black.withValues(alpha: 0.35),
+      );
     }
-    if (kIsWeb) {
+
+    final isNetwork =
+        path.startsWith('http://') || path.startsWith('https://');
+    if (kIsWeb || isNetwork) {
       return Image.network(
         path,
         fit: BoxFit.cover,
@@ -84,7 +104,11 @@ class SosDetailView extends GetView<SosDetailController> {
 
     final file = File(path);
     if (!file.existsSync()) return _placeholder();
-    return Image.file(file, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _placeholder());
+    return Image.file(
+      file,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => _placeholder(),
+    );
   }
 
   Widget _placeholder() {
@@ -198,4 +222,3 @@ class SosDetailView extends GetView<SosDetailController> {
     );
   }
 }
-

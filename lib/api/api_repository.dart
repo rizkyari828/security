@@ -54,6 +54,8 @@ import 'package:staffku/models/request/shift_swap/detail_shift_request.dart';
 import 'package:staffku/models/request/shift_swap/list_shift_request.dart';
 import 'package:staffku/models/request/shift_swap/simpan_shift_request.dart';
 import 'package:staffku/models/request/shift_swap/approve_shift_request.dart';
+import 'package:staffku/models/request/sos/list_sos_request.dart';
+import 'package:staffku/models/request/sos/submit_sos_request.dart';
 import 'package:staffku/models/request/update_fcm_profile_request.dart';
 import 'package:staffku/models/request/update_photo_profile_request.dart';
 import 'package:staffku/models/request/user_id_request.dart';
@@ -90,6 +92,7 @@ import 'package:staffku/models/response/prospek/master_id_response.dart';
 import 'package:staffku/models/response/shift_swap/detail_shift_response.dart';
 import 'package:staffku/models/response/shift_swap/get_shift_response.dart';
 import 'package:staffku/models/response/shift_swap/list_shift_response.dart';
+import 'package:staffku/models/response/sos/list_sos_response.dart';
 import 'package:staffku/models/response/prospek/master_status_response.dart';
 import 'package:staffku/models/response/prospek/show.dart';
 import 'package:staffku/models/response/prospek_v2/detail_prospek_v2_response.dart';
@@ -1592,6 +1595,60 @@ class ApiRepository {
     return null;
   }
   //END CLAIM
+
+  //START SOS
+  Future<SosListResponse?> listSos({required ListSosRequest data}) async {
+    try {
+      final res = await apiProvider
+          .listSos('/api/v2/list_sos', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        final body = res.body;
+        if (body is Map<String, dynamic>) {
+          return SosListResponse.fromJson(body);
+        }
+        if (body is Map) {
+          return SosListResponse.fromJson(Map<String, dynamic>.from(body));
+        }
+        if (body is String) {
+          return sosListResponseFromJson(body);
+        }
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<ErrorResponse?> submitSos(SubmitSosRequest data) async {
+    try {
+      final res = await apiProvider
+          .submitSos('/api/v2/simpan_sos', data)
+          .timeout(Duration(seconds: timeout));
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        final body = res.body;
+        if (body is Map<String, dynamic>) {
+          return ErrorResponse.fromJson(body);
+        }
+        if (body is Map) {
+          return ErrorResponse.fromJson(Map<String, dynamic>.from(body));
+        }
+        if (body is String) {
+          return errorResponseFromJson(body);
+        }
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+  //END SOS
 
   //START PAYSLIP
   Future<PayslipDownloadResult?> downloadPayslipExcel(

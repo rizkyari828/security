@@ -54,6 +54,8 @@ import 'package:staffku/models/request/shift_swap/detail_shift_request.dart';
 import 'package:staffku/models/request/shift_swap/list_shift_request.dart';
 import 'package:staffku/models/request/shift_swap/simpan_shift_request.dart';
 import 'package:staffku/models/request/shift_swap/approve_shift_request.dart';
+import 'package:staffku/models/request/sos/list_sos_request.dart';
+import 'package:staffku/models/request/sos/submit_sos_request.dart';
 import 'package:staffku/models/request/update_fcm_profile_request.dart';
 import 'package:staffku/models/request/update_photo_profile_request.dart';
 import 'package:get/get.dart';
@@ -511,6 +513,25 @@ class ApiProvider extends BaseProvider {
     return post(path, data.toJson());
   }
   //END CLAIM
+
+  //START SOS
+  Future<Response> listSos(String path, ListSosRequest data) {
+    return post(
+      path,
+      data.toJson(),
+      contentType: 'application/json',
+      headers: const {'accept': 'application/json'},
+    );
+  }
+
+  Future<Response> submitSos(String path, SubmitSosRequest data) {
+    return post(
+      path,
+      data.toFormData(),
+      contentType: 'multipart/form-data',
+    );
+  }
+  //END SOS
 
   //START PAYSLIP
   Future<Response> downloadPayslipExcel(
