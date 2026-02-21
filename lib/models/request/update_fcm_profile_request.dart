@@ -3,6 +3,7 @@
 //     final updateFcmProfileRequest = updateFcmProfileRequestFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:get/get.dart';
 
 UpdateFcmProfileRequest updateFcmProfileRequestFromJson(String str) => UpdateFcmProfileRequest.fromJson(json.decode(str));
 
@@ -10,16 +11,25 @@ String updateFcmProfileRequestToJson(UpdateFcmProfileRequest data) => json.encod
 
 class UpdateFcmProfileRequest {
     UpdateFcmProfileRequest({
-        this.fcmToken,
+        this.idUser,
+        this.fcmId,
     });
 
-    String? fcmToken;
+    String? idUser;
+    String? fcmId;
 
     factory UpdateFcmProfileRequest.fromJson(Map<String, dynamic> json) => UpdateFcmProfileRequest(
-        fcmToken: json["fcm_token"] == null ? null : json["fcm_token"],
+        idUser: (json["id_user"] ?? '').toString(),
+        fcmId: (json["fcm_id"] ?? json["fcm_token"] ?? '').toString(),
     );
 
     Map<String, dynamic> toJson() => {
-        "fcm_token": fcmToken == null ? null : fcmToken,
+        "id_user": idUser == null ? null : idUser,
+        "fcm_id": fcmId == null ? null : fcmId,
     };
+
+    FormData toFormData() => FormData({
+        "id_user": (idUser ?? '').trim(),
+        "fcm_id": (fcmId ?? '').trim(),
+    });
 }

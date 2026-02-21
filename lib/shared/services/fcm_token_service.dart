@@ -52,23 +52,24 @@ class FcmTokenService extends GetxService {
 
   Future<void> _syncTokenInternal(String? token) async {
     if (token == null || token.trim().isEmpty) return;
-    prefs.setString(StorageConstants.fcmToken, token);
+    final trimmedToken = token.trim();
+    prefs.setString(StorageConstants.fcmToken, trimmedToken);
 
-    final hasAuthToken =
-        (prefs.getString(StorageConstants.token) ?? '').trim().isNotEmpty;
-    if (!hasAuthToken) return;
+    final userId = (prefs.getString(StorageConstants.userId) ?? '').trim();
+    if (userId.isEmpty) return;
 
-    final lastSynced =
-        (prefs.getString(StorageConstants.fcmTokenSynced) ?? '').trim();
-    if (lastSynced == token.trim()) return;
+    final syncKey = '$userId|$trimmedToken';
+    final lastSynced = (prefs.getString(StorageConstants.fcmTokenSynced) ?? '')
+        .trim();
+    if (lastSynced == syncKey) return;
 
     try {
       final res = await apiRepository.updateFcmProfile(
-        UpdateFcmProfileRequest(fcmToken: token.trim()),
+        UpdateFcmProfileRequest(idUser: userId, fcmId: trimmedToken),
       );
 
       if (res?.error == false) {
-        prefs.setString(StorageConstants.fcmTokenSynced, token.trim());
+        prefs.setString(StorageConstants.fcmTokenSynced, syncKey);
       }
     } catch (_) {
       // ignore: best effort, will retry on next app start / refresh

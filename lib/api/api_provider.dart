@@ -21,6 +21,7 @@ import 'package:staffku/models/request/detail_request.dart';
 import 'package:staffku/models/request/detail_request_leave.dart';
 import 'package:staffku/models/request/id_request.dart';
 import 'package:staffku/models/request/input_request.dart';
+import 'package:staffku/models/request/face/save_face_request.dart';
 import 'package:staffku/models/request/izin/submit_izin_request.dart';
 import 'package:staffku/models/request/izin/update_approval_request.dart';
 import 'package:staffku/models/request/kuisioner/kuisioner_input_data_request.dart';
@@ -276,9 +277,14 @@ class ApiProvider extends BaseProvider {
     return get(path);
   }
 
+  Future<Response> saveFace(String path, SaveFaceRequest data) {
+    print(data.toFormData().fields);
+    return post(path, data.toFormData(), contentType: 'multipart/form-data');
+  }
+
   Future<Response> updateFcmProfile(String path, UpdateFcmProfileRequest data) {
-    print(data.toJson());
-    return patch(path, data.toJson());
+    print(data.toFormData().fields);
+    return post(path, data.toFormData(), contentType: 'multipart/form-data');
   }
 
   Future<Response> updatePhotoProfile(

@@ -99,8 +99,10 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    initFCM();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        Get.find<FcmNotificationService>().init();
+      } catch (_) {}
       try {
         Get.find<FcmTokenService>().initAndSync();
       } catch (_) {}
@@ -143,66 +145,3 @@ void configLoading() {
     ..animationStyle = EasyLoadingAnimationStyle.scale;
 }
 
-Future<void> initFCM() async {
-  if (Firebase.apps.isEmpty) return;
-
-  // if (StringUtils.isEmpty(_userData.token)) return; // stop
-
-  FirebaseMessaging.onMessage.listen((RemoteMessage event) {
-    print("message recieved");
-    print(event.notification?.body ?? event.data);
-    final title = event.notification?.title;
-    final body = event.notification?.body;
-    if (title == null && body == null) return;
-    Get.snackbar(
-      title ?? '',
-      body?.toString() ?? '',
-      icon: Icon(Icons.person, color: Colors.white),
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.green,
-      borderRadius: 20,
-      margin: EdgeInsets.all(15),
-      colorText: Colors.white,
-      duration: Duration(seconds: 4),
-      isDismissible: true,
-      // //dismissDirection: SnackDismissDirection.HORIZONTAL,
-      forwardAnimationCurve: Curves.easeOutBack,
-    );
-  });
-
-  // FirebaseMessaging.onMessageOpenedApp.listen((message) {
-  //   print('Message clicked!');
-  //   // print(message);
-  //   if (message.data.containsKey('type')) {
-  //     if (message.data['type'] == 'cnc') {
-  //       Get.toNamed(Routes.CN_C);
-  //     } else if (message.data['type'] == 'izin') {
-  //       Get.toNamed(Routes.LEAVE);
-  //     } else if (message.data['type'] == 'cuti') {
-  //       Get.toNamed(Routes.BENEFIT);
-  //     } else if (message.data['type'] == 'overtime') {
-  //       Get.toNamed(Routes.PROSPEK);
-  //     } else if (message.data['type'] == 'task') {
-  //       Get.toNamed(Routes.HOME);
-  //     } else {
-  //       Get.toNamed(Routes.HOME);
-  //     }
-  //   }
-  // });
-  // FirebaseMessaging.instance
-  //     .getInitialMessage()
-  //     .then((RemoteMessage? message) {
-  //   if (message != null) {
-  //     // _openNotificationPage(message);
-  //   }
-  // });
-  // FirebaseMessaging.onMessage.listen(_handleFirebaseMessage);
-  // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-  //   print('A new onMessageOpenedApp event was published!');
-  //   // _openNotificationPage(message);
-  // });
-  // FirebaseMessaging.onMessageOpenedApp.listen(_openNotificationPage);
-  // FirebaseMessaging.instance.getInitialMessage().then((remoteMessage) {
-  //   if (remoteMessage != null) _openNotificationPage(remoteMessage);
-  // });
-}

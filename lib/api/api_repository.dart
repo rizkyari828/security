@@ -21,6 +21,7 @@ import 'package:staffku/models/request/detail_request.dart';
 import 'package:staffku/models/request/detail_request_leave.dart';
 import 'package:staffku/models/request/id_request.dart';
 import 'package:staffku/models/request/input_request.dart';
+import 'package:staffku/models/request/face/save_face_request.dart';
 import 'package:staffku/models/request/izin/submit_izin_request.dart';
 import 'package:staffku/models/request/izin/update_approval_request.dart';
 import 'package:staffku/models/request/kuisioner/kuisioner_input_data_request.dart';
@@ -835,10 +836,28 @@ class ApiRepository {
     return null;
   }
 
+  Future<ErrorResponse?> saveFace(SaveFaceRequest data) async {
+    try {
+      final res = await apiProvider
+          .saveFace('/api/v2/simpan_face', data)
+          .timeout(Duration(seconds: timeout));
+      print(res);
+      if (res.statusCode == 200 || res.statusCode == 401) {
+        return ErrorResponse.fromJson(res.body);
+      }
+    } on TimeoutException catch (_) {
+      EasyLoading.showError('Connection Timeout. Please try again later');
+      EasyLoading.dismiss();
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
+
   Future<ErrorResponse?> updateFcmProfile(UpdateFcmProfileRequest data) async {
     try {
       final res = await apiProvider
-          .updateFcmProfile('/api/v2/v1/auth/update', data)
+          .updateFcmProfile('/api/v2/simpan_fcm', data)
           .timeout(Duration(seconds: timeout));
       print(res);
       if (res.statusCode == 200 || res.statusCode == 401) {

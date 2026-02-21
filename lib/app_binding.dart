@@ -18,5 +18,7 @@ class AppBinding extends Bindings {
       ),
       permanent: true,
     );
+
+    Get.put(FcmNotificationService(), permanent: true);
   }
 }

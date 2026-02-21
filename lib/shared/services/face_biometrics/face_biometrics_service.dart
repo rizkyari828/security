@@ -5,17 +5,12 @@ import 'dart:typed_data';
 import 'package:face_camera/face_camera.dart';
 import 'package:image/image.dart' as img;
 
-import 'face_biometrics_storage.dart';
 import 'face_embedding_model.dart';
 
 class FaceBiometricsService {
-  FaceBiometricsService({
-    FaceBiometricsStorage? storage,
-    FaceEmbeddingModel? model,
-  }) : _storage = storage ?? FaceBiometricsStorage(),
-       _model = model ?? FaceEmbeddingModel();
+  FaceBiometricsService({FaceEmbeddingModel? model})
+    : _model = model ?? FaceEmbeddingModel();
 
-  final FaceBiometricsStorage _storage;
   final FaceEmbeddingModel _model;
 
   final FaceDetector _detector = FaceDetector(
@@ -26,16 +21,7 @@ class FaceBiometricsService {
     ),
   );
 
-  bool hasEnrollment({required String userId}) => _storage.hasTemplate(userId: userId);
-
-  Future<void> clearEnrollment({required String userId}) async {
-    await _storage.deleteTemplate(userId: userId);
-  }
-
-  Future<void> enroll({
-    required String userId,
-    required List<File> samples,
-  }) async {
+  Future<List<double>> createTemplate({required List<File> samples}) async {
     if (samples.isEmpty) {
       throw ArgumentError('samples is empty');
     }
@@ -45,27 +31,7 @@ class FaceBiometricsService {
       embeddings.add(await embeddingFromFile(file));
     }
 
-    final template = _averageAndNormalize(embeddings);
-    await _storage.writeTemplate(userId: userId, embedding: template);
-  }
-
-  Future<FaceVerifyResult> verify({
-    required String userId,
-    required File sample,
-    double threshold = 0.60,
-  }) async {
-    final template = _storage.readTemplate(userId: userId);
-    if (template == null) {
-      return const FaceVerifyResult.notEnrolled();
-    }
-
-    final embedding = await embeddingFromFile(sample);
-    final similarity = cosineSimilarity(template.embedding, embedding);
-    return FaceVerifyResult(
-      similarity: similarity,
-      threshold: threshold,
-      matched: similarity >= threshold,
-    );
+    return _averageAndNormalize(embeddings);
   }
 
   Future<List<double>> embeddingFromFile(File file) async {
@@ -213,26 +179,6 @@ class FaceBox {
 
   double get width => right - left;
   double get height => bottom - top;
-}
-
-class FaceVerifyResult {
-  const FaceVerifyResult({
-    required this.similarity,
-    required this.threshold,
-    required this.matched,
-    this.enrolled = true,
-  });
-
-  const FaceVerifyResult.notEnrolled()
-    : similarity = 0.0,
-      threshold = 0.0,
-      matched = false,
-      enrolled = false;
-
-  final double similarity;
-  final double threshold;
-  final bool matched;
-  final bool enrolled;
 }
 
 class FaceBiometricsException implements Exception {

@@ -16,7 +16,6 @@ import 'package:staffku/models/response/dashboard/dashboard_response.dart';
 import 'package:staffku/models/response/menu/list_menu_response.dart';
 import 'package:staffku/models/response/rate/show_rate_review_response.dart';
 import 'dart:io' as Io;
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:staffku/api/api.dart';
@@ -209,30 +208,6 @@ class HomeController extends BaseController {
     //   _handleCheckConnectivity(result);
     // });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      if (message.data.containsKey('type')) {
-        if (message.data['type'] == 'izin') {
-          Get.toNamed(Routes.LEAVE);
-        } else if (message.data['type'] == 'cuti') {
-          Get.toNamed(Routes.BENEFIT);
-        } else if (message.data['type'] == 'overtime') {
-          Get.toNamed(Routes.PROSPEK);
-        } else if (message.data['type'] == 'task') {
-          Get.toNamed(Routes.HOME);
-          // getCurrentIndex(MainTabs.inbox);
-          // if (groupId.value == '3' ||
-          //     groupId.value == '4' ||
-          //     groupId.value == '2') {
-          //   switchTab(1);
-          // } else {
-          //   switchTab(2);
-          // }
-          // return 1;
-        } else {
-          Get.toNamed(Routes.HOME);
-        }
-      }
-    });
   }
 
   void callDialog() {
@@ -522,7 +497,10 @@ class HomeController extends BaseController {
 
   void submitToken(token) async {
     final res = await apiRepository.updateFcmProfile(
-      UpdateFcmProfileRequest(fcmToken: token),
+      UpdateFcmProfileRequest(
+        idUser: userId.value,
+        fcmId: token?.toString() ?? '',
+      ),
     );
     if (res == null) {
       print('Token update failed');
